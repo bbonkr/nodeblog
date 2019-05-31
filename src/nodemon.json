@@ -1,0 +1,17 @@
+{
+    "watch": [
+        "components",
+        "config",
+        "containers",
+        "models",
+        "pages",
+        "passport",
+        "reducers",
+        "routes",
+        "sagas",
+        "index.js",
+        "nodemon.json"
+    ],
+    "exec": "node index.js",
+    "ext": "js json jsx"
+}
