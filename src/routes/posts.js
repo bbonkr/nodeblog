@@ -79,7 +79,7 @@ router.get('/:slug', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attrebutes: ['id', 'displayName'],
+                    attributes: ['id', 'displayName'],
                 },
                 {
                     model: db.Tag,

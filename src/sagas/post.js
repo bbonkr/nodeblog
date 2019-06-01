@@ -47,7 +47,7 @@ function* loadPosts(action) {
             keyword: keyword,
         });
     } catch (e) {
-        console.error(e);
+        // console.error(e);
         yield put({
             type: LOAD_POSTS_FAIL,
             error: e,

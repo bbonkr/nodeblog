@@ -12,6 +12,7 @@ export const initialState = {
     searchKeyword: '',
     /** singlePost */
     singlePost: null,
+    loadSinglePostErrorReason: '',
     /** post loading  */
     loadingPost: false,
     isSinglePost: false,
@@ -54,12 +55,18 @@ const reducer = (state = initialState, action) =>
                 draft.loadPostErrorReason = action.error;
                 break;
             case LOAD_SINGLE_POST_CALL:
+                draft.singlePost = null;
                 draft.isSinglePost = true;
+                draft.loadSinglePostErrorReason = '';
+                draft.loadingPost = true;
                 break;
             case LOAD_SINGLE_POST_DONE:
                 draft.singlePost = action.data;
+                draft.loadingPost = false;
                 break;
             case LOAD_SINGLE_POST_FAIL:
+                draft.loadSinglePostErrorReason = action.error;
+                draft.loadingPost = false;
                 break;
             default:
                 break;

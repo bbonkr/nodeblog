@@ -55,34 +55,41 @@ const ListExcerpt = () => {
                 }
                 loading={loadingPosts}
                 dataSource={posts}
-                renderItem={item => (
-                    <List.Item
-                        key={item.id}
-                        actions={[
-                            <IconText
-                                type="clock-circle"
-                                text={moment(item.createdAt).format(
-                                    'YYYY-MM-DD HH:mm:ss',
-                                )}
-                            />,
-                        ]}>
-                        <List.Item.Meta
-                            avatar={
-                                <Avatar>
-                                    {item.User.displayName[0].toUpperCase()}
-                                </Avatar>
-                            }
-                            title={
-                                <Link
-                                    href={`/?slug=${item.slug}`}
-                                    as={`/${item.slug}`}>
-                                    <a>{item.title}</a>
-                                </Link>
-                            }
-                            description={item.excerpt}
-                        />
-                    </List.Item>
-                )}
+                renderItem={item => {
+                    const { slug, title, excerpt, createdAt } = item;
+                    const { displayName } = item.User;
+                    return (
+                        <List.Item
+                            key={item.id}
+                            actions={[
+                                <IconText
+                                    type="clock-circle"
+                                    text={moment(createdAt).format(
+                                        'YYYY-MM-DD HH:mm:ss',
+                                    )}
+                                />,
+                            ]}>
+                            <List.Item.Meta
+                                avatar={
+                                    <Avatar>
+                                        {displayName[0].toUpperCase()}
+                                    </Avatar>
+                                }
+                                title={
+                                    <Link
+                                        href={{
+                                            pathname: '/post',
+                                            query: { slug: slug },
+                                        }}
+                                        as={`/post/${slug}`}>
+                                        <a>{title}</a>
+                                    </Link>
+                                }
+                                description={excerpt}
+                            />
+                        </List.Item>
+                    );
+                }}
             />
         </article>
     );

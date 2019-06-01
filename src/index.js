@@ -45,7 +45,7 @@ nextApp.prepare().then(() => {
 
     expressApp.use(
         cors({
-            origin: 'http://localhost:3000',
+            origin: true,
             credentials: true,
         }),
     );
@@ -69,21 +69,20 @@ nextApp.prepare().then(() => {
 
     expressApp.use('/api', require('./routes'));
 
-    expressApp.get('/hashtag/:tag', (req, res) =>
-        nextApp.render(req, res, '/hashtag', { tag: req.params.tag }),
-    );
+    // expressApp.get('/hashtag/:tag', (req, res) =>
+    //     nextApp.render(req, res, '/hashtag', { tag: req.params.tag }),
+    // );
 
-    expressApp.get('/user/:id', (req, res) =>
-        nextApp.render(req, res, '/user', { id: req.params.id }),
-    );
+    // expressApp.get('/user/:id', (req, res) =>
+    //     nextApp.render(req, res, '/user', { id: req.params.id }),
+    // );
 
-    expressApp.get('/post/:id', (req, res) =>
-        nextApp.render(req, res, '/post', { id: req.params.id }),
-    );
+    // expressApp.get('/post/:id', (req, res) =>
+    //     nextApp.render(req, res, '/post', { id: req.params.id }),
+    // );
 
-    expressApp.get('/:slug', (req, res) => {
-        console.log('/:slug handler', req.path, req.params.slug);
-        return nextApp.render(req, res, '/', { slug: req.params.slug });
+    expressApp.get('/post/:slug', (req, res) => {
+        return nextApp.render(req, res, '/post', { slug: req.params.slug });
     });
 
     expressApp.get('*', (req, res) => handle(req, res));

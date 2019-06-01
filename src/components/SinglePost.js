@@ -4,8 +4,7 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Card } from 'antd';
 
-const SinglePost = () => {
-    const { singlePost: post } = useSelector(s => s.post);
+const SinglePost = ({ post }) => {
     return (
         <>
             <article>
@@ -14,10 +13,10 @@ const SinglePost = () => {
                         title={
                             <Link
                                 href={{
-                                    pathname: '/',
+                                    pathname: '/post',
                                     query: { slug: post.slug },
                                 }}
-                                as={`/${post.slug}`}>
+                                as={`/post/${post.slug}`}>
                                 <a>{post.title}</a>
                             </Link>
                         }
@@ -36,7 +35,7 @@ const SinglePost = () => {
 };
 
 SinglePost.propTypes = {
-    // post: PropTypes.object.isRequired,
+    post: PropTypes.object.isRequired,
 };
 
 export default SinglePost;
