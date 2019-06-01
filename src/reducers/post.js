@@ -14,11 +14,16 @@ export const initialState = {
     singlePost: null,
     /** post loading  */
     loadingPost: false,
+    isSinglePost: false,
 };
 
 export const LOAD_POSTS_CALL = 'LOAD_POSTS_CALL';
 export const LOAD_POSTS_DONE = 'LOAD_POSTS_DONE';
 export const LOAD_POSTS_FAIL = 'LOAD_POSTS_FAIL';
+
+export const LOAD_SINGLE_POST_CALL = 'LOAD_SINGLE_POST_CALL';
+export const LOAD_SINGLE_POST_DONE = 'LOAD_SINGLE_POST_DONE';
+export const LOAD_SINGLE_POST_FAIL = 'LOAD_SINGLE_POST_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -30,11 +35,15 @@ const reducer = (state = initialState, action) =>
                     : true;
                 draft.loadingPosts = true;
                 draft.loadPostErrorReason = '';
+                draft.isSinglePost = false;
                 break;
             case LOAD_POSTS_DONE:
                 action.data.forEach(v => {
-                    draft.posts.push(v);
-                    draft.nextPageToken = `${v.id}`;
+                    const postIndex = draft.posts.findIndex(x => x.id === v.id);
+                    if (postIndex < 0) {
+                        draft.posts.push(v);
+                        draft.nextPageToken = `${v.id}`;
+                    }
                 });
                 draft.hasMorePost = action.data.length === draft.postsLimit;
                 draft.loadingPosts = false;
@@ -43,6 +52,14 @@ const reducer = (state = initialState, action) =>
             case LOAD_POSTS_FAIL:
                 draft.loadingPosts = false;
                 draft.loadPostErrorReason = action.error;
+                break;
+            case LOAD_SINGLE_POST_CALL:
+                draft.isSinglePost = true;
+                break;
+            case LOAD_SINGLE_POST_DONE:
+                draft.singlePost = action.data;
+                break;
+            case LOAD_SINGLE_POST_FAIL:
                 break;
             default:
                 break;

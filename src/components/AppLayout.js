@@ -48,7 +48,7 @@ const AppLayout = ({ children }) => {
             <Menu mode="horizontal">
                 <Menu.Item key="home">
                     <Link href="/">
-                        <a>NodeBird</a>
+                        <a>NodeBlog</a>
                     </Link>
                 </Menu.Item>
                 <Menu.Item key="profile">

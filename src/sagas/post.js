@@ -13,6 +13,9 @@ import {
     LOAD_POSTS_CALL,
     LOAD_POSTS_DONE,
     LOAD_POSTS_FAIL,
+    LOAD_SINGLE_POST_CALL,
+    LOAD_SINGLE_POST_DONE,
+    LOAD_SINGLE_POST_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -56,6 +59,30 @@ function* watchLoadPosts() {
     yield takeLatest(LOAD_POSTS_CALL, loadPosts);
 }
 
+function loadSinglePostApi(slug) {
+    return axios.get(`/posts/${slug}`);
+}
+
+function* loadSinglePost(action) {
+    try {
+        const result = yield call(loadSinglePostApi, action.data);
+        yield put({
+            type: LOAD_SINGLE_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        // console.error(e);
+        yield put({
+            type: LOAD_SINGLE_POST_FAIL,
+            error: e,
+        });
+    }
+}
+
+function* watchLoadSinglePost() {
+    yield takeLatest(LOAD_SINGLE_POST_CALL, loadSinglePost);
+}
+
 export default function* postSaga() {
-    yield all([fork(watchLoadPosts)]);
+    yield all([fork(watchLoadPosts), fork(watchLoadSinglePost)]);
 }

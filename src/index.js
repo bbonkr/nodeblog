@@ -9,7 +9,7 @@ const passportConfig = require('./passport');
 const dotenv = require('dotenv');
 const next = require('next');
 const axios = require('axios');
-
+const path = require('path');
 // const userApiRouter = require('./routes/user');
 // const postsApiRouter = require('./routes/posts');
 // const postApiRouter = require('./routes/post');
@@ -41,10 +41,11 @@ nextApp.prepare().then(() => {
     expressApp.use(express.json());
     expressApp.use(express.urlencoded({ extended: true }));
     expressApp.use('/', express.static('uploads'));
+    expressApp.use('/', express.static(path.join(__dirname, 'public')));
 
     expressApp.use(
         cors({
-            origin: true, //'http://localhost:3000',
+            origin: 'http://localhost:3000',
             credentials: true,
         }),
     );
@@ -79,6 +80,11 @@ nextApp.prepare().then(() => {
     expressApp.get('/post/:id', (req, res) =>
         nextApp.render(req, res, '/post', { id: req.params.id }),
     );
+
+    expressApp.get('/:slug', (req, res) => {
+        console.log('/:slug handler', req.path, req.params.slug);
+        return nextApp.render(req, res, '/', { slug: req.params.slug });
+    });
 
     expressApp.get('*', (req, res) => handle(req, res));
 

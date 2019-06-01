@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { List, Avatar, Button } from 'antd';
 import moment from 'moment';
@@ -22,7 +23,7 @@ const ListExcerpt = () => {
         hasMorePost,
     } = useSelector(s => s.post);
 
-    console.log('hasMorePost:', hasMorePost);
+    // console.log('hasMorePost:', hasMorePost);
 
     const onClickLoadMorePosts = useCallback(
         e => {
@@ -71,7 +72,13 @@ const ListExcerpt = () => {
                                     {item.User.displayName[0].toUpperCase()}
                                 </Avatar>
                             }
-                            title={item.title}
+                            title={
+                                <Link
+                                    href={`/?slug=${item.slug}`}
+                                    as={`/${item.slug}`}>
+                                    <a>{item.title}</a>
+                                </Link>
+                            }
                             description={item.excerpt}
                         />
                     </List.Item>
