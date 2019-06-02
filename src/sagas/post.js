@@ -16,6 +16,9 @@ import {
     LOAD_SINGLE_POST_CALL,
     LOAD_SINGLE_POST_DONE,
     LOAD_SINGLE_POST_FAIL,
+    LOAD_CATEGORY_POSTS_CALL,
+    LOAD_CATEGORY_POSTS_DONE,
+    LOAD_CATEGORY_POSTS_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -83,6 +86,41 @@ function* watchLoadSinglePost() {
     yield takeLatest(LOAD_SINGLE_POST_CALL, loadSinglePost);
 }
 
+function loadCategoryPostsApi(category, pageToken = '', limit = 10, keyword = '') {
+    return axios.get(
+        `/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword,
+        )}`,
+    );
+}
+
+function* loadCategoryPosts(action){
+    try{
+        const { category, pageToken, limit, keyword } = action.data;
+        const result = yield call(loadCategoryPostsApi, category, pageToken, limit, keyword);
+        yield put({
+            type: LOAD_CATEGORY_POSTS_DONE,
+            data: result.data,
+            currentCategory: category,
+        })
+    }
+    catch (e){
+        console.error(e);
+        yield put({
+            type: LOAD_CATEGORY_POSTS_FAIL,
+            error: e,
+        })
+    }
+}
+
+function* watchLoadCategoryPosts(){
+    yield takeLatest(LOAD_CATEGORY_POSTS_CALL, loadCategoryPosts);
+}
+
 export default function* postSaga() {
-    yield all([fork(watchLoadPosts), fork(watchLoadSinglePost)]);
+    yield all([
+        fork(watchLoadPosts), 
+        fork(watchLoadSinglePost),
+        fork(watchLoadCategoryPosts),
+    ]);
 }

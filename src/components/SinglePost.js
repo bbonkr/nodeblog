@@ -13,11 +13,13 @@ const SinglePost = ({ post }) => {
                         title={
                             <Link
                                 href={{
-                                    pathname: '/post',
+                                    pathname: '/content',
                                     query: { slug: post.slug },
                                 }}
-                                as={`/post/${post.slug}`}>
-                                <a>{post.title}</a>
+                                as={`/${post.slug}`}>
+                                <a>
+                                    <h1>{post.title}</h1>
+                                </a>
                             </Link>
                         }
                         description={

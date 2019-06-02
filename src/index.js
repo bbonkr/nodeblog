@@ -27,7 +27,10 @@ const prod = process.env.NODE_ENV === 'production';
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
 
-db.sequelize.sync({ force: false });
+db.sequelize.sync({
+    // If force is true, each Model will run DROP TABLE IF EXISTS, before it tries to create its own table
+    force: true,
+});
 
 passportConfig();
 
@@ -81,17 +84,22 @@ nextApp.prepare().then(() => {
     //     nextApp.render(req, res, '/post', { id: req.params.id }),
     // );
 
-    expressApp.get('/post/:slug', (req, res) => {
-        return nextApp.render(req, res, '/post', { slug: req.params.slug });
+    // => /:slug URL은 /content/:slug 에서 처리합니다.
+    // expressApp.get('/post/:slug', (req, res) => {
+    //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
+    // });
+
+    expressApp.get('/:slug', (req, res) => {
+        return nextApp.render(req, res, '/content', { slug: req.params.slug });
     });
 
     expressApp.get('*', (req, res) => handle(req, res));
 
     // seed data
-    // console.log('start to insert seed data.');
-    // const { seed } = require('./config/seed');
-    // seed();
-    // console.log('insert seed data completed.');
+    console.log('start to insert seed data.');
+    const { seed } = require('./config/seed');
+    seed();
+    console.log('insert seed data completed.');
 
     expressApp.listen(3000, () => {
         console.log('server is running on http://localhost:3000');

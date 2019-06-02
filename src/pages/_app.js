@@ -70,6 +70,8 @@ NodeBlog.getInitialProps = async context => {
     const { ctx, Component } = context;
     let pageProps = {};
 
+    // console.log('router', router);
+
     const state = ctx.store.getState();
     const cookie = ctx.isServer ? ctx.req.headers.cookie : '';
 
