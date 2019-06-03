@@ -4,6 +4,8 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../models');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 router.get('/', async (req, res, next) => {
     try {
@@ -29,6 +31,19 @@ router.get('/', async (req, res, next) => {
                     },
                 };
             }
+        }
+
+        if (keyword) {
+            Object.assign(where, {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${keyword}%` } },
+                    {
+                        content: {
+                            [Op.like]: `%${keyword}%`,
+                        },
+                    },
+                ],
+            });
         }
 
         const posts = await db.Post.findAll({

@@ -1,6 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { Affix, BackTop, Menu, Input, Row, Col } from 'antd';
+import {
+    Affix,
+    BackTop,
+    Menu,
+    Input,
+    Row,
+    Col,
+    Button,
+    Icon,
+    Modal,
+} from 'antd';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import Router from 'next/router';
@@ -26,6 +36,9 @@ const AppLayout = ({ children }) => {
     const dispatch = useDispatch();
     // const { me } = useSelector(state => state.user);
     const { categories } = useSelector(s => s.category);
+    const [searchModalVisible, setSearchModalVisible] = useState(false);
+    const [searchKeywordText, setSearchKeywordText] = useState('');
+
     // Server side rendering 은 페이지에서 적용해야 한다.
     // _app.js 로 이동
     // useEffect(() => {
@@ -34,15 +47,36 @@ const AppLayout = ({ children }) => {
     //     }
     // }, []);
 
-    const onSearch = value => {
-        Router.push(
-            {
-                pathname: '/hashtag',
-                query: { tag: value },
-            },
-            `/hashtag/${value}`,
-        );
-    };
+    const onClickShowSearchModal = useCallback(e => {
+        setSearchKeywordText('');
+        setSearchModalVisible(true);
+    }, []);
+
+    const onSearchModalCancel = useCallback(e => {
+        setSearchModalVisible(false);
+    }, []);
+
+    const onChangeSearchKeywordText = useCallback(e => {
+        setSearchKeywordText(e.target.value);
+    }, []);
+
+    const onSearch = useCallback(
+        async (value, e) => {
+            e.preventDefault();
+
+            if (value) {
+                setSearchModalVisible(false);
+                await Router.push(
+                    {
+                        pathname: '/search',
+                        query: { keyword: value },
+                    },
+                    `/search/${value}`,
+                );
+            }
+        },
+        [searchModalVisible],
+    );
 
     return (
         <div>
@@ -61,12 +95,18 @@ const AppLayout = ({ children }) => {
                             <a>Profile</a>
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="mail">
-                        <Input.Search
+                    <Menu.Item key="search">
+                        {/* <Input.Search
                             enterButton
                             style={{ verticalAlign: 'middle' }}
                             onSearch={onSearch}
-                        />
+                        /> */}
+                        <Button
+                            icon="search"
+                            style={{ verticalAlign: 'middle' }}
+                            onClick={onClickShowSearchModal}>
+                            Search
+                        </Button>
                     </Menu.Item>
                 </Menu>
             </Affix>
@@ -92,6 +132,21 @@ const AppLayout = ({ children }) => {
                     <a href="https://github.com/bbonkr">bbon</a>
                 </ContentRight>
             </Row>
+
+            <Modal
+                title="Search"
+                icon={<Icon type="search" />}
+                style={{ top: '30px' }}
+                visible={searchModalVisible}
+                onCancel={onSearchModalCancel}
+                footer={null}>
+                <Input.Search
+                    enterButton
+                    value={searchKeywordText}
+                    onChange={onChangeSearchKeywordText}
+                    onSearch={onSearch}
+                />
+            </Modal>
         </div>
     );
 };
