@@ -19,7 +19,7 @@ const CategoryList = ({ categories }) => {
                         <Link
                             href={{
                                 pathname: '/category',
-                                query: { category: item.slug },
+                                query: { slug: item.slug },
                             }}
                             as={`/category/${item.slug}`}>
                             <a>{item.name}</a>

@@ -29,7 +29,7 @@ const handle = nextApp.getRequestHandler();
 
 db.sequelize.sync({
     // If force is true, each Model will run DROP TABLE IF EXISTS, before it tries to create its own table
-    force: true,
+    force: false,
 });
 
 passportConfig();
@@ -88,6 +88,10 @@ nextApp.prepare().then(() => {
     // expressApp.get('/post/:slug', (req, res) => {
     //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
     // });
+
+    expressApp.get('/category/:slug', (req, res) => {
+        return nextApp.render(req, res, '/category', { slug: req.params.slug });
+    });
 
     expressApp.get('/:slug', (req, res) => {
         return nextApp.render(req, res, '/content', { slug: req.params.slug });

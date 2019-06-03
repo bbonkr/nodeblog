@@ -11,6 +11,7 @@ import axios from 'axios';
 import AppLayout from '../components/AppLayout';
 import reducer from '../reducers/index';
 import rootSaga from '../sagas';
+import { LOAD_CATEGORIES_CALL } from '../reducers/category';
 
 const NodeBlog = ({ Component, store, pageProps }) => (
     <Container>
@@ -85,6 +86,13 @@ NodeBlog.getInitialProps = async context => {
     //         type: LOAD_USER_REQUEST,
     //     });
     // }
+
+    if (ctx.isServer) {
+        ctx.store.dispatch({
+            type: LOAD_CATEGORIES_CALL,
+            data: '',
+        });
+    }
 
     if (Component.getInitialProps) {
         pageProps = (await Component.getInitialProps(ctx)) || {};

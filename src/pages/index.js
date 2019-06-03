@@ -34,11 +34,6 @@ Home.getInitialProps = async context => {
                 keyword: '',
             },
         });
-
-        context.store.dispatch({
-            type: LOAD_CATEGORIES_CALL,
-            data: '',
-        });
     }
     return { home: !!home };
 };
