@@ -101,5 +101,9 @@ typings/
 
 # End of https://www.gitignore.io/api/node,visualstudiocode
 
+# unittest
+__snapshots__/
+
+# files
 public/
 uploads/

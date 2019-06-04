@@ -36,7 +36,7 @@ const ListExcerpt = () => {
                 },
             });
         },
-        [nextPageToken, postsLimit, searchKeyword, hasMorePost],
+        [dispatch, nextPageToken, postsLimit, searchKeyword],
     );
 
     return (
