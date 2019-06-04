@@ -19,7 +19,11 @@ import {
     LOAD_CATEGORY_POSTS_CALL,
     LOAD_CATEGORY_POSTS_DONE,
     LOAD_CATEGORY_POSTS_FAIL,
+    LOAD_TAG_POSTS_CALL,
+    LOAD_TAG_POSTS_DONE,
+    LOAD_TAG_POSTS_FAIL,
 } from '../reducers/post';
+import { taggedTemplateExpression } from '@babel/types';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(
@@ -86,7 +90,12 @@ function* watchLoadSinglePost() {
     yield takeLatest(LOAD_SINGLE_POST_CALL, loadSinglePost);
 }
 
-function loadCategoryPostsApi(category, pageToken = '', limit = 10, keyword = '') {
+function loadCategoryPostsApi(
+    category,
+    pageToken = '',
+    limit = 10,
+    keyword = '',
+) {
     return axios.get(
         `/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
             keyword,
@@ -94,33 +103,77 @@ function loadCategoryPostsApi(category, pageToken = '', limit = 10, keyword = ''
     );
 }
 
-function* loadCategoryPosts(action){
-    try{
+function* loadCategoryPosts(action) {
+    try {
         const { category, pageToken, limit, keyword } = action.data;
-        const result = yield call(loadCategoryPostsApi, category, pageToken, limit, keyword);
+        const result = yield call(
+            loadCategoryPostsApi,
+            category,
+            pageToken,
+            limit,
+            keyword,
+        );
         yield put({
             type: LOAD_CATEGORY_POSTS_DONE,
             data: result.data,
             currentCategory: category,
-        })
-    }
-    catch (e){
+        });
+    } catch (e) {
         console.error(e);
         yield put({
             type: LOAD_CATEGORY_POSTS_FAIL,
             error: e,
-        })
+        });
     }
 }
 
-function* watchLoadCategoryPosts(){
+function* watchLoadCategoryPosts() {
     yield takeLatest(LOAD_CATEGORY_POSTS_CALL, loadCategoryPosts);
+}
+
+function loadTagPostsApi(tag, pageToken = '', limit = 10, keyword = '') {
+    return axios.get(
+        `/posts/tag/${encodeURIComponent(
+            tag,
+        )}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword,
+        )}`,
+    );
+}
+
+function* loadTagPosts(action) {
+    try {
+        const { tag, pageToken, limit, keyword } = action.data;
+        const result = yield call(
+            loadTagPostsApi,
+            tag,
+            pageToken,
+            limit,
+            keyword,
+        );
+        yield put({
+            type: LOAD_TAG_POSTS_DONE,
+            data: result.data,
+            currentTag: tag,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_TAG_POSTS_FAIL,
+            error: e,
+        });
+    }
+}
+
+function* watchLoadTagPosts() {
+    yield takeLatest(LOAD_TAG_POSTS_CALL, loadTagPosts);
 }
 
 export default function* postSaga() {
     yield all([
-        fork(watchLoadPosts), 
+        fork(watchLoadPosts),
         fork(watchLoadSinglePost),
         fork(watchLoadCategoryPosts),
+        fork(watchLoadTagPosts),
     ]);
 }

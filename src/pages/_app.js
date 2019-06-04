@@ -12,7 +12,8 @@ import AppLayout from '../components/AppLayout';
 import reducer from '../reducers/index';
 import rootSaga from '../sagas';
 import { LOAD_CATEGORIES_CALL } from '../reducers/category';
-
+const fbAdmin = process.env.FB_ADMIN;
+const siteName = process.env.SITE_NAME;
 const NodeBlog = ({ Component, store, pageProps }) => (
     <Container>
         <Provider store={store}>
@@ -30,9 +31,33 @@ const NodeBlog = ({ Component, store, pageProps }) => (
                     { name: 'description', content: 'NodeBlog' },
                     { name: 'og:title', content: 'NodeBlog' },
                     { name: 'og:description', content: 'NodeBlog' },
-                    { property: 'og:type', content: 'website' },
+                    { name: 'og:type', content: 'website' },
+                    { name: 'fb:admins', content: fbAdmin },
+                    {
+                        name: 'og:site_name',
+                        content: siteName,
+                    },
                 ]}
                 link={[
+                    {
+                        rel: 'shortcut icon',
+                        href: '/favicon.ico',
+                        type: 'image/x-icon',
+                    },
+                    {
+                        rel: 'apple-touch-icon',
+                        href: '/bbon-icon.png',
+                        sizes: '512x512',
+                    },
+                    {
+                        rel: 'me',
+                        href: 'https://www.facebook.com/bbonkr',
+                    },
+                    {
+                        rel: 'author',
+                        type: 'text/plain',
+                        href: '/humans.txt',
+                    },
                     {
                         rel: 'stylesheet',
                         href:

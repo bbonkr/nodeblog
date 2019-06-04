@@ -2,7 +2,8 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import { Card } from 'antd';
+import { Card, Divider } from 'antd';
+import TagLink from './TagLink';
 
 const SinglePost = ({ post }) => {
     return (
@@ -30,6 +31,17 @@ const SinglePost = ({ post }) => {
                             />
                         }
                     />
+                    <Divider />
+                    {post.tags &&
+                        post.tags.map(v => {
+                            return (
+                                <TagLink
+                                    key={v.slug}
+                                    name={v.name}
+                                    slug={v.slug}
+                                />
+                            );
+                        })}
                 </Card>
             </article>
         </>

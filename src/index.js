@@ -93,6 +93,10 @@ nextApp.prepare().then(() => {
         return nextApp.render(req, res, '/category', { slug: req.params.slug });
     });
 
+    expressApp.get('/tag/:slug', (req, res) => {
+        return nextApp.render(req, res, '/tag', { slug: req.params.slug });
+    });
+
     expressApp.get('/search', (req, res) => {
         return nextApp.render(req, res, '/search', {
             keyword: '',
