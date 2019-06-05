@@ -23,7 +23,6 @@ import {
     LOAD_TAG_POSTS_DONE,
     LOAD_TAG_POSTS_FAIL,
 } from '../reducers/post';
-import { taggedTemplateExpression } from '@babel/types';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(

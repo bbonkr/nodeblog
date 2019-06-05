@@ -22,7 +22,10 @@ module.exports = () => {
                         });
                     }
 
-                    const result = bcrypt.compare(password, user.Password);
+                    const result = await bcrypt.compare(
+                        password,
+                        user.password,
+                    );
                     if (result) {
                         delete user.password;
 
@@ -33,7 +36,8 @@ module.exports = () => {
                         });
                     }
                 } catch (e) {
-                    consele.error(e);
+                    console.error(e);
+
                     return done(e);
                 }
             },

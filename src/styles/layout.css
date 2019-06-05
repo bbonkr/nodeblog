@@ -1,0 +1,6 @@
+.layout-height {
+    height: -moz-calc(100% - (20px + 30px));
+    height: -webkit-calc(100% - (20px + 30px));
+    height: calc(100% - (20px + 30px));
+    display: block
+}

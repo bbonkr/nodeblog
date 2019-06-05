@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Card, Divider } from 'antd';
+import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 
 const SinglePost = ({ post }) => {
@@ -32,8 +33,19 @@ const SinglePost = ({ post }) => {
                         }
                     />
                     <Divider />
-                    {post.tags &&
-                        post.tags.map(v => {
+                    {post.Categories &&
+                        post.Categories.map(v => {
+                            return (
+                                <CategoryLink
+                                    key={v.slug}
+                                    name={v.name}
+                                    slug={v.slug}
+                                />
+                            );
+                        })}
+                    <Divider dashed={true} />
+                    {post.Tags &&
+                        post.Tags.map(v => {
                             return (
                                 <TagLink
                                     key={v.slug}

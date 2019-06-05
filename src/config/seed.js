@@ -2,6 +2,8 @@ const db = require('../models');
 const bcrypt = require('bcrypt');
 
 exports.seed = async () => {
+    console.log('start to insert seed data.');
+
     const hasUser = await db.User.findAll({
         attributes: ['id'],
     });
@@ -45,6 +47,7 @@ exports.seed = async () => {
             `,
                 excerpt: `test ${i + 1} 샘플문서입니다.`,
                 UserId: testUser.id,
+                createdAt: new Date().setHours(i),
             });
         }
 
@@ -57,6 +60,9 @@ exports.seed = async () => {
         // 태그 추가
         await testTag.addPosts(posts);
 
-        await testKrTag.addPosts(posts.filter(v => v.id % 2 == 0));
+        await testKrTag.addPosts(posts.filter(v => v.id % 2 === 0));
+        console.log('insert seed data completed.');
+    } else {
+        console.log('User is exists. DO NOT SEED DATA.');
     }
 };

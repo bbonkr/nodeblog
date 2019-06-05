@@ -1,6 +1,8 @@
 const express = require('express');
+const bcrypt = require('bcrypt');
 const router = express.Router();
 const db = require('../models');
+const isLoggedIn = require('./middleware');
 
 /**
  * 사용자를 추가합니다.
@@ -31,6 +33,31 @@ router.post('/', async (req, res, next) => {
         delete user.password;
 
         return res.json(newUser);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.get('/me', isLoggedIn, async (req, res, next) => {
+    try {
+        const me = await db.User.findOne({
+            where: {
+                id: req.user.id,
+            },
+            include: [
+                {
+                    model: db.Post,
+                },
+            ],
+            attributes: ['id', 'email', 'displayName'],
+        });
+
+        if (me) {
+            return res.json(me);
+        } else {
+            return res.status(404).send('Could not find my info.');
+        }
     } catch (e) {
         console.error(e);
         return next(e);

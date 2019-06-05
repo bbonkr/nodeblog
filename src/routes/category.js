@@ -12,7 +12,7 @@ router.get('/', async (req, res, next) => {
                 {
                     model: db.Post,
                     through: 'PostCategory',
-                    as: 'posts',
+                    as: 'Posts',
                     attributes: ['id'],
                 },
             ],
@@ -37,7 +37,7 @@ router.get('/:slug', async (req, res, next) => {
                 {
                     model: db.Post,
                     through: 'PostCategory',
-                    as: 'posts',
+                    as: 'Posts',
                     attributes: ['id'],
                 },
             ],

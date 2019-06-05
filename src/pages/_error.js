@@ -25,7 +25,7 @@ NodeBlogError.getInitialProps = async context => {
     const statusCode = context.res
         ? context.res.statusCode
         : context.err
-        ? err.statusCode
+        ? context.err.statusCode
         : null;
     return {
         statusCode,

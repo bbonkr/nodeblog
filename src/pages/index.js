@@ -6,7 +6,7 @@ import { LOAD_CATEGORIES_CALL } from '../reducers/category';
 
 const Home = ({ home }) => {
     return (
-        <div>
+        <div style={{ padding: '0.75rem' }}>
             <ListExcerpt />
         </div>
     );

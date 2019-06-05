@@ -12,6 +12,8 @@ import AppLayout from '../components/AppLayout';
 import reducer from '../reducers/index';
 import rootSaga from '../sagas';
 import { LOAD_CATEGORIES_CALL } from '../reducers/category';
+import { ME_CALL } from '../reducers/user';
+
 const fbAdmin = process.env.FB_ADMIN;
 const siteName = process.env.SITE_NAME;
 const NodeBlog = ({ Component, store, pageProps }) => (
@@ -105,19 +107,20 @@ NodeBlog.getInitialProps = async context => {
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {
         axios.defaults.headers.Cookie = cookie;
+
+        // if (!state.user.me) {
+        //     ctx.store.dispatch({
+        //         type: ME_CALL,
+        //     });
+        // }
     }
-    // if (!state.user.me) {
+
+    // if (ctx.isServer) {
     //     ctx.store.dispatch({
-    //         type: LOAD_USER_REQUEST,
+    //         type: LOAD_CATEGORIES_CALL,
+    //         data: '',
     //     });
     // }
-
-    if (ctx.isServer) {
-        ctx.store.dispatch({
-            type: LOAD_CATEGORIES_CALL,
-            data: '',
-        });
-    }
 
     if (Component.getInitialProps) {
         pageProps = (await Component.getInitialProps(ctx)) || {};

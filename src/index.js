@@ -89,6 +89,14 @@ nextApp.prepare().then(() => {
     //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
     // });
 
+    expressApp.get('/signin', (req, res) => {
+        return nextApp.render(req, res, '/signin');
+    });
+
+    expressApp.get('/signup', (req, res) => {
+        return nextApp.render(req, res, '/signup');
+    });
+
     expressApp.get('/category/:slug', (req, res) => {
         return nextApp.render(req, res, '/category', { slug: req.params.slug });
     });
@@ -116,10 +124,8 @@ nextApp.prepare().then(() => {
     expressApp.get('*', (req, res) => handle(req, res));
 
     // seed data
-    console.log('start to insert seed data.');
     const { seed } = require('./config/seed');
     seed();
-    console.log('insert seed data completed.');
 
     expressApp.listen(3000, () => {
         console.log('server is running on http://localhost:3000');

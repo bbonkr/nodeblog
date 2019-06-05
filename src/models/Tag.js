@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     Tag.associate = db => {
         db.Tag.belongsToMany(db.Post, {
             through: 'PostTag',
-            as: 'posts',
+            as: 'Posts',
         });
     };
 

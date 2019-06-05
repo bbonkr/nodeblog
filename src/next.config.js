@@ -10,11 +10,13 @@ module.exports = withBundleAnalyzer({
             analyzerMode: 'static',
             reportFilename: 'bundles/server.html',
         },
+
         browser: {
             analyzerMode: 'static',
             reportFilename: 'bundles/client.html',
         },
     },
+
     distDir: '.next',
     webpack(config) {
         // console.log('config', config);

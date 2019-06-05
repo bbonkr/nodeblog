@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
     Image.associate = db => {
         db.Image.belongsToMany(db.Post, {
             through: 'PostImage',
-            as: 'posts',
+            as: 'Posts',
         });
     };
 

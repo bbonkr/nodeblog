@@ -55,13 +55,17 @@ router.get('/', async (req, res, next) => {
                 },
                 {
                     model: db.Tag,
-                    as: 'tags',
+                    as: 'Tags',
                     through: 'PostTag',
                 },
                 {
                     model: db.Category,
-                    as: 'categories',
+                    as: 'Categories',
                     through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -121,16 +125,20 @@ router.get('/category/:category', async (req, res, next) => {
                 },
                 {
                     model: db.Tag,
-                    as: 'tags',
+                    as: 'Tags',
                     through: 'PostTag',
                 },
                 {
                     model: db.Category,
-                    as: 'categories',
+                    as: 'Categories',
                     through: 'PostCategory',
                     where: {
                         slug: category,
                     },
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -190,7 +198,7 @@ router.get('/tag/:tag', async (req, res, next) => {
                 },
                 {
                     model: db.Tag,
-                    as: 'tags',
+                    as: 'Tags',
                     through: 'PostTag',
                     where: {
                         slug: tag,
@@ -198,8 +206,12 @@ router.get('/tag/:tag', async (req, res, next) => {
                 },
                 {
                     model: db.Category,
-                    as: 'categories',
+                    as: 'Categories',
                     through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -236,13 +248,17 @@ router.get('/:slug', async (req, res, next) => {
                 },
                 {
                     model: db.Tag,
-                    as: 'tags',
+                    as: 'Tags',
                     through: 'PostTag',
                 },
                 {
                     model: db.Category,
-                    as: 'categories',
+                    as: 'Categories',
                     through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
                 },
             ],
             order: [['createdAt', 'DESC']],
@@ -258,6 +274,18 @@ router.get('/:slug', async (req, res, next) => {
         });
 
         if (post) {
+            // console.dir(post);
+
+            console.log('ipAddress: ', req.connection.remoteAddress);
+            console.log('userAgent: ', req.headers['user-agent']);
+
+            const log = await db.PostAccessLog.create({
+                ipAddress: req.connection.remoteAddress,
+                userAgent: req.headers['user-agent'],
+            });
+
+            await post.addPostAccessLog(log);
+
             return res.json(post);
         } else {
             return res.status(404).send('페이지를 찾을 수 없습니다.');

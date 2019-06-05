@@ -1,4 +1,4 @@
-'use strict';
+
 
 const fs = require('fs');
 const path = require('path');
@@ -36,6 +36,7 @@ db.Image = require('./Image')(sequelize, Sequelize);
 db.Post = require('./Post')(sequelize, Sequelize);
 db.User = require('./User')(sequelize, Sequelize);
 db.Category = require('./Category')(sequelize, Sequelize);
+db.PostAccessLog = require('./PostAccessLog')(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {

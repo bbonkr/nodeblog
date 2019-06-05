@@ -2,9 +2,9 @@ import React from 'react';
 import { Icon } from 'antd';
 import PropTypes from 'prop-types';
 
-const IconText = ({ type, text }) => (
-    <span>
-        <Icon type={type} style={{ marginRight: 8 }} />
+const IconText = ({ type, text, spanProps, iconProps }) => (
+    <span {...spanProps}>
+        <Icon type={type} style={{ marginRight: 8 }} {...iconProps} />
         {text}
     </span>
 );

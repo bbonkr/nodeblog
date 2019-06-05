@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
     Category.associate = db => {
         db.Category.belongsToMany(db.Post, {
             through: 'PostCategory',
-            as: 'posts',
+            as: 'Posts',
         });
     };
 
