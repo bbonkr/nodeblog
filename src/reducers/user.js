@@ -22,7 +22,18 @@ const reducer = (state = initialState, action) =>
                 break;
             case SIGN_IN_DONE:
                 draft.me = action.data;
-                // Router.push({ pathname: '/' });
+                if (!!action.returnUrl) {
+                    Router.push(action.returnUrl);
+                } else {
+                    Router.push(
+                        {
+                            pathname: '/',
+                            query: { home: true },
+                        },
+                        '/',
+                    );
+                }
+
                 break;
             case SIGN_IN_FAIL:
                 draft.signInFailMessage = action.reason
@@ -30,10 +41,19 @@ const reducer = (state = initialState, action) =>
                     : action.error;
                 break;
             case SIGN_OUT_CALL:
-                draft.me = null;
                 break;
             case SIGN_OUT_DONE:
-                // Router.push({ pathname: '/' });
+                draft.me = null;
+                if (!!action.returnUrl) {
+                    Router.push(action.returnUrl);
+                } else {
+                    Router.push({ pathname: '/', query: { home: true } }, '/');
+                }
+                // Router.push(
+                //     !!action.returnUrl
+                //         ? action.returnUrl
+                //         : { pathname: '/', query: { home: true } },
+                // );
                 break;
             case SIGN_OUT_FAIL:
                 break;
@@ -43,8 +63,7 @@ const reducer = (state = initialState, action) =>
                 draft.me = action.data;
                 break;
             case ME_FAIL:
-                draft.me = null;
-                Router.push({ pathname: '/signin' });
+                //Router.push({ pathname: '/signin' });
                 break;
             default:
                 break;

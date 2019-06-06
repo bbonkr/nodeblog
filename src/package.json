@@ -8,6 +8,7 @@
         "dev": "nodemon",
         "sequelize": "node_modules/.bin/sequelize",
         "build": "cross-env BUNDLE_ANALYZER=both next build",
+        "prestart": "npm run build",
         "start": "cross-env NODE_ENV=production next start -p 3000"
     },
     "author": "",

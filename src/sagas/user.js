@@ -33,7 +33,7 @@ function* getMyInfo(action) {
             data: result.data,
         });
     } catch (e) {
-        console.error(e);
+        // console.error(e);
         yield put({
             type: ME_FAIL,
             error: e,
@@ -55,6 +55,7 @@ function* signIn(action) {
         yield put({
             type: SIGN_IN_DONE,
             data: result.data,
+            returnUrl: action.returnUrl,
         });
     } catch (e) {
         console.error(e);
@@ -80,6 +81,7 @@ function* signOut(action) {
         yield put({
             type: SIGN_OUT_DONE,
             data: result.data,
+            returnUrl: action.returnUrl,
         });
     } catch (e) {
         console.error(e);

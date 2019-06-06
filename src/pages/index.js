@@ -2,7 +2,6 @@ import React from 'react';
 import ListExcerpt from '../components/ListExcerpt';
 import PropTypes from 'prop-types';
 import { LOAD_POSTS_CALL } from '../reducers/post';
-import { LOAD_CATEGORIES_CALL } from '../reducers/category';
 
 const Home = ({ home }) => {
     return (

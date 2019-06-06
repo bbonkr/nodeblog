@@ -1,8 +1,7 @@
-const express = require('express');
+const router = require('express').Router();
 const bcrypt = require('bcrypt');
-const router = express.Router();
 const db = require('../models');
-const isLoggedIn = require('./middleware');
+const { isLoggedIn } = require('./middleware');
 
 /**
  * 사용자를 추가합니다.
@@ -59,7 +58,7 @@ router.get('/me', isLoggedIn, async (req, res, next) => {
             return res.status(404).send('Could not find my info.');
         }
     } catch (e) {
-        console.error(e);
+        // console.error(e);
         return next(e);
     }
 });

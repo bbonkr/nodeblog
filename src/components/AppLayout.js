@@ -37,13 +37,14 @@ const ContentRight = styled(Col)`
     padding: 0.6em 1em 0.6em;
 `;
 
-const AppLayout = ({ children }) => {
+const AppLayout = ({ children, url }) => {
     const dispatch = useDispatch();
     // const { me } = useSelector(state => state.user);
     const { categories } = useSelector(s => s.category);
     const [searchModalVisible, setSearchModalVisible] = useState(false);
     const [searchKeywordText, setSearchKeywordText] = useState('');
     const { me } = useSelector(s => s.user);
+    const { currentUrl } = useSelector(state => state.settings);
     // Server side rendering 은 페이지에서 적용해야 한다.
     // _app.js 로 이동
     // useEffect(() => {
@@ -80,11 +81,15 @@ const AppLayout = ({ children }) => {
         }
     }, []);
 
-    const onClickSignOut = useCallback(() => {
-        dispatch({
-            type: SIGN_OUT_CALL,
-        });
-    }, [dispatch]);
+    const onClickSignOut = useCallback(
+        e => {
+            dispatch({
+                type: SIGN_OUT_CALL,
+                returnUrl: currentUrl,
+            });
+        },
+        [currentUrl, dispatch],
+    );
 
     return (
         <div>
@@ -130,7 +135,13 @@ const AppLayout = ({ children }) => {
                             <Menu.Item
                                 key="signin"
                                 style={{ textAlign: 'right' }}>
-                                <Link href="/signin">
+                                <Link
+                                    href={{
+                                        pathname: '/signin',
+                                        query: {
+                                            returnUrl: currentUrl,
+                                        },
+                                    }}>
                                     <a>Sign in</a>
                                 </Link>
                             </Menu.Item>

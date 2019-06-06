@@ -27,8 +27,6 @@ router.post('/signin', (req, res, next) => {
             next(err);
         }
 
-        console.log('passport info: ', info);
-
         if (info) {
             return res.status(401).send(info.reason);
         }
@@ -52,9 +50,14 @@ router.post('/signin', (req, res, next) => {
 });
 
 router.post('/signout', (req, res, next) => {
-    req.logout();
-    req.session.destroy();
-    return res.send('logout success.');
+    try {
+        req.logout();
+        req.session && req.session.destroy();
+        return res.send('logout success.');
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
 });
 
 module.exports = router;

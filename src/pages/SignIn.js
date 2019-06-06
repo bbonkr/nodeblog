@@ -2,11 +2,11 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import { Form, Input, Checkbox, Button, Icon, Row, Col } from 'antd';
-import IconText from '../components/IconText';
 import styled from 'styled-components';
-import Validator from '../helper/validator';
+import Validator from '../helpers/validator';
 import { SIGN_IN_CALL } from '../reducers/user';
 import Router from 'next/router';
+import PropTypes from 'prop-types';
 
 const INPUT_EMAIL_PLACEHOLDER = 'Your email Address';
 const INPUT_PASSWORD_PLACEHOLDER = 'Your password';
@@ -20,7 +20,7 @@ const ErrorMessage = styled.div`
     padding: 0.3rem;
 `;
 
-const SignIn = () => {
+const SignIn = ({ returnUrl }) => {
     const dispatch = useDispatch();
     const [email, setEmail] = useState('');
     const [emailError, setEmailError] = useState('');
@@ -31,7 +31,7 @@ const SignIn = () => {
 
     useEffect(() => {
         if (me && me.id) {
-            Router.push({ pathname: '/' });
+            Router.push({ pathname: '/', query: { home: true } });
         }
     }, [me]);
 
@@ -69,7 +69,8 @@ const SignIn = () => {
 
     const isSubmitButtonDisabled = useCallback(() => {
         return !!(emailError || passwordError);
-    });
+    }, [emailError, passwordError]);
+
     const onSubmit = useCallback(
         e => {
             e.preventDefault();
@@ -91,12 +92,24 @@ const SignIn = () => {
                             password: password,
                             remember: remember,
                         },
+                        returnUrl: returnUrl,
                     });
                 }
             }
         },
-        [dispatch, email, isSubmitButtonDisabled, password, remember],
+        [
+            dispatch,
+            email,
+            isSubmitButtonDisabled,
+            password,
+            remember,
+            returnUrl,
+        ],
     );
+
+    if (me) {
+        return <div>Redirect to default page.</div>;
+    }
 
     return (
         <div>
@@ -191,6 +204,18 @@ const SignIn = () => {
             </Row>
         </div>
     );
+};
+
+SignIn.getInitialProps = async context => {
+    const { returnUrl } = context.query;
+    return {
+        doNotSetCurrentUrl: true,
+        returnUrl,
+    };
+};
+
+SignIn.propTypes = {
+    returnUrl: PropTypes.string,
 };
 
 export default SignIn;

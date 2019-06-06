@@ -34,7 +34,7 @@ Content.getInitialProps = async context => {
     });
 
     return {
-        slug,
+        slug: slug,
     };
 };
 

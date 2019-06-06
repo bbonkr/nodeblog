@@ -13,106 +13,128 @@ import reducer from '../reducers/index';
 import rootSaga from '../sagas';
 import { LOAD_CATEGORIES_CALL } from '../reducers/category';
 import { ME_CALL } from '../reducers/user';
+import { SET_CURRENT_URL } from '../reducers/settings';
 
 const fbAdmin = process.env.FB_ADMIN;
 const siteName = process.env.SITE_NAME;
-const NodeBlog = ({ Component, store, pageProps }) => (
-    <Container>
-        <Provider store={store}>
-            <Helmet
-                title="NodeBlog"
-                htmlAttributes={{ lang: 'ko' }}
-                meta={[
-                    { charset: 'UTF-8' },
-                    {
-                        name: 'viewport',
-                        content:
-                            'width=device-width,minimum-scale=1,initial-scale=1',
-                    },
-                    { 'http-equiv': 'X-UA-Compatible', content: 'IE-edge' },
-                    { name: 'description', content: 'NodeBlog' },
-                    { name: 'og:title', content: 'NodeBlog' },
-                    { name: 'og:description', content: 'NodeBlog' },
-                    { name: 'og:type', content: 'website' },
-                    { name: 'fb:admins', content: fbAdmin },
-                    {
-                        name: 'og:site_name',
-                        content: siteName,
-                    },
-                ]}
-                link={[
-                    {
-                        rel: 'shortcut icon',
-                        href: '/favicon.ico',
-                        type: 'image/x-icon',
-                    },
-                    {
-                        rel: 'apple-touch-icon',
-                        href: '/bbon-icon.png',
-                        sizes: '512x512',
-                    },
-                    {
-                        rel: 'me',
-                        href: 'https://www.facebook.com/bbonkr',
-                    },
-                    {
-                        rel: 'author',
-                        type: 'text/plain',
-                        href: '/humans.txt',
-                    },
-                    {
-                        rel: 'stylesheet',
-                        href:
-                            'https://cdnjs.cloudflare.com/ajax/libs/antd/3.18.2/antd.css',
-                    },
-                    {
-                        rel: 'stylesheet',
-                        href:
-                            'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css',
-                        type: 'text/css',
-                        charset: 'UTF-8',
-                    },
-                    {
-                        rel: 'stylesheet',
-                        href:
-                            'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css',
-                        type: 'text/css',
-                        charset: 'UTF-8',
-                    },
-                ]}
-                script={[
-                    {
-                        src:
-                            'https://cdnjs.cloudflare.com/ajax/libs/antd/3.18.2/antd.js',
-                    },
-                ]}
-            />
-            <AppLayout>
-                <Component {...pageProps} />
-            </AppLayout>
-        </Provider>
-    </Container>
-);
+const NodeBlog = ({ Component, store, pageProps, url }) => {
+    console.log('pageProps', pageProps);
+    return (
+        <Container>
+            <Provider store={store}>
+                <Helmet
+                    title="NodeBlog"
+                    htmlAttributes={{ lang: 'ko' }}
+                    meta={[
+                        { charset: 'UTF-8' },
+                        {
+                            name: 'viewport',
+                            content:
+                                'width=device-width,minimum-scale=1,initial-scale=1',
+                        },
+                        { 'http-equiv': 'X-UA-Compatible', content: 'IE-edge' },
+                        { name: 'description', content: 'NodeBlog' },
+                        { name: 'og:title', content: 'NodeBlog' },
+                        { name: 'og:description', content: 'NodeBlog' },
+                        { name: 'og:type', content: 'website' },
+                        { name: 'fb:admins', content: fbAdmin },
+                        {
+                            name: 'og:site_name',
+                            content: siteName,
+                        },
+                    ]}
+                    link={[
+                        {
+                            rel: 'shortcut icon',
+                            href: '/favicon.ico',
+                            type: 'image/x-icon',
+                        },
+                        {
+                            rel: 'apple-touch-icon',
+                            href: '/bbon-icon.png',
+                            sizes: '512x512',
+                        },
+                        {
+                            rel: 'me',
+                            href: 'https://www.facebook.com/bbonkr',
+                        },
+                        {
+                            rel: 'author',
+                            type: 'text/plain',
+                            href: '/humans.txt',
+                        },
+                        {
+                            rel: 'stylesheet',
+                            href:
+                                'https://cdnjs.cloudflare.com/ajax/libs/antd/3.18.2/antd.css',
+                        },
+                        {
+                            rel: 'stylesheet',
+                            href:
+                                'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css',
+                            type: 'text/css',
+                            charset: 'UTF-8',
+                        },
+                        {
+                            rel: 'stylesheet',
+                            href:
+                                'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css',
+                            type: 'text/css',
+                            charset: 'UTF-8',
+                        },
+                    ]}
+                    script={[
+                        {
+                            src:
+                                'https://cdnjs.cloudflare.com/ajax/libs/antd/3.18.2/antd.js',
+                        },
+                    ]}
+                />
+                <AppLayout {...url}>
+                    <Component {...pageProps} url={url} store={store} />
+                </AppLayout>
+            </Provider>
+        </Container>
+    );
+};
+
+const normalizeUrl = (pathname, query) => {
+    let url = pathname;
+    if (!!query) {
+        url = `${url}?`;
+        for (let k in query) {
+            url = `${url}${k}=${query[k]}&`;
+        }
+        url = url.slice(0, -1);
+    }
+
+    return url;
+};
 
 NodeBlog.getInitialProps = async context => {
     const { ctx, Component } = context;
+
     let pageProps = {};
 
-    // console.log('router', router);
+    const url = ctx.isServer
+        ? ctx.req.url
+        : !!ctx.asPath
+        ? ctx.asPath
+        : normalizeUrl(ctx.pathname, ctx.query);
 
     const state = ctx.store.getState();
     const cookie = ctx.isServer ? ctx.req.headers.cookie : '';
+    const { me } = state.user;
 
-    // console.log(cookie);
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {
         axios.defaults.headers.Cookie = cookie;
+    }
 
-        // if (!state.user.me) {
-        //     ctx.store.dispatch({
-        //         type: ME_CALL,
-        //     });
-        // }
+    if (!me) {
+        ctx.store.dispatch({
+            type: ME_CALL,
+        });
     }
 
     // if (ctx.isServer) {
@@ -126,13 +148,20 @@ NodeBlog.getInitialProps = async context => {
         pageProps = (await Component.getInitialProps(ctx)) || {};
     }
 
-    return { pageProps };
+    console.log('current url ====> ', url);
+
+    if (!pageProps.doNotSetCurrentUrl) {
+        ctx.store.dispatch({ type: SET_CURRENT_URL, data: url });
+    }
+
+    return { pageProps, url: url };
 };
 
 NodeBlog.propTypes = {
     Component: PropTypes.elementType.isRequired,
     store: PropTypes.object.isRequired,
-    pageProps: PropTypes.any.isRequired,
+    pageProps: PropTypes.any,
+    url: PropTypes.string,
 };
 
 const loggingMiddleware = store => next => action => {
