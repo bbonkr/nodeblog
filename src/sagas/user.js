@@ -19,6 +19,9 @@ import {
     ME_CALL,
     ME_FAIL,
     ME_DONE,
+    SIGN_UP_CALL,
+    SIGN_UP_FAIL,
+    SIGN_UP_DONE,
 } from '../reducers/user';
 
 function getMyInfoApi() {
@@ -37,6 +40,7 @@ function* getMyInfo(action) {
         yield put({
             type: ME_FAIL,
             error: e,
+            reason: e.response && e.response.data,
         });
     }
 }
@@ -88,6 +92,7 @@ function* signOut(action) {
         yield put({
             type: SIGN_OUT_FAIL,
             error: e,
+            reason: e.response && e.response.data,
         });
     }
 }
@@ -96,6 +101,36 @@ function* watchSignOut() {
     yield takeLatest(SIGN_OUT_CALL, signOut);
 }
 
+function signUpApi(formData) {
+    return axios.post('/user', formData, {});
+}
+
+function* signUp(action) {
+    try {
+        const result = yield call(signUpApi, action.data);
+        yield put({
+            type: SIGN_UP_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: SIGN_UP_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchSignUp() {
+    yield takeLatest(SIGN_UP_CALL, signUp);
+}
+
 export default function* postSaga() {
-    yield all([fork(watchGetMyInfo), fork(watchSignIn), fork(watchSignOut)]);
+    yield all([
+        fork(watchGetMyInfo),
+        fork(watchSignIn),
+        fork(watchSignOut),
+        fork(watchSignUp),
+    ]);
 }

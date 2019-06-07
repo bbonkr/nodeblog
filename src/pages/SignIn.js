@@ -7,18 +7,17 @@ import Validator from '../helpers/validator';
 import { SIGN_IN_CALL } from '../reducers/user';
 import Router from 'next/router';
 import PropTypes from 'prop-types';
+import {
+    ContentWrapper,
+    ErrorMessageWrapper,
+} from '../styledComponents/Wrapper';
 
 const INPUT_EMAIL_PLACEHOLDER = 'Your email Address';
 const INPUT_PASSWORD_PLACEHOLDER = 'Your password';
-const errorColor = '#e93232';
+
 const MESSAGE_INVALID_EMAIL = 'Invalid email address.';
 const MESSAGE_REQUIRED_EMAIL = 'Please Input your email address';
 const MESSAGE_REQUIRED_PASSWORD = 'Please Input your password';
-
-const ErrorMessage = styled.div`
-    color: ${errorColor};
-    padding: 0.3rem;
-`;
 
 const SignIn = ({ returnUrl }) => {
     const dispatch = useDispatch();
@@ -109,18 +108,18 @@ const SignIn = ({ returnUrl }) => {
     );
 
     if (me) {
-        return <div>Redirect to default page.</div>;
+        return <ContentWrapper>Redirect to default page.</ContentWrapper>;
     }
 
     return (
-        <div>
+        <ContentWrapper>
             <Row type="flex" justify="center" align="middle">
                 <Col xs={24} sm={24} md={12}>
                     {signInFailMessage && (
-                        <ErrorMessage>
+                        <ErrorMessageWrapper>
                             <h4>Please check your input.</h4>
                             {signInFailMessage}
-                        </ErrorMessage>
+                        </ErrorMessageWrapper>
                     )}
                     <Form onSubmit={onSubmit}>
                         <Form.Item>
@@ -203,7 +202,7 @@ const SignIn = ({ returnUrl }) => {
                     </Form>
                 </Col>
             </Row>
-        </div>
+        </ContentWrapper>
     );
 };
 

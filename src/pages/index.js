@@ -2,12 +2,13 @@ import React from 'react';
 import ListExcerpt from '../components/ListExcerpt';
 import PropTypes from 'prop-types';
 import { LOAD_POSTS_CALL } from '../reducers/post';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Home = ({ home }) => {
     return (
-        <div style={{ padding: '0.75rem' }}>
+        <ContentWrapper>
             <ListExcerpt />
-        </div>
+        </ContentWrapper>
     );
 };
 

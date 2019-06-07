@@ -3,14 +3,28 @@ const bcrypt = require('bcrypt');
 const db = require('../models');
 const { isLoggedIn } = require('./middleware');
 
+const findUserById = async id => {
+    const me = await db.User.findOne({
+        where: {
+            id: id,
+        },
+        include: [
+            {
+                model: db.Post,
+            },
+        ],
+        attributes: ['id', 'email', 'displayName'],
+    });
+
+    return me;
+};
+
 /**
  * 사용자를 추가합니다.
  */
 router.post('/', async (req, res, next) => {
     try {
-        const email = req.body.email;
-        const displayName = req.body.displayName;
-        const password = req.body.password;
+        const { email, displayName, password } = req.body;
 
         const user = await db.User.findOne({
             where: {
@@ -29,9 +43,11 @@ router.post('/', async (req, res, next) => {
             password: hashedPassword,
         });
 
-        delete user.password;
+        const me = await findUserById(newUser.id);
 
-        return res.json(newUser);
+        // TODO Send mail
+
+        return res.json(me);
     } catch (e) {
         console.error(e);
         return next(e);
@@ -40,17 +56,7 @@ router.post('/', async (req, res, next) => {
 
 router.get('/me', isLoggedIn, async (req, res, next) => {
     try {
-        const me = await db.User.findOne({
-            where: {
-                id: req.user.id,
-            },
-            include: [
-                {
-                    model: db.Post,
-                },
-            ],
-            attributes: ['id', 'email', 'displayName'],
-        });
+        const me = await findUserById(req.user.id);
 
         if (me) {
             return res.json(me);

@@ -23,6 +23,8 @@ const reducer = (state = initialState, action) =>
             case LOAD_CATEGORIES_FAIL:
                 draft.loadingCategories = false;
                 break;
+            default:
+                break;
         }
     });
 

@@ -96,7 +96,7 @@ const AppLayout = ({ children, url }) => {
             <BackTop />
             <Layout className="layout-height">
                 <Layout.Header
-                    style={{ position: 'fixed', zIndex: 1, width: '100%' }}>
+                    style={{ position: 'fixed', zIndex: 500, width: '100%' }}>
                     <div className="logo" />
                     <Menu
                         theme="dark"

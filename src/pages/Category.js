@@ -3,14 +3,15 @@ import ListExcerpt from '../components/ListExcerpt';
 import PropTypes from 'prop-types';
 import { Card, Divider } from 'antd';
 import { LOAD_CATEGORY_POSTS_CALL } from '../reducers/post';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Category = ({ slug }) => {
     return (
-        <div>
+        <ContentWrapper>
             <Card title={slug} />
             <Divider />
             <ListExcerpt />
-        </div>
+        </ContentWrapper>
     );
 };
 

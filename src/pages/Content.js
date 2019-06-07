@@ -5,11 +5,12 @@ import PropTypes from 'prop-types';
 import { Spin, Skeleton } from 'antd';
 import SinglePost from '../components/SinglePost';
 import { LOAD_SINGLE_POST_CALL } from '../reducers/post';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Content = ({ slug }) => {
     const { loadingPost, singlePost } = useSelector(s => s.post);
     return (
-        <article>
+        <ContentWrapper>
             <Spin spinning={loadingPost} tip="loading ...">
                 {singlePost ? (
                     <SinglePost post={singlePost} />
@@ -17,7 +18,7 @@ const Content = ({ slug }) => {
                     <Skeleton active paragraph={{ rows: 4 }} />
                 )}
             </Spin>
-        </article>
+        </ContentWrapper>
     );
 };
 

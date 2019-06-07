@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Input, Divider } from 'antd';
 import ListExcerpt from '../components/ListExcerpt';
 import { LOAD_POSTS_CALL } from '../reducers/post';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const KEYWORD_INPUT_PLACEHOLDER = 'Searching keyword';
 
@@ -26,10 +27,10 @@ const Search = ({ keyword }) => {
                 },
             });
         }
-    }, []);
+    }, [dispatch, postsLimit]);
 
     return (
-        <div>
+        <ContentWrapper>
             <Input.Search
                 enterButton
                 name="keyword"
@@ -41,7 +42,7 @@ const Search = ({ keyword }) => {
 
             <Divider />
             <ListExcerpt />
-        </div>
+        </ContentWrapper>
     );
 };
 

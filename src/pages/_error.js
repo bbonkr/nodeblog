@@ -1,15 +1,16 @@
 import React from 'react';
 import Error from 'next/error';
 import PropTypes from 'prop-types';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const NodeBlogError = ({ statusCode }) => {
     console.log('statusCode', statusCode);
 
     return (
-        <div>
+        <ContentWrapper>
             <h1>{`HTTP ${statusCode}`}</h1>
             {/* <Error statusCode={statusCode} /> */}
-        </div>
+        </ContentWrapper>
     );
 };
 
