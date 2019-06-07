@@ -2,7 +2,7 @@ import React from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import { Card, Divider } from 'antd';
+import { Card, Divider, Avatar } from 'antd';
 import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 
@@ -12,6 +12,7 @@ const SinglePost = ({ post }) => {
             <article>
                 <Card>
                     <Card.Meta
+                    avatar={<Avatar>{post.User.displayName[0]}</Avatar>}
                         title={
                             <Link
                                 href={{
@@ -29,7 +30,7 @@ const SinglePost = ({ post }) => {
                                 dangerouslySetInnerHTML={{
                                     __html: post.content,
                                 }}
-                            />
+                            />                            
                         }
                     />
                     <Divider />

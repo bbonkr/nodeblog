@@ -22,17 +22,17 @@ const reducer = (state = initialState, action) =>
                 break;
             case SIGN_IN_DONE:
                 draft.me = action.data;
-                if (!!action.returnUrl) {
-                    Router.push(action.returnUrl);
-                } else {
-                    Router.push(
-                        {
-                            pathname: '/',
-                            query: { home: true },
-                        },
-                        '/',
-                    );
-                }
+                // if (!!action.returnUrl) {
+                //     Router.push(action.returnUrl);
+                // } else {
+                //     Router.push(
+                //         {
+                //             pathname: '/',
+                //             query: { home: true },
+                //         },
+                //         '/',
+                //     );
+                // }
 
                 break;
             case SIGN_IN_FAIL:
@@ -44,11 +44,11 @@ const reducer = (state = initialState, action) =>
                 break;
             case SIGN_OUT_DONE:
                 draft.me = null;
-                if (!!action.returnUrl) {
-                    Router.push(action.returnUrl);
-                } else {
-                    Router.push({ pathname: '/', query: { home: true } }, '/');
-                }
+                // if (!!action.returnUrl) {
+                //     Router.push(action.returnUrl);
+                // } else {
+                //     Router.push({ pathname: '/', query: { home: true } }, '/');
+                // }
                 // Router.push(
                 //     !!action.returnUrl
                 //         ? action.returnUrl
@@ -63,7 +63,6 @@ const reducer = (state = initialState, action) =>
                 draft.me = action.data;
                 break;
             case ME_FAIL:
-                //Router.push({ pathname: '/signin' });
                 break;
             default:
                 break;

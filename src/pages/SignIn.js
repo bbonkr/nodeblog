@@ -31,9 +31,10 @@ const SignIn = ({ returnUrl }) => {
 
     useEffect(() => {
         if (me && me.id) {
-            Router.push({ pathname: '/', query: { home: true } });
+            // Router.push({ pathname: '/', query: { home: true } });
+            Router.push(returnUrl);
         }
-    }, [me]);
+    }, [me, returnUrl]);
 
     const onEmailChange = useCallback(e => {
         const value = e.target.value;
