@@ -1,10 +1,6 @@
-/**
- * 사용되지 않습니다.
- * /:slug 은 /content/:slug 에서 처리합니다.
- */
-
 import React from 'react';
 import { useSelector } from 'react-redux';
+import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Spin, Skeleton } from 'antd';
 import SinglePost from '../components/SinglePost';
@@ -12,8 +8,7 @@ import { LOAD_SINGLE_POST_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Post = ({ slug }) => {
-    const { singlePost, loadingPost } = useSelector(state => state.post);
-
+    const { loadingPost, singlePost } = useSelector(s => s.post);
     return (
         <ContentWrapper>
             <Spin spinning={loadingPost} tip="loading ...">
@@ -32,14 +27,16 @@ Post.propTypes = {
 };
 
 Post.getInitialProps = async context => {
-    const slug = context.query.slug;
+    const { slug } = context.query;
 
     context.store.dispatch({
         type: LOAD_SINGLE_POST_CALL,
         data: slug,
     });
 
-    return { slug };
+    return {
+        slug: slug,
+    };
 };
 
 export default Post;

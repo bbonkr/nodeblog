@@ -100,10 +100,10 @@ const ListExcerpt = () => {
                                     title={
                                         <Link
                                             href={{
-                                                pathname: '/content',
+                                                pathname: '/post',
                                                 query: { slug: slug },
                                             }}
-                                            as={`/${slug}`}>
+                                            as={`/post/${slug}`}>
                                             <a>
                                                 <h3>{title}</h3>
                                             </a>

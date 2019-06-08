@@ -123,8 +123,8 @@ nextApp.prepare().then(() => {
         });
     });
 
-    expressApp.get('/:slug', (req, res) => {
-        return nextApp.render(req, res, '/content', { slug: req.params.slug });
+    expressApp.get('/post/:slug', (req, res) => {
+        return nextApp.render(req, res, '/post', { slug: req.params.slug });
     });
 
     expressApp.get('*', (req, res) => handle(req, res));

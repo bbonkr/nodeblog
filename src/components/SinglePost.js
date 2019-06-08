@@ -12,14 +12,14 @@ const SinglePost = ({ post }) => {
             <article>
                 <Card>
                     <Card.Meta
-                    avatar={<Avatar>{post.User.displayName[0]}</Avatar>}
+                        avatar={<Avatar>{post.User.displayName[0]}</Avatar>}
                         title={
                             <Link
                                 href={{
-                                    pathname: '/content',
+                                    pathname: '/post',
                                     query: { slug: post.slug },
                                 }}
-                                as={`/${post.slug}`}>
+                                as={`/post/${post.slug}`}>
                                 <a>
                                     <h1>{post.title}</h1>
                                 </a>
@@ -30,7 +30,7 @@ const SinglePost = ({ post }) => {
                                 dangerouslySetInnerHTML={{
                                     __html: post.content,
                                 }}
-                            />                            
+                            />
                         }
                     />
                     <Divider />
