@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import Router from 'next/router';
 import { ME_CALL } from '../../reducers/user';
 import { withAuth } from '../../utils/auth';
+import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 
 const Me = () => {
@@ -13,10 +14,12 @@ const Me = () => {
     }
 
     return (
-        <ContentWrapper>
-            <h1>Me</h1>
-            <div>{me && me.displayName}</div>
-        </ContentWrapper>
+        <MeLayout>
+            <ContentWrapper>
+                <h1>Me</h1>
+                <div>{me && me.displayName}</div>
+            </ContentWrapper>
+        </MeLayout>
     );
 };
 

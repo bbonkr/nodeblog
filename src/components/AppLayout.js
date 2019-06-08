@@ -92,9 +92,9 @@ const AppLayout = ({ children, url }) => {
     );
 
     return (
-        <div>
+        <div style={{ minHeight: '100%' }}>
             <BackTop />
-            <Layout className="layout-height">
+            <Layout style={{ minHeight: '100%' }}>
                 <Layout.Header
                     style={{ position: 'fixed', zIndex: 500, width: '100%' }}>
                     <div className="logo" />
@@ -171,7 +171,11 @@ const AppLayout = ({ children, url }) => {
                         )}
                     </Menu>
                 </Layout.Header>
-                <Layout.Content style={{ marginTop: '64px' }}>
+                <Layout.Content
+                    style={{
+                        marginTop: '64px',
+                        minHeight: '100%',
+                    }}>
                     {/*style={{ padding: '0 50px', marginTop: 64 }}*/}
                     <article>{children}</article>
                     {/* style={{ padding: '0.75rem' }} */}
