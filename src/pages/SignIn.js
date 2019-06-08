@@ -8,8 +8,9 @@ import { SIGN_IN_CALL } from '../reducers/user';
 import Router from 'next/router';
 import PropTypes from 'prop-types';
 import {
+    ERROR_COLOR,
     ContentWrapper,
-    ErrorMessageWrapper,
+    ErrorMessageWrapper
 } from '../styledComponents/Wrapper';
 
 const INPUT_EMAIL_PLACEHOLDER = 'Your email Address';
@@ -90,21 +91,14 @@ const SignIn = ({ returnUrl }) => {
                         data: {
                             email: email,
                             password: password,
-                            remember: remember,
+                            remember: remember
                         },
-                        returnUrl: returnUrl,
+                        returnUrl: returnUrl
                     });
                 }
             }
         },
-        [
-            dispatch,
-            email,
-            isSubmitButtonDisabled,
-            password,
-            remember,
-            returnUrl,
-        ],
+        [dispatch, email, isSubmitButtonDisabled, password, remember, returnUrl]
     );
 
     if (me) {
@@ -113,7 +107,7 @@ const SignIn = ({ returnUrl }) => {
 
     return (
         <ContentWrapper>
-            <Row type="flex" justify="center" align="middle">
+            <Row type='flex' justify='center' align='middle'>
                 <Col xs={24} sm={24} md={12}>
                     {signInFailMessage && (
                         <ErrorMessageWrapper>
@@ -130,9 +124,9 @@ const SignIn = ({ returnUrl }) => {
                                 placeholder={INPUT_EMAIL_PLACEHOLDER}
                                 prefix={
                                     <Icon
-                                        type="mail"
+                                        type='mail'
                                         style={{
-                                            color: 'rgba(0,0,0,0.25)',
+                                            color: 'rgba(0,0,0,0.25)'
                                         }}
                                     />
                                 }
@@ -140,10 +134,10 @@ const SignIn = ({ returnUrl }) => {
                             {emailError && (
                                 <span>
                                     <Icon
-                                        type="alert"
-                                        style={{ color: errorColor }}
+                                        type='alert'
+                                        style={{ color: ERROR_COLOR }}
                                     />
-                                    <span style={{ color: errorColor }}>
+                                    <span style={{ color: ERROR_COLOR }}>
                                         {emailError}
                                     </span>
                                 </span>
@@ -157,9 +151,9 @@ const SignIn = ({ returnUrl }) => {
                                 placeholder={INPUT_PASSWORD_PLACEHOLDER}
                                 prefix={
                                     <Icon
-                                        type="lock"
+                                        type='lock'
                                         style={{
-                                            color: 'rgba(0,0,0,0.25)',
+                                            color: 'rgba(0,0,0,0.25)'
                                         }}
                                     />
                                 }
@@ -167,7 +161,7 @@ const SignIn = ({ returnUrl }) => {
                             {passwordError && (
                                 <span>
                                     <Icon
-                                        type="alert"
+                                        type='alert'
                                         style={{ color: errorColor }}
                                     />
                                     <span style={{ color: errorColor }}>
@@ -179,23 +173,25 @@ const SignIn = ({ returnUrl }) => {
                         <Form.Item>
                             <Checkbox
                                 checked={remember}
-                                onChange={onRememberChange}>
+                                onChange={onRememberChange}
+                            >
                                 Remember me
                             </Checkbox>
-                            <Link href="/findpassword">
+                            <Link href='/findpassword'>
                                 <a style={{ float: 'right' }}>
                                     Forgot password
                                 </a>
                             </Link>
                             <Button
-                                type="primary"
-                                htmlType="submit"
+                                type='primary'
+                                htmlType='submit'
                                 style={{ width: '100%' }}
-                                disabled={isSubmitButtonDisabled()}>
+                                disabled={isSubmitButtonDisabled()}
+                            >
                                 Log in
                             </Button>
                             {'Or '}
-                            <Link href="/signup">
+                            <Link href='/signup'>
                                 <a>Register now!</a>
                             </Link>
                         </Form.Item>
@@ -210,12 +206,12 @@ SignIn.getInitialProps = async context => {
     const { returnUrl } = context.query;
     return {
         doNotSetCurrentUrl: true,
-        returnUrl,
+        returnUrl
     };
 };
 
 SignIn.propTypes = {
-    returnUrl: PropTypes.string,
+    returnUrl: PropTypes.string
 };
 
 export default SignIn;
