@@ -6,17 +6,20 @@ import {
     ErrorMessageWrapper,
 } from '../styledComponents/Wrapper';
 import SignUpForm from '../components/SignUpForm';
+import DefaultLayout from '../components/DefaultLayout';
 
 const SignUp = () => {
     return (
-        <ContentWrapper>
-            <Row type="flex" justify="center" align="middle">
-                <Col xs={24} sm={24} md={12}>
-                    <div>sign up</div>
-                    <SignUpForm />
-                </Col>
-            </Row>
-        </ContentWrapper>
+        <DefaultLayout>
+            <ContentWrapper>
+                <Row type="flex" justify="center" align="middle">
+                    <Col xs={24} sm={24} md={12}>
+                        <div>sign up</div>
+                        <SignUpForm />
+                    </Col>
+                </Row>
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 

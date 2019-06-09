@@ -10,8 +10,9 @@ import PropTypes from 'prop-types';
 import {
     ERROR_COLOR,
     ContentWrapper,
-    ErrorMessageWrapper
+    ErrorMessageWrapper,
 } from '../styledComponents/Wrapper';
+import DefaultLayout from '../components/DefaultLayout';
 
 const INPUT_EMAIL_PLACEHOLDER = 'Your email Address';
 const INPUT_PASSWORD_PLACEHOLDER = 'Your password';
@@ -31,8 +32,8 @@ const SignIn = ({ returnUrl }) => {
 
     useEffect(() => {
         if (me && me.id) {
-            // Router.push({ pathname: '/', query: { home: true } });
-            Router.push(returnUrl);
+            console.log('returnUrl', returnUrl);
+            Router.push(!!returnUrl ? returnUrl : '/');
         }
     }, [me, returnUrl]);
 
@@ -91,127 +92,142 @@ const SignIn = ({ returnUrl }) => {
                         data: {
                             email: email,
                             password: password,
-                            remember: remember
+                            remember: remember,
                         },
-                        returnUrl: returnUrl
+                        returnUrl: returnUrl,
                     });
                 }
             }
         },
-        [dispatch, email, isSubmitButtonDisabled, password, remember, returnUrl]
+        [
+            dispatch,
+            email,
+            isSubmitButtonDisabled,
+            password,
+            remember,
+            returnUrl,
+        ],
     );
 
     if (me) {
-        return <ContentWrapper>Redirect to default page.</ContentWrapper>;
+        // TODO ADD Loading page
+        return <ContentWrapper>Loading.</ContentWrapper>;
     }
 
     return (
-        <ContentWrapper>
-            <Row type='flex' justify='center' align='middle'>
-                <Col xs={24} sm={24} md={12}>
-                    {signInFailMessage && (
-                        <ErrorMessageWrapper>
-                            <h4>Please check your input.</h4>
-                            {signInFailMessage}
-                        </ErrorMessageWrapper>
-                    )}
-                    <Form onSubmit={onSubmit}>
-                        <Form.Item>
-                            <Input
-                                style={{ width: '100%' }}
-                                value={email}
-                                onChange={onEmailChange}
-                                placeholder={INPUT_EMAIL_PLACEHOLDER}
-                                prefix={
-                                    <Icon
-                                        type='mail'
-                                        style={{
-                                            color: 'rgba(0,0,0,0.25)'
-                                        }}
-                                    />
-                                }
-                            />
-                            {emailError && (
-                                <span>
-                                    <Icon
-                                        type='alert'
-                                        style={{ color: ERROR_COLOR }}
-                                    />
-                                    <span style={{ color: ERROR_COLOR }}>
-                                        {emailError}
+        <DefaultLayout>
+            <ContentWrapper>
+                <Row type="flex" justify="center" align="middle">
+                    <Col xs={24} sm={24} md={12}>
+                        {signInFailMessage && (
+                            <ErrorMessageWrapper>
+                                <h4>Please check your input.</h4>
+                                {signInFailMessage}
+                            </ErrorMessageWrapper>
+                        )}
+                        <Form onSubmit={onSubmit}>
+                            <Form.Item>
+                                <Input
+                                    style={{ width: '100%' }}
+                                    value={email}
+                                    onChange={onEmailChange}
+                                    placeholder={INPUT_EMAIL_PLACEHOLDER}
+                                    prefix={
+                                        <Icon
+                                            type="mail"
+                                            style={{
+                                                color: 'rgba(0,0,0,0.25)',
+                                            }}
+                                        />
+                                    }
+                                />
+                                {emailError && (
+                                    <span>
+                                        <Icon
+                                            type="alert"
+                                            style={{ color: ERROR_COLOR }}
+                                        />
+                                        <span style={{ color: ERROR_COLOR }}>
+                                            {emailError}
+                                        </span>
                                     </span>
-                                </span>
-                            )}
-                        </Form.Item>
-                        <Form.Item>
-                            <Input.Password
-                                style={{ width: '100%' }}
-                                value={password}
-                                onChange={onPasswordChange}
-                                placeholder={INPUT_PASSWORD_PLACEHOLDER}
-                                prefix={
-                                    <Icon
-                                        type='lock'
-                                        style={{
-                                            color: 'rgba(0,0,0,0.25)'
-                                        }}
-                                    />
-                                }
-                            />
-                            {passwordError && (
-                                <span>
-                                    <Icon
-                                        type='alert'
-                                        style={{ color: errorColor }}
-                                    />
-                                    <span style={{ color: errorColor }}>
-                                        {passwordError}
+                                )}
+                            </Form.Item>
+                            <Form.Item>
+                                <Input.Password
+                                    style={{ width: '100%' }}
+                                    value={password}
+                                    onChange={onPasswordChange}
+                                    placeholder={INPUT_PASSWORD_PLACEHOLDER}
+                                    prefix={
+                                        <Icon
+                                            type="lock"
+                                            style={{
+                                                color: 'rgba(0,0,0,0.25)',
+                                            }}
+                                        />
+                                    }
+                                />
+                                {passwordError && (
+                                    <span>
+                                        <Icon
+                                            type="alert"
+                                            style={{ color: ERROR_COLOR }}
+                                        />
+                                        <span style={{ color: ERROR_COLOR }}>
+                                            {passwordError}
+                                        </span>
                                     </span>
-                                </span>
-                            )}
-                        </Form.Item>
-                        <Form.Item>
-                            <Checkbox
-                                checked={remember}
-                                onChange={onRememberChange}
-                            >
-                                Remember me
-                            </Checkbox>
-                            <Link href='/findpassword'>
-                                <a style={{ float: 'right' }}>
-                                    Forgot password
-                                </a>
-                            </Link>
-                            <Button
-                                type='primary'
-                                htmlType='submit'
-                                style={{ width: '100%' }}
-                                disabled={isSubmitButtonDisabled()}
-                            >
-                                Log in
-                            </Button>
-                            {'Or '}
-                            <Link href='/signup'>
-                                <a>Register now!</a>
-                            </Link>
-                        </Form.Item>
-                    </Form>
-                </Col>
-            </Row>
-        </ContentWrapper>
+                                )}
+                            </Form.Item>
+                            <Form.Item>
+                                <Checkbox
+                                    checked={remember}
+                                    onChange={onRememberChange}>
+                                    Remember me
+                                </Checkbox>
+                                <Link href="/findpassword">
+                                    <a style={{ float: 'right' }}>
+                                        Forgot password
+                                    </a>
+                                </Link>
+                                <Button
+                                    type="primary"
+                                    htmlType="submit"
+                                    style={{ width: '100%' }}
+                                    disabled={isSubmitButtonDisabled()}>
+                                    Log in
+                                </Button>
+                                {'Or '}
+                                <Link href="/signup">
+                                    <a>Register now!</a>
+                                </Link>
+                            </Form.Item>
+                        </Form>
+                    </Col>
+                </Row>
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 
 SignIn.getInitialProps = async context => {
-    const { returnUrl } = context.query;
+    let url = context.query.returnUrl;
+
+    const state = context.store.getState();
+    const { returnUrl } = state.settings;
+    if (!url) {
+        url = !!returnUrl ? returnUrl : '/';
+    }
+
     return {
         doNotSetCurrentUrl: true,
-        returnUrl
+        returnUrl: url,
     };
 };
 
 SignIn.propTypes = {
-    returnUrl: PropTypes.string
+    returnUrl: PropTypes.string,
 };
 
 export default SignIn;

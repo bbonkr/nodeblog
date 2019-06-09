@@ -1,29 +1,63 @@
-import React, { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import React from 'react';
 import Router from 'next/router';
+import { normalizeReturnUrl } from '../helpers/url';
+const { Component } = React;
 
-const withAuth = WrappedComponent => props => {
-    console.log('withAuth');
-    const { me } = useSelector(s => s.user);
-    const { url } = props;
+const withAuth = WrappedComponent => {
+    return class extends Component {
+        static async getInitialProps(ctx) {
+            // const url = ctx.isServer
+            //     ? ctx.req.url
+            //     : !!ctx.asPath
+            //     ? ctx.asPath
+            //     : normalizeReturnUrl(ctx.pathname, ctx.query);
 
-    useEffect(() => {
-        if (!me) {
-            console.log('로그인 페이지로 이동합니다.');
-            Router.push({
-                pathname: '/signin',
-                query: {
-                    returnUrl: !!url ? url : '/',
-                },
-            });
+            // console.log('withAuth ==> url: ', url);
+
+            const state = ctx.store.getState();
+            // const { store } = ctx;
+            const { me } = state.user;
+            let pageProps = {};
+
+            if (WrappedComponent.getInitialProps) {
+                pageProps = (await WrappedComponent.getInitialProps(ctx)) || {};
+            }
+
+            return {
+                ...pageProps,
+                me,
+                // returnUrl: url,
+            };
         }
-    }, [me, url]);
 
-    return <WrappedComponent {...props} />;
-};
+        constructor(props) {
+            super(props);
 
-withAuth.getInitialProps = async ctx => {
-    return {};
+            this.state = {
+                loading: true,
+            };
+        }
+
+        componentDidMount() {
+            if (!this.props.me) {
+                const returnUrl = encodeURIComponent(
+                    !!this.props.returnUrl ? this.props.returnUrl : '/',
+                );
+
+                Router.push(`/signin?returnUrl=${returnUrl}`);
+            }
+
+            this.setState({ loading: false });
+        }
+
+        render() {
+            if (this.state.loading) {
+                // TODO Add loading page
+                return <div>Loading ...</div>;
+            }
+            return <WrappedComponent {...this.props} />;
+        }
+    };
 };
 
 export { withAuth };

@@ -5,6 +5,7 @@ import { Input, Divider } from 'antd';
 import ListExcerpt from '../components/ListExcerpt';
 import { LOAD_POSTS_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
+import DefaultLayout from '../components/DefaultLayout';
 
 const KEYWORD_INPUT_PLACEHOLDER = 'Searching keyword';
 
@@ -16,33 +17,38 @@ const Search = ({ keyword }) => {
         setKeywordText(e.target.value);
     }, []);
 
-    const onSearch = useCallback((value, e) => {
-        if (value) {
-            dispatch({
-                type: LOAD_POSTS_CALL,
-                data: {
-                    pageToken: null,
-                    limit: postsLimit,
-                    keyword: value,
-                },
-            });
-        }
-    }, [dispatch, postsLimit]);
+    const onSearch = useCallback(
+        (value, e) => {
+            if (value) {
+                dispatch({
+                    type: LOAD_POSTS_CALL,
+                    data: {
+                        pageToken: null,
+                        limit: postsLimit,
+                        keyword: value,
+                    },
+                });
+            }
+        },
+        [dispatch, postsLimit],
+    );
 
     return (
-        <ContentWrapper>
-            <Input.Search
-                enterButton
-                name="keyword"
-                value={keywordText}
-                onChange={onChangeKeyword}
-                onSearch={onSearch}
-                placeholder={KEYWORD_INPUT_PLACEHOLDER}
-            />
+        <DefaultLayout>
+            <ContentWrapper>
+                <Input.Search
+                    enterButton
+                    name="keyword"
+                    value={keywordText}
+                    onChange={onChangeKeyword}
+                    onSearch={onSearch}
+                    placeholder={KEYWORD_INPUT_PLACEHOLDER}
+                />
 
-            <Divider />
-            <ListExcerpt />
-        </ContentWrapper>
+                <Divider />
+                <ListExcerpt />
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 

@@ -1,4 +1,5 @@
 {
+    "verbose": true,
     "watch": [
         "components",
         "config",
@@ -14,6 +15,8 @@
         "index.js",
         "nodemon.json"
     ],
+    "ignore": ["*.test.js", "__snapshots__"],
     "exec": "node index.js",
-    "ext": "js json jsx"
+    "ext": "js json jsx",
+    "delay": 2500
 }

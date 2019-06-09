@@ -89,19 +89,19 @@ nextApp.prepare().then(() => {
     //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
     // });
 
-    expressApp.get('/signin', (req, res) => {
-        return nextApp.render(req, res, '/signin', {
-            returnUrl: req.query.returnUrl,
-        });
-    });
+    // expressApp.get('/signin', (req, res) => {
+    //     return nextApp.render(req, res, '/signin', {
+    //         returnUrl: req.query.returnUrl,
+    //     });
+    // });
 
-    expressApp.get('/signup', (req, res) => {
-        return nextApp.render(req, res, '/signup');
-    });
+    // expressApp.get('/signup', (req, res) => {
+    //     return nextApp.render(req, res, '/signup');
+    // });
 
-    expressApp.get('/me', (req, res) => {
-        return nextApp.render(req, res, '/me');
-    });
+    // expressApp.get('/me', (req, res) => {
+    //     return nextApp.render(req, res, '/me');
+    // });
 
     expressApp.get('/category/:slug', (req, res) => {
         return nextApp.render(req, res, '/category', { slug: req.params.slug });

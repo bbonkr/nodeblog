@@ -6,19 +6,22 @@ import { Spin, Skeleton } from 'antd';
 import SinglePost from '../components/SinglePost';
 import { LOAD_SINGLE_POST_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
+import DefaultLayout from '../components/DefaultLayout';
 
 const Post = ({ slug }) => {
     const { loadingPost, singlePost } = useSelector(s => s.post);
     return (
-        <ContentWrapper>
-            <Spin spinning={loadingPost} tip="loading ...">
-                {singlePost ? (
-                    <SinglePost post={singlePost} />
-                ) : (
-                    <Skeleton active paragraph={{ rows: 4 }} />
-                )}
-            </Spin>
-        </ContentWrapper>
+        <DefaultLayout>
+            <ContentWrapper>
+                <Spin spinning={loadingPost} tip="loading ...">
+                    {singlePost ? (
+                        <SinglePost post={singlePost} />
+                    ) : (
+                        <Skeleton active paragraph={{ rows: 4 }} />
+                    )}
+                </Spin>
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 

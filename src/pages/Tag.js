@@ -3,14 +3,18 @@ import PropTypes from 'prop-types';
 import { Card, Divider } from 'antd';
 import ListExcerpt from '../components/ListExcerpt';
 import { LOAD_TAG_POSTS_CALL } from '../reducers/post';
+import DefaultLayout from '../components/DefaultLayout';
+import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Tag = ({ slug }) => {
     return (
-        <div>
-            <Card title={slug} />
-            <Divider />
-            <ListExcerpt />
-        </div>
+        <DefaultLayout>
+            <ContentWrapper>
+                <Card title={slug} />
+                <Divider />
+                <ListExcerpt />
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 

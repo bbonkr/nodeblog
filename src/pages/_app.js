@@ -13,12 +13,13 @@ import reducer from '../reducers/index';
 import rootSaga from '../sagas';
 import { LOAD_CATEGORIES_CALL } from '../reducers/category';
 import { ME_CALL } from '../reducers/user';
+import { normalizeReturnUrl } from '../helpers/url';
 import { SET_CURRENT_URL } from '../reducers/settings';
 
 const fbAdmin = process.env.FB_ADMIN;
 const siteName = process.env.SITE_NAME;
-const NodeBlog = ({ Component, store, pageProps, url }) => {
-    console.log('pageProps', pageProps);
+const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
+    // console.log('pageProps', pageProps);
     return (
         <Container>
             <Provider store={store}>
@@ -90,25 +91,12 @@ const NodeBlog = ({ Component, store, pageProps, url }) => {
                         },
                     ]}
                 />
-                <AppLayout {...url}>
-                    <Component {...pageProps} url={url} store={store} />
+                <AppLayout>
+                    <Component {...pageProps} returnUrl={returnUrl} />
                 </AppLayout>
             </Provider>
         </Container>
     );
-};
-
-const normalizeUrl = (pathname, query) => {
-    let url = pathname;
-    if (!!query) {
-        url = `${url}?`;
-        for (let k in query) {
-            url = `${url}${k}=${query[k]}&`;
-        }
-        url = url.slice(0, -1);
-    }
-
-    return url;
 };
 
 NodeBlog.getInitialProps = async context => {
@@ -116,15 +104,11 @@ NodeBlog.getInitialProps = async context => {
 
     let pageProps = {};
 
-    const url = ctx.isServer
-        ? ctx.req.url
-        : !!ctx.asPath
-        ? ctx.asPath
-        : normalizeUrl(ctx.pathname, ctx.query);
-
     const state = ctx.store.getState();
     const cookie = ctx.isServer ? ctx.req.headers.cookie : '';
     const { me } = state.user;
+
+    let url = '';
 
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {
@@ -148,25 +132,35 @@ NodeBlog.getInitialProps = async context => {
         pageProps = (await Component.getInitialProps(ctx)) || {};
     }
 
-    console.log('current url ====> ', url);
-
-    if (!pageProps.doNotSetCurrentUrl) {
-        ctx.store.dispatch({ type: SET_CURRENT_URL, data: url });
+    if (pageProps.doNotSetCurrentUrl) {
+        // signIn page
+        url = ctx.query.returnUrl;
+    } else {
+        url = ctx.isServer
+            ? ctx.req.url
+            : !!ctx.asPath
+            ? ctx.asPath
+            : normalizeReturnUrl(ctx.pathname, ctx.query);
+        ctx.store.dispatch({
+            type: SET_CURRENT_URL,
+            data: url,
+        });
     }
 
-    return { pageProps, url: url };
+    return { pageProps, returnUrl: url };
 };
 
 NodeBlog.propTypes = {
     Component: PropTypes.elementType.isRequired,
     store: PropTypes.object.isRequired,
     pageProps: PropTypes.any,
-    url: PropTypes.string,
+    returnUrl: PropTypes.string,
 };
 
 const loggingMiddleware = store => next => action => {
     // 액션확인
     // console.log(action);
+    console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
     next(action);
 };
 

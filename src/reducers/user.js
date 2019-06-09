@@ -1,4 +1,5 @@
 import produce from 'immer';
+import Router from 'next/router';
 export const initialState = {
     me: null,
     signInFailMessage: '',
@@ -22,6 +23,7 @@ export const ME_FAIL = 'ME_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
+        console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
         switch (action.type) {
             case SIGN_IN_CALL:
                 draft.signInInProcess = true;
@@ -40,6 +42,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case SIGN_OUT_DONE:
                 draft.me = null;
+                Router.push(!!action.returnUrl ? action.returnUrl : '/');
                 break;
             case SIGN_OUT_FAIL:
                 break;

@@ -3,29 +3,28 @@ import ListExcerpt from '../components/ListExcerpt';
 import PropTypes from 'prop-types';
 import { LOAD_POSTS_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
+import DefaultLayout from '../components/DefaultLayout';
 
-const Home = ({ home }) => {
+const Home = ({}) => {
     return (
-        <ContentWrapper>
-            <ListExcerpt />
-        </ContentWrapper>
+        <DefaultLayout>
+            <ContentWrapper>
+                <ListExcerpt />
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 
-Home.defaultProps = {
-    home: false,
-};
+Home.defaultProps = {};
 
-Home.propTypes = {
-    home: PropTypes.bool,
-};
+Home.propTypes = {};
 
 Home.getInitialProps = async context => {
     const state = context.store.getState();
     const { home } = context.query;
     const { postsLimit, posts } = state.post;
     const lastPost = posts && posts.length > 0 && posts[posts.length - 1];
-    if (context.isServer || home) {
+    if (context.isServer || !posts || posts.length === 0) {
         context.store.dispatch({
             type: LOAD_POSTS_CALL,
             data: {
@@ -35,7 +34,7 @@ Home.getInitialProps = async context => {
             },
         });
     }
-    return { home: !!home };
+    return {};
 };
 
 export default Home;

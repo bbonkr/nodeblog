@@ -11,6 +11,7 @@ export const LOAD_CATEGORIES_FAIL = 'LOAD_CATEGORIES_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
+        console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
         switch (action.type) {
             case LOAD_CATEGORIES_CALL:
                 draft.categories = [];

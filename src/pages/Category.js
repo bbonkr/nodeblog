@@ -4,14 +4,17 @@ import PropTypes from 'prop-types';
 import { Card, Divider } from 'antd';
 import { LOAD_CATEGORY_POSTS_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
+import DefaultLayout from '../components/DefaultLayout';
 
 const Category = ({ slug }) => {
     return (
-        <ContentWrapper>
-            <Card title={slug} />
-            <Divider />
-            <ListExcerpt />
-        </ContentWrapper>
+        <DefaultLayout>
+            <ContentWrapper>
+                <Card title={slug} />
+                <Divider />
+                <ListExcerpt />
+            </ContentWrapper>
+        </DefaultLayout>
     );
 };
 

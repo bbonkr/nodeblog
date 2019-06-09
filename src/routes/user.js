@@ -2,22 +2,23 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const db = require('../models');
 const { isLoggedIn } = require('./middleware');
+const { findUserById } = require('./helper');
 
-const findUserById = async id => {
-    const me = await db.User.findOne({
-        where: {
-            id: id,
-        },
-        include: [
-            {
-                model: db.Post,
-            },
-        ],
-        attributes: ['id', 'email', 'displayName'],
-    });
+// const findUserById = async id => {
+//     const me = await db.User.findOne({
+//         where: {
+//             id: id,
+//         },
+//         include: [
+//             {
+//                 model: db.Post,
+//             },
+//         ],
+//         attributes: ['id', 'email', 'displayName'],
+//     });
 
-    return me;
-};
+//     return me;
+// };
 
 /**
  * 사용자를 추가합니다.
@@ -50,21 +51,6 @@ router.post('/', async (req, res, next) => {
         return res.json(me);
     } catch (e) {
         console.error(e);
-        return next(e);
-    }
-});
-
-router.get('/me', isLoggedIn, async (req, res, next) => {
-    try {
-        const me = await findUserById(req.user.id);
-
-        if (me) {
-            return res.json(me);
-        } else {
-            return res.status(404).send('Could not find my info.');
-        }
-    } catch (e) {
-        // console.error(e);
         return next(e);
     }
 });

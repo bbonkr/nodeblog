@@ -25,7 +25,7 @@ import {
 } from '../reducers/user';
 
 function getMyInfoApi() {
-    return axios.get('/user/me', { withCredentials: true });
+    return axios.get('/me', { withCredentials: true });
 }
 
 function* getMyInfo(action) {
