@@ -237,9 +237,14 @@ router.get('/tag/:tag', async (req, res, next) => {
 
 router.get('/:slug', async (req, res, next) => {
     try {
+        if (!req.params.slug) {
+            return res.status(401).send('유효한 요청이 아닙니다.');
+        }
+
+        const slug = decodeURIComponent(req.params.slug);
         const post = await db.Post.findOne({
             where: {
-                slug: req.params.slug,
+                slug: slug,
             },
             include: [
                 {

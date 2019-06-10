@@ -36,28 +36,33 @@ const MeLayout = ({ children }) => {
         }
     }, [me]);
 
-    const onCollapse = useCallback((collapsed, type) => {}, []);
+    const onCollapse = useCallback((collapsed, type) => {
+        setMenuCollapsed(collapsed);
+    }, []);
     const onBreakPoint = useCallback(broken => {}, []);
-    const onClickMenu = useCallback(({ item, key, keyPath, domEvent }) => {
-        switch (key) {
-            case 'me':
-                Router.push('/me');
-                setSelectedMenuKey('me');
-                break;
-            case 'posts':
-                Router.push('/me/posts');
-                setSelectedMenuKey('posts');
-                break;
-            case 'signout':
-                dispatch({
-                    type: SIGN_OUT_CALL,
-                    returnUrl: '/',
-                });
-                break;
-            default:
-                break;
-        }
-    }, [dispatch]);
+    const onClickMenu = useCallback(
+        ({ item, key, keyPath, domEvent }) => {
+            switch (key) {
+                case 'me':
+                    Router.push('/me');
+                    setSelectedMenuKey('me');
+                    break;
+                case 'posts':
+                    Router.push('/me/posts');
+                    setSelectedMenuKey('posts');
+                    break;
+                case 'signout':
+                    dispatch({
+                        type: SIGN_OUT_CALL,
+                        returnUrl: '/',
+                    });
+                    break;
+                default:
+                    break;
+            }
+        },
+        [dispatch],
+    );
 
     return (
         <Layout style={{ minHeight: '100%' }}>
@@ -72,12 +77,7 @@ const MeLayout = ({ children }) => {
                     selectedKeys={[selectedMenuKey]}
                     onClick={onClickMenu}>
                     <Menu.Item key="home">
-                        <Link
-                            href={{
-                                pathname: '/',
-                                query: { home: true },
-                            }}
-                            as="/">
+                        <Link href="/">
                             <a>NodeBlog</a>
                         </Link>
                     </Menu.Item>
@@ -95,9 +95,47 @@ const MeLayout = ({ children }) => {
                     marginTop: '64px',
                     minHeight: '100%',
                 }}>
-                {/*style={{ padding: '0 50px', marginTop: 64 }}*/}
-                <article>{children}</article>
-                {/* style={{ padding: '0.75rem' }} */}
+                <Layout>
+                    <Sider
+                        style={{
+                            overflow: 'auto',
+                            height: '100vh',
+                            position: 'fixed',
+                            left: '0',
+                        }}
+                        collapsible={true}
+                        collapsed={menuCollapsed}
+                        onCollapse={onCollapse}>
+                        <Menu mode="inline" defaultSelectedKeys={['me']}>
+                            <Menu.Item key="me">
+                                <Link href="/me">
+                                    <a>Dashboard</a>
+                                </Link>
+                            </Menu.Item>
+                            <Menu.SubMenu key="post" title="Posts">
+                                <Menu.Item key="posts">
+                                    <Link href="/me/posts">
+                                        <a>My Posts</a>
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item key="write">
+                                    <Link href="/me/write">
+                                        <a>New Post</a>
+                                    </Link>
+                                </Menu.Item>
+                                <Menu.Item>Category</Menu.Item>
+                            </Menu.SubMenu>
+                            <Menu.Item>Settings</Menu.Item>
+                            <Menu.Item>Menu 3</Menu.Item>
+                        </Menu>
+                    </Sider>
+                    <Layout style={{ marginLeft: '200px' }}>
+                        {/* <Layout.Header /> */}
+                        <Layout.Content>
+                            <article>{children}</article>
+                        </Layout.Content>
+                    </Layout>
+                </Layout>
             </Layout.Content>
             <Layout.Footer />
         </Layout>

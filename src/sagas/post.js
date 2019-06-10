@@ -22,9 +22,6 @@ import {
     LOAD_TAG_POSTS_CALL,
     LOAD_TAG_POSTS_DONE,
     LOAD_TAG_POSTS_FAIL,
-    LOAD_MY_POSTS_CALL,
-    LOAD_MY_POSTS_DONE,
-    LOAD_MY_POSTS_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -69,7 +66,7 @@ function* watchLoadPosts() {
 }
 
 function loadSinglePostApi(slug) {
-    return axios.get(`/posts/${slug}`);
+    return axios.get(`/posts/${encodeURIComponent(slug)}`);
 }
 
 function* loadSinglePost(action) {
@@ -171,51 +168,11 @@ function* watchLoadTagPosts() {
     yield takeLatest(LOAD_TAG_POSTS_CALL, loadTagPosts);
 }
 
-function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
-    return axios.get(
-        `/me/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-        {
-            withCredentials: true,
-        },
-    );
-}
-
-function* loadMyPosts(action) {
-    try {
-        const { pageToken, limit, keyword } = action.data;
-
-        const result = yield call(
-            loadMyPostsApi,
-            pageToken,
-            limit || 10,
-            keyword,
-        );
-        yield put({
-            type: LOAD_MY_POSTS_DONE,
-            data: result.data,
-        });
-    } catch (e) {
-        console.error(e);
-        yield put({
-            type: LOAD_MY_POSTS_FAIL,
-            error: e,
-            reason: e.response && e.response.data,
-        });
-    }
-}
-
-function* watchLoadMyPosts() {
-    yield takeLatest(LOAD_MY_POSTS_CALL, loadMyPosts);
-}
-
 export default function* postSaga() {
     yield all([
         fork(watchLoadPosts),
         fork(watchLoadSinglePost),
         fork(watchLoadCategoryPosts),
         fork(watchLoadTagPosts),
-        fork(watchLoadMyPosts),
     ]);
 }

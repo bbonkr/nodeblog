@@ -22,6 +22,8 @@ export const initialState = {
     myPosts: [],
     loadingMyPosts: false,
     loadMyPostErrorReason: '',
+
+    writingPost: false,
 };
 
 export const LOAD_POSTS_CALL = 'LOAD_POSTS_CALL';
@@ -39,10 +41,6 @@ export const LOAD_CATEGORY_POSTS_FAIL = 'LOAD_CATEGORY_POSTS_FAIL';
 export const LOAD_TAG_POSTS_CALL = 'LOAD_TAG_POSTS_CALL';
 export const LOAD_TAG_POSTS_DONE = 'LOAD_TAG_POSTS_DONE';
 export const LOAD_TAG_POSTS_FAIL = 'LOAD_TAG_POSTS_FAIL';
-
-export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
-export const LOAD_MY_POSTS_DONE = 'LOAD_MY_POSTS_DONE';
-export const LOAD_MY_POSTS_FAIL = 'LOAD_MY_POSTS_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -96,16 +94,6 @@ const reducer = (state = initialState, action) =>
             case LOAD_SINGLE_POST_FAIL:
                 draft.loadSinglePostErrorReason = action.error;
                 draft.loadingPost = false;
-                break;
-            case LOAD_MY_POSTS_CALL:
-                draft.loadingMyPosts = true;
-                break;
-            case LOAD_MY_POSTS_DONE:
-                draft.loadingMyPosts = false;
-                draft.myPosts = action.data;
-                break;
-            case LOAD_MY_POSTS_FAIL:
-                draft.loadingMyPosts = false;
                 break;
             default:
                 break;

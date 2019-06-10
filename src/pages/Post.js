@@ -31,10 +31,10 @@ Post.propTypes = {
 
 Post.getInitialProps = async context => {
     const { slug } = context.query;
-
+    const decodedSlug = decodeURIComponent(slug);
     context.store.dispatch({
         type: LOAD_SINGLE_POST_CALL,
-        data: slug,
+        data: decodedSlug,
     });
 
     return {

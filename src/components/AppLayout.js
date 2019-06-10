@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 const AppLayout = ({ children }) => {
     return (
-        <div style={{ minHeight: '100%' }}>
+        <div style={{ minHeight: '100vh' }}>
             <BackTop />
             <div>{children}</div>
         </div>

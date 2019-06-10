@@ -4,7 +4,7 @@ import { List, Card } from 'antd';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
-import { LOAD_MY_POSTS_CALL } from '../../reducers/post';
+import { LOAD_MY_POSTS_CALL } from '../../reducers/me';
 
 const Posts = () => {
     const { myPosts } = useSelector(state => state.post);
@@ -34,7 +34,7 @@ const Posts = () => {
 
 Posts.getInitialProps = async context => {
     const state = context.store.getState();
-    const { postsLimit, myPosts } = state.post;
+    const { postsLimit, myPosts } = state.me;
     const lastPost =
         myPosts && myPosts.length > 0 && myPosts[myPosts.length - 1];
 

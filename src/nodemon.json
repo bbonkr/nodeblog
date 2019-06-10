@@ -13,6 +13,7 @@
         "sagas",
         "utils",
         "index.js",
+        "next.config.js",
         "nodemon.json"
     ],
     "ignore": ["*.test.js", "__snapshots__"],
