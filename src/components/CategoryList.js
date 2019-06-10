@@ -3,6 +3,11 @@ import { List, Badge } from 'antd';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 
+/**
+ * 분류 목록을 출력하는 컴포넌트입니다.
+ *
+ * @param {array} 분류 데이터
+ */
 const CategoryList = ({ categories }) => {
     return (
         <List

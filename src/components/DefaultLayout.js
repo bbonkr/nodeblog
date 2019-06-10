@@ -1,23 +1,10 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import {
-    BackTop,
-    Menu,
-    Input,
-    Col,
-    Button,
-    Icon,
-    Modal,
-    Layout,
-    Avatar,
-} from 'antd';
+import { Menu, Input, Col, Button, Icon, Modal, Layout, Avatar } from 'antd';
 import PropTypes from 'prop-types';
 import { useSelector, useDispatch } from 'react-redux';
 import Router from 'next/router';
 import styled from 'styled-components';
-// import LoginForm from './LoginForm';
-// import MyProfileCard from './MyProfileCard';
-// import { LOAD_USER_REQUEST } from '../reducers/user';
 import CategoryList from '../components/CategoryList';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { SIGN_OUT_CALL } from '../reducers/user';
@@ -34,21 +21,19 @@ const ContentRight = styled(Col)`
     padding: 0.6em 1em 0.6em;
 `;
 
-const DefaultLayout = ({ children, url }) => {
+/**
+ * 기본 레이아웃 컴포넌트입니다.
+ *
+ * @param {element} 자식 요소
+ * @param {string}
+ */
+const DefaultLayout = ({ children }) => {
     const dispatch = useDispatch();
-    // const { me } = useSelector(state => state.user);
-    const { categories } = useSelector(s => s.category);
+
     const [searchModalVisible, setSearchModalVisible] = useState(false);
     const [searchKeywordText, setSearchKeywordText] = useState('');
     const { me } = useSelector(s => s.user);
     const { currentUrl } = useSelector(state => state.settings);
-    // Server side rendering 은 페이지에서 적용해야 한다.
-    // _app.js 로 이동
-    // useEffect(() => {
-    //     if (!me) {
-    //         dispatch({ type: LOAD_USER_REQUEST });
-    //     }
-    // }, []);
 
     const onClickShowSearchModal = useCallback(e => {
         setSearchKeywordText('');
@@ -110,11 +95,6 @@ const DefaultLayout = ({ children, url }) => {
                             </Link>
                         </Menu.Item>
                         <Menu.Item key="search">
-                            {/* <Input.Search
-                            enterButton
-                            style={{ verticalAlign: 'middle' }}
-                            onSearch={onSearch}
-                        /> */}
                             <Button
                                 icon="search"
                                 style={{ verticalAlign: 'middle' }}
@@ -165,11 +145,9 @@ const DefaultLayout = ({ children, url }) => {
                 <Layout.Content
                     style={{
                         marginTop: '64px',
-                        minHeight: '100%',
+                        minHeight: '100vh',
                     }}>
-                    {/*style={{ padding: '0 50px', marginTop: 64 }}*/}
                     <article>{children}</article>
-                    {/* style={{ padding: '0.75rem' }} */}
                 </Layout.Content>
                 <Layout.Footer />
             </Layout>
@@ -188,29 +166,6 @@ const DefaultLayout = ({ children, url }) => {
                     onSearch={onSearch}
                 />
             </Modal>
-
-            {/* {me ? <MyProfileCard /> : <LoginForm />} */}
-            {/* <Row gutter={10}>
-                <ContentLeft
-                    xs={24}
-                    md={6}
-                    style={{ padding: '0.6em 1.0em 0.6em' }}>
-                    
-                    <CategoryList categories={categories} />
-                </ContentLeft>
-                <ContentMain
-                    xs={24}
-                    md={12}
-                    style={{ padding: '0.6em 1.0em 0.6em' }}>
-                    {children}
-                </ContentMain>
-                <ContentRight
-                    xs={24}
-                    md={6}
-                    style={{ padding: '0.6em 1.0em 0.6em' }}>
-                    <a href="https://github.com/bbonkr">bbon</a>
-                </ContentRight>
-            </Row>  */}
         </div>
     );
 };

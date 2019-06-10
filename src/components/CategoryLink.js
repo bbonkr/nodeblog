@@ -8,6 +8,12 @@ const LinkWrapper = styled.span`
     margin-right: 1em;
 `;
 
+/**
+ * 분류 링크 컴포넌트입니다.
+ *
+ * @param {string} 분류 이름
+ * @param {string} 분류 슬러그
+ */
 const CategoryLink = ({ name, slug }) => {
     return (
         <LinkWrapper>
