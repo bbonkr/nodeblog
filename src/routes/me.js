@@ -22,6 +22,54 @@ router.get('/', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.get('/post/:id', isLoggedIn, async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id || '0', 10);
+
+        const post = await db.Post.findOne({
+            where: { id: id, UserId: req.user.id },
+            include: [
+                {
+                    model: db.User,
+                    attributes: ['id', 'email', 'displayName'],
+                },
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                },
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+            ],
+            attributes: [
+                'id',
+                'title',
+                'slug',
+                'markdown',
+                'UserId',
+                'createdAt',
+                'updatedAt',
+            ],
+        });
+
+        if (!post) {
+            return res.status(404).send('Could not find a post.');
+        }
+
+        return res.json(post);
+    } catch (e) {
+        // console.error(e);
+        return next(e);
+    }
+});
+
 router.get('/posts', isLoggedIn, async (req, res, next) => {
     try {
         const limit = (req.query.limit && parseInt(req.query.limit, 10)) || 10;
@@ -67,6 +115,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
                     attributes: ['id'],
                 },
             ],
+            order: [['createdAt', 'DESC']],
             limit: limit,
             skip: skip,
             attributes: [

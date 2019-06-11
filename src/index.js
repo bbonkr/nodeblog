@@ -8,18 +8,13 @@ const passport = require('passport');
 const passportConfig = require('./passport');
 const dotenv = require('dotenv');
 const next = require('next');
-const axios = require('axios');
 const path = require('path');
-// const userApiRouter = require('./routes/user');
-// const postsApiRouter = require('./routes/posts');
-// const postApiRouter = require('./routes/post');
-// const hashtagApiRouter = require('./routes/hashtag');
-// const sampleApiRouter = require('./routes/sample');
-const addApiRoutes = require('./routes');
 
 const expressApp = express();
 
 dotenv.config();
+
+const serverPort = process.env.PORT || 3000;
 
 const dev = process.env.NODE_ENV !== 'production';
 const prod = process.env.NODE_ENV === 'production';
@@ -37,7 +32,7 @@ passportConfig();
 nextApp.prepare().then(() => {
     /** express app */
 
-    // logging
+    // logging https://github.com/expressjs/morgan
     expressApp.use(morgan('dev'));
 
     // form data
@@ -127,13 +122,17 @@ nextApp.prepare().then(() => {
         return nextApp.render(req, res, '/post', { slug: req.params.slug });
     });
 
+    // expressApp.get('/me/write/:id', (req, res) => {
+    //     return nextApp.render(req, res, '/me/write', { id: req.params.id });
+    // });
+
     expressApp.get('*', (req, res) => handle(req, res));
 
     // seed data
     const { seed } = require('./config/seed');
     seed();
 
-    expressApp.listen(3000, () => {
-        console.log('server is running on http://localhost:3000');
+    expressApp.listen(serverPort, () => {
+        console.log(`server is running on http://localhost:${serverPort}`);
     });
 });

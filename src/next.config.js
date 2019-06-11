@@ -1,7 +1,10 @@
 const webpack = require('webpack');
-const withBundleAnalyzer = require('@zeit/next-bundle-analyzer');
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+    enabled: process.env.ANALYZE === 'true',
+});
 const CompressionPlugin = require('compression-webpack-plugin');
-const withCSS = require('@zeit/next-css');
+// const withCSS = require('@zeit/next-css');
+const withSass = require('@zeit/next-sass');
 
 function HACK_removeMinimizeOptionFromCssLoaders(config) {
     console.warn(
@@ -18,32 +21,44 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
     });
 }
 
-module.exports = withCSS(
-    withBundleAnalyzer({
-        // cssModules: true,
-        // cssLoaderOptions: {
-        //     url: false,
+module.exports = withBundleAnalyzer(
+    withSass({
+        // withSass
+        // sassLoaderOptions: {
+        //     includePaths: ['styles'],
         // },
-        analyzeServer: ['server', 'both'].includes(process.env.BUNDLE_ANALYZE),
-        analyzeBrowser: ['browser', 'both'].includes(
-            process.env.BUNDLE_ANALYZE,
-        ),
-        bundleAnalyzerConfig: {
-            server: {
-                analyzerMode: 'static',
-                reportFilename: 'bundles/server.html',
-            },
 
-            browser: {
-                analyzerMode: 'static',
-                reportFilename: 'bundles/client.html',
-            },
-        },
+        // withBundleAnalyzer
+        // analyzeServer: ['server', 'both'].includes(
+        //     process.env.BUNDLE_ANALYZE,
+        // ),
+        // analyzeBrowser: ['browser', 'both'].includes(
+        //     process.env.BUNDLE_ANALYZE,
+        // ),
+        // bundleAnalyzerConfig: {
+        //     server: {
+        //         analyzerMode: 'static',
+        //         reportFilename: 'bundles/server.html',
+        //     },
+
+        //     browser: {
+        //         analyzerMode: 'static',
+        //         reportFilename: 'bundles/client.html',
+        //     },
+        // },
 
         distDir: '.next',
         webpack(config) {
             // console.log('config', config);
             const prod = process.env.NODE_ENV === 'production';
+
+            const plugins = [
+                ...config.plugins,
+                new webpack.ContextReplacementPlugin(
+                    /moment[/\\]locale$/,
+                    /^\.\/ko$/,
+                ),
+            ];
 
             if (prod) {
                 config.plugins.push(new CompressionPlugin());
@@ -55,17 +70,25 @@ module.exports = withCSS(
             // });
             // console.log(config);
             HACK_removeMinimizeOptionFromCssLoaders(config);
+
             return {
                 ...config,
                 mode: prod ? 'production' : 'development',
                 devtool: prod ? 'hidden-source-map' : 'eval',
-                plugins: [
-                    ...config.plugins,
-                    new webpack.ContextReplacementPlugin(
-                        /moment[/\\]locale$/,
-                        /ko/,
-                    ),
-                ],
+                module: {
+                    ...config.module,
+                    rules: [
+                        ...config.module.rules,
+                        {
+                            loader: 'webpack-ant-icon-loader',
+                            enforce: 'pre',
+                            include: [
+                                require.resolve('@ant-design/icons/lib/dist'),
+                            ],
+                        },
+                    ],
+                },
+                plugins: plugins,
             };
         },
     }),

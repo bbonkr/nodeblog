@@ -53,10 +53,11 @@ function* loadPosts(action) {
             keyword: keyword,
         });
     } catch (e) {
-        // console.error(e);
+        console.error(e);
         yield put({
             type: LOAD_POSTS_FAIL,
             error: e,
+            reason: e.response && e.response.data,
         });
     }
 }
@@ -81,6 +82,7 @@ function* loadSinglePost(action) {
         yield put({
             type: LOAD_SINGLE_POST_FAIL,
             error: e,
+            reason: e.response && e.response.data,
         });
     }
 }

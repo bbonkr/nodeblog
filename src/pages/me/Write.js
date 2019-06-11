@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Input, Divider, Select, Form, Button, Tabs, Icon } from 'antd';
 import Markdown from 'react-markdown';
@@ -11,12 +11,15 @@ import xssFilter from 'showdown-xss-filter';
 import {
     LOAD_MY_CATEGORIES_CALL,
     LOAD_MY_TAGS_CALL,
+    LOAD_MY_POST_CALL,
     WRITE_POST_CALL,
+    EDIT_POST_CALL,
+    WRITE_NEW_POST_CALL,
 } from '../../reducers/me';
 
 const PLACEHOLDER_MARKDOWN = 'Write your thought!';
 
-const Write = () => {
+const Write = ({ id }) => {
     const dispatch = useDispatch();
 
     // https://github.com/showdownjs/showdown/wiki/Showdown-options
@@ -48,10 +51,16 @@ const Write = () => {
             extensions: [xssFilter],
         },
     );
+    // const { myPost } = useSelector(s => s.me);
 
-    const { categories, tags, loadingCategories, loadingTags } = useSelector(
-        s => s.me,
-    );
+    const {
+        categories,
+        tags,
+        loadingCategories,
+        loadingTags,
+        loadingMyPost,
+        myPost,
+    } = useSelector(s => s.me);
 
     const [title, setTitle] = useState('');
     const [slug, setSlug] = useState('');
@@ -59,6 +68,10 @@ const Write = () => {
     const [html, setHtml] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
+    const [selectedCategoryValues, setSelectedCategoryValues] = useState([]);
+    const [selectedTagValues, setSelectedTagValues] = useState([]);
+    // const [initCategories, setInitCategories] = useState([]);
+    // const [initTags, setInitTags] = useState([]);
 
     const onChangeTitle = useCallback(e => {
         const text = e.target.value;
@@ -97,6 +110,61 @@ const Write = () => {
     //     }
     // }, []);
 
+    useEffect(() => {
+        console.log('/me/write => useEffect id: ', id);
+
+        // if (!id) {
+        //     dispatch({ type: WRITE_NEW_POST_CALL });
+        // }
+
+        if (id && myPost) {
+            setTitle(myPost.title);
+            setSlug(myPost.slug);
+            setMarkdown(myPost.markdown);
+
+            // setInitCategories(
+            //     !!myPost.Categories
+            //         ? myPost.Categories.map(v => ({
+            //               value: v.slug,
+            //               label: v.name,
+            //           }))
+            //         : [],
+            // );
+
+            // setInitTags(
+            //     !!myPost.Tags
+            //         ? myPost.Tags.map(v => ({ value: v.slug, label: v.name }))
+            //         : [],
+            // );
+
+            setSelectedCategoryValues(
+                !!myPost.Categories ? myPost.Categories.map(v => v.slug) : [],
+            );
+            setSelectedTagValues(
+                !!myPost.Tags ? myPost.Tags.map(v => v.slug) : [],
+            );
+
+            setSelectedCategories(
+                myPost.Categories
+                    ? myPost.Categories.map(v => {
+                          return { name: v.name, slug: v.slug };
+                      })
+                    : [],
+            );
+
+            setSelectedTags(
+                myPost.Tags
+                    ? myPost.Tags.map(v => {
+                          return {
+                              name: v.name,
+                              slug: v.slug,
+                          };
+                      })
+                    : [],
+            );
+        }
+    }, [dispatch, id, myPost]);
+
     const onTabKeyPressed = useCallback(e => {
         e.preventDefault();
         const indent = `    `;
@@ -118,11 +186,13 @@ const Write = () => {
                 return { name: v.props.value, slug: v.key };
             }),
         );
+        setSelectedCategoryValues(values);
     }, []);
 
     const onChangeTags = useCallback((values, options) => {
         console.log('selected values', values);
         console.log('selected options', options);
+
         setSelectedTags(
             options.map(v => {
                 return {
@@ -131,6 +201,7 @@ const Write = () => {
                 };
             }),
         );
+        setSelectedTagValues(values);
     }, []);
 
     const onSubmit = useCallback(
@@ -144,18 +215,32 @@ const Write = () => {
                 setSlug(title.replace(/\s+/g, '-').toLowerCase());
             }
 
-            dispatch({
-                type: WRITE_POST_CALL,
-                data: {
-                    title: title,
-                    slug: slug,
-                    markdown: markdown,
-                    categories: selectedCategories,
-                    tags: selectedTags,
-                },
-            });
+            if (id) {
+                dispatch({
+                    type: EDIT_POST_CALL,
+                    id: id,
+                    data: {
+                        title: title,
+                        slug: slug,
+                        markdown: markdown,
+                        categories: selectedCategories,
+                        tags: selectedTags,
+                    },
+                });
+            } else {
+                dispatch({
+                    type: WRITE_POST_CALL,
+                    data: {
+                        title: title,
+                        slug: slug,
+                        markdown: markdown,
+                        categories: selectedCategories,
+                        tags: selectedTags,
+                    },
+                });
+            }
         },
-        [dispatch, markdown, selectedCategories, selectedTags, slug, title],
+        [dispatch, id, markdown, selectedCategories, selectedTags, slug, title],
     );
 
     return (
@@ -204,14 +289,14 @@ const Write = () => {
                             mode="multiple"
                             onChange={onChangeCategories}
                             style={{ width: '100%' }}
-                            loading={loadingCategories}>
+                            loading={loadingCategories}
+                            value={selectedCategoryValues}>
                             {categories.map(c => {
-                                const selected = false;
                                 return (
                                     <Select.Option
                                         key={c.slug}
-                                        selected={selected}
-                                        value={c.name}>
+                                        value={c.slug}
+                                        label={c.name}>
                                         {c.name}
                                     </Select.Option>
                                 );
@@ -223,14 +308,14 @@ const Write = () => {
                             mode="tags"
                             onChange={onChangeTags}
                             style={{ width: '100%' }}
-                            loading={loadingTags}>
+                            loading={loadingTags}
+                            value={selectedTagValues}>
                             {tags.map(t => {
-                                const selected = false;
                                 return (
                                     <Select.Option
                                         key={t.slug}
-                                        selected={selected}
-                                        value={t.name}>
+                                        value={t.slug}
+                                        label={t.name}>
                                         {t.name}
                                     </Select.Option>
                                 );
@@ -249,6 +334,17 @@ const Write = () => {
 };
 
 Write.getInitialProps = async context => {
+    const { id } = context.query;
+
+    console.log('/me/write ==> id: ', id);
+
+    if (id) {
+        context.store.dispatch({
+            type: LOAD_MY_POST_CALL,
+            data: id,
+        });
+    }
+
     context.store.dispatch({
         type: LOAD_MY_CATEGORIES_CALL,
     });
@@ -257,7 +353,7 @@ Write.getInitialProps = async context => {
         type: LOAD_MY_TAGS_CALL,
     });
 
-    return {};
+    return { id };
 };
 
 export default withAuth(Write);

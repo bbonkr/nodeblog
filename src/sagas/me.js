@@ -13,6 +13,9 @@ import {
     LOAD_MY_POSTS_CALL,
     LOAD_MY_POSTS_DONE,
     LOAD_MY_POSTS_FAIL,
+    LOAD_MY_POST_CALL,
+    LOAD_MY_POST_DONE,
+    LOAD_MY_POST_FAIL,
     WRITE_POST_CALL,
     WRITE_POST_DONE,
     WRITE_POST_FAIL,
@@ -22,6 +25,12 @@ import {
     LOAD_MY_CATEGORIES_CALL,
     LOAD_MY_CATEGORIES_FAIL,
     LOAD_MY_CATEGORIES_DONE,
+    EDIT_POST_CALL,
+    EDIT_POST_DONE,
+    EDIT_POST_FAIL,
+    WRITE_NEW_POST_CALL,
+    WRITE_NEW_POST_FAIL,
+    WRITE_NEW_POST_DONE,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -64,7 +73,7 @@ function* watchLoadMyPosts() {
 }
 
 function writePostApi(formData) {
-    return axios.post('/post?id=', formData, { withCredentials: true });
+    return axios.post('/post', formData, { withCredentials: true });
 }
 
 function* writePost(action) {
@@ -135,11 +144,81 @@ function* watchLoadTags() {
     yield takeLatest(LOAD_MY_TAGS_CALL, loadTags);
 }
 
+function editPostApi(id, data) {
+    return axios.patch(`/post/${id}`, data, { withCredentials: true });
+}
+
+function* editPost(action) {
+    try {
+        const result = yield call(editPostApi, action.id, action.data);
+        yield put({
+            type: EDIT_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        yield put({
+            type: EDIT_POST_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchEditPost() {
+    yield takeLatest(EDIT_POST_CALL, editPost);
+}
+
+function loadMyPostApi(id) {
+    return axios.get(`/me/post/${id}`, { withCredentials: true });
+}
+
+function* loadMyPost(action) {
+    try {
+        const result = yield call(loadMyPostApi, action.data);
+
+        yield put({
+            type: LOAD_MY_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_MY_POST_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadMyPost() {
+    yield takeLatest(LOAD_MY_POST_CALL, loadMyPost);
+}
+
+function* writeNewPost(action) {
+    try {
+        yield put({
+            type: WRITE_NEW_POST_DONE,
+        });
+    } catch (e) {
+        yield put({
+            type: WRITE_NEW_POST_FAIL,
+            error: e,
+        });
+    }
+}
+
+function* watchWriteNewPost() {
+    yield takeLatest(WRITE_NEW_POST_CALL, writeNewPost);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
+        fork(watchLoadMyPost),
         fork(watchWritePost),
+        fork(watchEditPost),
         fork(watchLoadCategories),
         fork(watchLoadTags),
+        fork(watchWriteNewPost),
     ]);
 }

@@ -83,6 +83,12 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                             type: 'text/css',
                             charset: 'UTF-8',
                         },
+                        {
+                            rel: 'stylesheet',
+                            href: '/_next/static/css/styles.chunk.css',
+                            type: 'text/css',
+                            charset: 'UTF-8',
+                        },
                     ]}
                     script={[
                         {
@@ -113,12 +119,12 @@ NodeBlog.getInitialProps = async context => {
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {
         axios.defaults.headers.Cookie = cookie;
-    }
 
-    if (!me) {
-        ctx.store.dispatch({
-            type: ME_CALL,
-        });
+        if (!me) {
+            ctx.store.dispatch({
+                type: ME_CALL,
+            });
+        }
     }
 
     // if (ctx.isServer) {
@@ -141,6 +147,7 @@ NodeBlog.getInitialProps = async context => {
             : !!ctx.asPath
             ? ctx.asPath
             : normalizeReturnUrl(ctx.pathname, ctx.query);
+
         ctx.store.dispatch({
             type: SET_CURRENT_URL,
             data: url,

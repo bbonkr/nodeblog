@@ -9,7 +9,8 @@
         "sequelize": "node_modules/.bin/sequelize",
         "build": "cross-env BUNDLE_ANALYZER=both next build",
         "prestart": "npm run build",
-        "start": "cross-env NODE_ENV=production next start -p 3000"
+        "start": "cross-env NODE_ENV=production PORT=5000 node index.js",
+        "next:start": "cross-env NODE_ENV=production next start -p 5000"
     },
     "author": "",
     "license": "MIT",
@@ -23,6 +24,8 @@
         "@types/sequelize": "^4.28.3",
         "@zeit/next-bundle-analyzer": "^0.1.2",
         "@zeit/next-css": "^1.0.1",
+        "@zeit/next-sass": "^1.0.1",
+        "@zeit/next-typescript": "^1.1.1",
         "acorn": "^6.1.1",
         "antd": "^3.18.2",
         "axios": "^0.19.0",
@@ -54,6 +57,7 @@
         "next": "^8.1.0",
         "next-redux-saga": "^4.0.2",
         "next-redux-wrapper": "^3.0.0-alpha.2",
+        "node-sass": "^4.12.0",
         "nodemon": "^1.19.0",
         "passport": "^0.4.0",
         "passport-local": "^1.0.0",
@@ -73,11 +77,12 @@
         "showdown": "^1.9.0",
         "showdown-xss-filter": "^0.2.0",
         "styled-components": "^4.2.0",
-        "typescript": "^3.5.1",
         "webpack": "^4.32.1",
+        "webpack-ant-icon-loader": "^1.0.5",
         "webpack-bundle-analyzer": "^3.3.2"
     },
     "devDependencies": {
+        "@next/bundle-analyzer": "^8.1.0",
         "eslint-plugin-react-hooks": "^1.6.0"
     },
     "eslintConfig": {

@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { List, Card } from 'antd';
 import MeLayout from '../../components/MeLayout';
@@ -7,7 +8,7 @@ import { withAuth } from '../../utils/auth';
 import { LOAD_MY_POSTS_CALL } from '../../reducers/me';
 
 const Posts = () => {
-    const { myPosts } = useSelector(state => state.post);
+    const { myPosts } = useSelector(state => state.me);
 
     return (
         <MeLayout>
@@ -20,7 +21,19 @@ const Posts = () => {
                             return (
                                 <List.Item key={post.id}>
                                     <Card>
-                                        <Card.Meta title={post.title} />
+                                        <Card.Meta
+                                            title={
+                                                <Link
+                                                    href={{
+                                                        pathname: '/me/write',
+                                                        query: { id: post.id },
+                                                    }}>
+                                                    <a>
+                                                        <h3>{post.title}</h3>
+                                                    </a>
+                                                </Link>
+                                            }
+                                        />
                                     </Card>
                                 </List.Item>
                             );

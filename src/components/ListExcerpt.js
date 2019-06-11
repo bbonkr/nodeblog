@@ -10,6 +10,8 @@ import { LOAD_POSTS_CALL } from '../reducers/post';
 import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 
+// import '../styles/styles.scss';
+
 const FullWidthButton = styled(Button)`
     width: 100%;
 `;
@@ -60,8 +62,8 @@ const ListExcerpt = () => {
                     xs: 1,
                     sm: 1,
                     md: 3,
-                    lg: 4,
-                    xl: 6,
+                    lg: 3,
+                    xl: 4,
                     xxl: 6,
                 }}
                 loading={loadingPosts}
@@ -105,46 +107,64 @@ const ListExcerpt = () => {
                                             }}
                                             as={`/post/${slug}`}>
                                             <a>
-                                                <h3>{title}</h3>
+                                                <h3
+                                                    style={{
+                                                        textOverflow:
+                                                            'ellipsis',
+                                                    }}>
+                                                    {title}
+                                                </h3>
                                             </a>
                                         </Link>
                                     }
                                 />
-                                <Divider dashed={true} />
-                                <div>
-                                    {post.Categories &&
-                                        post.Categories.map(v => {
-                                            return (
-                                                <CategoryLink
-                                                    key={v.slug}
-                                                    name={v.name}
-                                                    slug={v.slug}
-                                                />
-                                            );
-                                        })}
-                                </div>
+                                <div
+                                    style={{
+                                        minHeight: '16rem',
+                                        maxHeigh: '16rem',
+                                    }}>
+                                    <Divider dashed={true} />
+                                    <div>
+                                        {post.Categories &&
+                                            post.Categories.map(v => {
+                                                return (
+                                                    <CategoryLink
+                                                        key={v.slug}
+                                                        name={v.name}
+                                                        slug={v.slug}
+                                                    />
+                                                );
+                                            })}
+                                    </div>
 
-                                {post.Categories &&
-                                    post.Categories.length > 0 && (
+                                    {post.Categories &&
+                                        post.Categories.length > 0 && (
+                                            <Divider dashed={true} />
+                                        )}
+
+                                    <div
+                                        style={{
+                                            textOverflow: 'ellipsis',
+                                            height: '100%',
+                                        }}>
+                                        {excerpt}
+                                    </div>
+
+                                    {post.Tags && post.Tags.length > 0 && (
                                         <Divider dashed={true} />
                                     )}
-
-                                <div>{excerpt}</div>
-
-                                {post.Tags && post.Tags.length > 0 && (
-                                    <Divider dashed={true} />
-                                )}
-                                <div>
-                                    {post.Tags &&
-                                        post.Tags.map(v => {
-                                            return (
-                                                <TagLink
-                                                    key={v.slug}
-                                                    name={v.name}
-                                                    slug={v.slug}
-                                                />
-                                            );
-                                        })}
+                                    <div>
+                                        {post.Tags &&
+                                            post.Tags.map(v => {
+                                                return (
+                                                    <TagLink
+                                                        key={v.slug}
+                                                        name={v.name}
+                                                        slug={v.slug}
+                                                    />
+                                                );
+                                            })}
+                                    </div>
                                 </div>
                             </Card>
                         </List.Item>

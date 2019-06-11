@@ -119,7 +119,7 @@ const MeLayout = ({ children }) => {
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="write">
-                                    <Link href="/me/write">
+                                    <Link href="/me/write" shallow={false}>
                                         <a>New Post</a>
                                     </Link>
                                 </Menu.Item>
