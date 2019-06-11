@@ -93,7 +93,7 @@ const MeLayout = ({ children }) => {
             <Layout.Content
                 style={{
                     marginTop: '64px',
-                    minHeight: '100%',
+                    minHeight: '100vh',
                 }}>
                 <Layout>
                     <Sider
