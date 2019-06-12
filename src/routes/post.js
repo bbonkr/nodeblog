@@ -9,7 +9,7 @@ const showdown = require('showdown');
 const xssFilter = require('showdown-xss-filter');
 const { isLoggedIn } = require('./middleware');
 const Op = Sequelize.Op;
-
+const { makeSlug } = require('../helpers/url');
 const EXCERPT_LENGTH = 200;
 
 const markdownConverter = new showdown.Converter(
@@ -55,7 +55,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             ? slug
             : title.replace(/\s+/g, '-').toLowerCase();
 
-        const checkPost = await db.Post.where({
+        const checkPost = await db.Post.findOne({
             where: { slug: slug, UserId: req.user.id },
         });
         if (!!checkPost) {
@@ -94,10 +94,12 @@ router.post('/', isLoggedIn, async (req, res, next) => {
         if (tags) {
             const foundTags = await Promise.all(
                 tags.map(v => {
+                    const slug = makeSlug(v.name);
                     return db.Tag.findOrCreate({
                         where: { slug: v.slug },
                         defaults: {
-                            slug: v.slug,
+                            name: v.name,
+                            slug: slug,
                         },
                     });
                 }),
@@ -261,10 +263,12 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
         if (tags) {
             const foundTags = await Promise.all(
                 tags.map(v => {
+                    const slug = makeSlug(v.name);
                     return db.Tag.findOrCreate({
                         where: { slug: v.slug },
                         defaults: {
-                            slug: v.slug,
+                            name: v.name,
+                            slug: slug,
                         },
                     });
                 }),

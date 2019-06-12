@@ -1,4 +1,6 @@
 import produce from 'immer';
+import { ShowNotification } from '../components/ShowNotification';
+import Router from 'next/router';
 
 export const initialState = {
     myPosts: [],
@@ -126,7 +128,16 @@ const reducer = (state = initialState, action) =>
                 break;
             case WRITE_POST_DONE:
                 draft.writingPost = false;
-                console.log(action.data);
+                // draft.myPost = action.data;
+                ShowNotification({
+                    title: 'Saved.',
+                    message: 'Your request is success.',
+                });
+                Router.push({
+                    pathname: '/me/write',
+                    query: { id: action.data.id },
+                    as: `/me/write/${action.data.id}`,
+                });
                 break;
             case WRITE_POST_FAIL:
                 draft.writingPost = false;
@@ -136,7 +147,16 @@ const reducer = (state = initialState, action) =>
                 break;
             case EDIT_POST_DONE:
                 draft.writingPost = false;
-                console.log(action.data);
+                // draft.myPost = action.data;
+                ShowNotification({
+                    title: 'Saved.',
+                    message: 'Your request is success.',
+                });
+                Router.push({
+                    pathname: '/me/write',
+                    query: { id: action.data.id },
+                    as: `/me/write/${action.data.id}`,
+                });
                 break;
             case EDIT_POST_FAIL:
                 draft.writingPost = false;
