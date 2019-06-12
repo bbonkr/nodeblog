@@ -9,7 +9,7 @@ const passportConfig = require('./passport');
 const dotenv = require('dotenv');
 const next = require('next');
 const path = require('path');
-
+const DatabaseSessionStore = require('./passport/databaseSessionStore');
 const expressApp = express();
 
 dotenv.config();
@@ -28,6 +28,11 @@ db.sequelize.sync({
 });
 
 passportConfig();
+
+const dbSessionStore = new DatabaseSessionStore({
+    database: db,
+    expiration: 1000 * 60 * 60 * 24 * 90,
+});
 
 nextApp.prepare().then(() => {
     /** express app */
@@ -58,7 +63,7 @@ nextApp.prepare().then(() => {
                 httpOnly: true,
                 secure: false, // https 사용시 true
             },
-            // store:
+            store: dbSessionStore,
         }),
     );
 

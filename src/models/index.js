@@ -1,5 +1,3 @@
-
-
 const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
@@ -37,6 +35,8 @@ db.Post = require('./Post')(sequelize, Sequelize);
 db.User = require('./User')(sequelize, Sequelize);
 db.Category = require('./Category')(sequelize, Sequelize);
 db.PostAccessLog = require('./PostAccessLog')(sequelize, Sequelize);
+/** passport store */
+db.SessionStore = require('../passport/sessionStore')(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {
