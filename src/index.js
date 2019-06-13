@@ -43,7 +43,7 @@ nextApp.prepare().then(() => {
     // form data
     expressApp.use(express.json());
     expressApp.use(express.urlencoded({ extended: true }));
-    expressApp.use('/', express.static('uploads'));
+    expressApp.use('/uploads', express.static('uploads'));
     expressApp.use('/', express.static(path.join(__dirname, 'public')));
 
     expressApp.use(

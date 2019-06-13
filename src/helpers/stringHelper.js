@@ -53,6 +53,16 @@ module.exports.formatNumber = num => {
     return n;
 };
 
+module.exports.replaceAll = (fromText, toFind, thenReplace) => {
+    if (typeof fromText !== 'string') {
+        throw new Error('First argument should be a string type.');
+    }
+
+    const regEx = new RegExp(toFind, 'g');
+
+    return fromText.replace(regEx, thenReplace);
+};
+
 // (function(exports) {
 //     /**
 //      * URL과 쿼리 정보를 사용해서 URL을 작성합니다.

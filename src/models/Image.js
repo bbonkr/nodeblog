@@ -2,7 +2,17 @@ module.exports = (sequelize, DataTypes) => {
     const Image = sequelize.define(
         'Image',
         {
+            /**
+             * HTTP 접근 경로
+             */
             src: {
+                type: DataTypes.STRING(500),
+                allowNull: false,
+            },
+            /**
+             * 서버 경로
+             */
+            path: {
                 type: DataTypes.STRING(500),
                 allowNull: false,
             },
@@ -30,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     );
 
     Image.associate = db => {
+        db.Image.belongsTo(db.User);
         db.Image.belongsToMany(db.Post, {
             through: 'PostImage',
             as: 'Posts',

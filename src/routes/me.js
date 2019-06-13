@@ -4,8 +4,46 @@ const Sequelize = require('sequelize');
 const db = require('../models');
 const { isLoggedIn } = require('./middleware');
 const { findUserById } = require('./helper');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+const moment = require('moment');
+const { replaceAll } = require('../helpers/stringHelper');
 
 const Op = Sequelize.Op;
+
+const upload = multer({
+    storage: multer.diskStorage({
+        destination(req, res, done) {
+            // 파일 저장 경로
+            const mm = moment(Date.now()).format('MM');
+            const yyyy = moment(Date.now()).format('YYYY');
+            const dest = path.join('uploads', yyyy, mm);
+            console.log('destination directory: ', dest);
+
+            fs.exists(dest, exists => {
+                if (!exists) {
+                    fs.mkdir(dest, { recursive: true }, err => {
+                        if (!err) {
+                            console.error(err);
+                        }
+                    });
+                }
+            });
+
+            done(null, dest);
+        },
+        filename(req, file, done) {
+            const ext = path.extname(file.originalname);
+            const basename = encodeURIComponent(
+                path.basename(file.originalname, ext),
+            );
+            // 저장되는 파일이름
+            done(null, `${basename}${new Date().valueOf()}${ext}`);
+        },
+    }),
+    limits: { fileSize: 20 * 1024 * 1024 },
+});
 
 router.get('/', isLoggedIn, async (req, res, next) => {
     try {
@@ -162,9 +200,131 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
     }
 });
 
+/**
+ * 첨부파일 조회
+ */
 router.get('/media', isLoggedIn, async (req, res, next) => {
     try {
+        const { pageToken, keyword, limit } = req.query;
+        const recordLimit = parseInt(limit, 10) || 10;
+        const skip = pageToken ? 1 : 0;
+        let where = { UserId: req.user.id };
+
+        if (pageToken) {
+            const id = parseInt(pageToken, 10);
+            const latestImage = await db.Image.findOne({ where: { id: id } });
+
+            Object.assign(where, {
+                id: {
+                    [Op.lt]: latestImage.id,
+                },
+            });
+        }
+
+        if (keyword) {
+            Object.assign(where, {
+                fileName: {
+                    [Op.like]: `%${keyword.trim()}%`,
+                },
+            });
+        }
+
+        const images = await db.Image.findAll({
+            where: where,
+            attributes: [
+                'id',
+                'src',
+                'fileName',
+                'fileExtension',
+                'size',
+                'contentType',
+                'createdAt',
+            ],
+            order: [['createdAt', 'DESC']],
+            limit: recordLimit,
+            skip: skip,
+        });
+
+        return res.json(images);
     } catch (e) {
+        return next(e);
+    }
+});
+
+router.post(
+    '/media',
+    isLoggedIn,
+    upload.array('files'),
+    async (req, res, next) => {
+        try {
+            const images = await Promise.all(
+                req.files.map(v => {
+                    console.log('file: ', v);
+
+                    const filename = v.originalname;
+                    const ext = path.extname(filename);
+                    const basename = path.basename(filename, ext);
+
+                    return db.Image.create({
+                        src: `/${replaceAll(v.path, '\\\\', '/')}`,
+                        path: `${path.join(__dirname, v.path)}`,
+                        fileName: basename,
+                        fileExtension: ext,
+                        size: v.size,
+                        contentType: v.mimetype,
+                        UserId: req.user.id,
+                    });
+                }),
+            );
+
+            console.log('Promise.all ==> images', images);
+
+            const addedImages = await db.Image.findAll({
+                where: {
+                    id: {
+                        [Op.in]: images.map(v => v.id),
+                    },
+                },
+                attributes: [
+                    'src',
+                    'fileName',
+                    'fileExtension',
+                    'size',
+                    'contentType',
+                ],
+            });
+
+            return res.json(addedImages);
+        } catch (e) {
+            console.error(e);
+            next(e);
+        }
+    },
+);
+
+router.delete('/media/:src', isLoggedIn, async (req, res, next) => {
+    try {
+        const { src } = req.params;
+        const deleteSrc = decodeURIComponent(src);
+
+        const foundImage = await db.Image.findOne({
+            where: {
+                UserId: req.user.id,
+                src: deleteSrc,
+            },
+        });
+
+        if (!foundImage) {
+            return res.status(404).send('Could not find a file.');
+        }
+
+        fs.unlinkSync(foundImage.path);
+
+        await foundImage.destroy();
+
+        return res.send('File is deleted.');
+    } catch (e) {
+        console.error(e);
         return next(e);
     }
 });

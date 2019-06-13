@@ -11,7 +11,7 @@ import axios from 'axios';
 import AppLayout from '../components/AppLayout';
 import reducer from '../reducers/index';
 import rootSaga from '../sagas';
-import { normalizeReturnUrl } from '../reducers/category';
+import { normalizeReturnUrl } from '../helpers/stringHelper';
 import { ME_CALL } from '../reducers/user';
 import stringHelper from '../helpers/stringHelper';
 import { SET_CURRENT_URL } from '../reducers/settings';

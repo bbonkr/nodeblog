@@ -4,6 +4,7 @@ import Router from 'next/router';
 
 export const initialState = {
     myPosts: [],
+    postsLimit: 10,
     hasMorePost: false,
     searchKeyword: '',
     nextPageToken: '',
@@ -21,6 +22,15 @@ export const initialState = {
     loadMyPostErrorReadon: '',
     writingPost: false,
     writePostErrorReason: '',
+
+    mediaFiles: [],
+    mediaFilesNextPageToken: '',
+    mediaFilesSearchKeyword: '',
+    mediaFilesCount: 0,
+    mediaFilesLimit: 10,
+    hasMoreMediaFiles: false,
+    loadingMediaFiles: false,
+    loadMediaFilesErrorReason: '',
 };
 
 export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
@@ -50,6 +60,22 @@ export const WRITE_POST_FAIL = 'WRITE_POST_FAIL';
 export const EDIT_POST_CALL = 'EDIT_POST_CALL';
 export const EDIT_POST_DONE = 'EDIT_POST_DONE';
 export const EDIT_POST_FAIL = 'EDIT_POST_FAIL';
+
+export const LOAD_MY_MEDIA_FILES_CALL = 'LOAD_MY_MEDIA_FILES_CALL';
+export const LOAD_MY_MEDIA_FILES_DONE = 'LOAD_MY_MEDIA_FILES_DONE';
+export const LOAD_MY_MEDIA_FILES_FAIL = 'LOAD_MY_MEDIA_FILES_FAIL';
+
+export const UPLOAD_MY_MEDIA_FILES_CALL = 'UPLOAD_MY_MEDIA_FILES_CALL';
+export const UPLOAD_MY_MEDIA_FILES_DONE = 'UPLOAD_MY_MEDIA_FILES_DONE';
+export const UPLOAD_MY_MEDIA_FILES_FAIL = 'UPLOAD_MY_MEDIA_FILES_FAIL';
+
+export const EDIT_MY_MEDIA_FILES_CALL = 'EDIT_MY_MEDIA_FILES_CALL';
+export const EDIT_MY_MEDIA_FILES_DONE = 'EDIT_MY_MEDIA_FILES_DONE';
+export const EDIT_MY_MEDIA_FILES_FAIL = 'EDIT_MY_MEDIA_FILES_FAIL';
+
+export const DELETE_MY_MEDIA_FILES_CALL = 'DELETE_MY_MEDIA_FILES_CALL';
+export const DELETE_MY_MEDIA_FILES_DONE = 'DELETE_MY_MEDIA_FILES_DONE';
+export const DELETE_MY_MEDIA_FILES_FAIL = 'DELETE_MY_MEDIA_FILES_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -169,6 +195,44 @@ const reducer = (state = initialState, action) =>
                 draft.myPost = null;
                 break;
             case WRITE_NEW_POST_FAIL:
+                break;
+
+            case LOAD_MY_MEDIA_FILES_CALL:
+                draft.mediaFiles = action.data.pageToken
+                    ? draft.mediaFiles
+                    : [];
+                draft.hasMoreMediaFiles = action.data.pageToken
+                    ? draft.hasMoreMediaFiles
+                    : true;
+                draft.loadingMediaFiles = true;
+                draft.loadMediaFilesErrorReason = '';
+                break;
+            case LOAD_MY_MEDIA_FILES_DONE:
+                action.data.forEach(v => {
+                    const mediaIndex = draft.mediaFiles.findIndex(
+                        x => x.id === v.id,
+                    );
+                    if (mediaIndex < 0) {
+                        draft.mediaFiles.push(v);
+                        draft.mediaFilesNextPageToken = `${v.id}`;
+                    }
+                });
+
+                draft.hasMoreMediaFiles =
+                    action.data.length === draft.mediaFilesLimit;
+                draft.loadingMediaFiles = false;
+                draft.mediaFilesSearchKeyword = action.keyword;
+                break;
+            case LOAD_MY_MEDIA_FILES_FAIL:
+                draft.loadingMediaFiles = true;
+                draft.loadMediaFilesErrorReason = action.reason;
+                break;
+            case UPLOAD_MY_MEDIA_FILES_CALL:
+                break;
+            case UPLOAD_MY_MEDIA_FILES_DONE:
+                draft.mediaFiles = action.data.concat(draft.mediaFiles);
+                break;
+            case UPLOAD_MY_MEDIA_FILES_FAIL:
                 break;
             default:
                 break;

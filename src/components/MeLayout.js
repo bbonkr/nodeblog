@@ -109,13 +109,23 @@ const MeLayout = ({ children }) => {
                         <Menu mode="inline" defaultSelectedKeys={['me']}>
                             <Menu.Item key="me">
                                 <Link href="/me">
-                                    <a>Dashboard</a>
+                                    <a>
+                                        <span>
+                                            <Icon type="dashboard" />
+                                            Dashboard
+                                        </span>
+                                    </a>
                                 </Link>
                             </Menu.Item>
                             <Menu.SubMenu key="post" title="Posts">
                                 <Menu.Item key="posts">
                                     <Link href="/me/posts">
-                                        <a>My Posts</a>
+                                        <a>
+                                            <span>
+                                                <Icon type="project" />
+                                                My Posts
+                                            </span>
+                                        </a>
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="write">
@@ -126,12 +136,35 @@ const MeLayout = ({ children }) => {
                                         }}
                                         as="/me/write"
                                         shallow={false}>
-                                        <a>New Post</a>
+                                        <a>
+                                            <span>
+                                                <Icon type="edit" /> New Post
+                                            </span>
+                                        </a>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item>Category</Menu.Item>
+                                <Menu.Item>
+                                    <span>
+                                        <Icon type="container" />
+                                        Category
+                                    </span>
+                                </Menu.Item>
                             </Menu.SubMenu>
-                            <Menu.Item>Settings</Menu.Item>
+                            <Menu.Item key="media">
+                                <Link href="/me/media">
+                                    <a>
+                                        <span>
+                                            <Icon type="picture" /> Media
+                                        </span>
+                                    </a>
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item>
+                                <span>
+                                    <Icon type="setting" />
+                                    Settings
+                                </span>
+                            </Menu.Item>
                             <Menu.Item>Menu 3</Menu.Item>
                         </Menu>
                     </Sider>

@@ -31,6 +31,12 @@ import {
     WRITE_NEW_POST_CALL,
     WRITE_NEW_POST_FAIL,
     WRITE_NEW_POST_DONE,
+    UPLOAD_MY_MEDIA_FILES_CALL,
+    UPLOAD_MY_MEDIA_FILES_DONE,
+    UPLOAD_MY_MEDIA_FILES_FAIL,
+    LOAD_MY_MEDIA_FILES_CALL,
+    LOAD_MY_MEDIA_FILES_FAIL,
+    LOAD_MY_MEDIA_FILES_DONE,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -211,6 +217,69 @@ function* watchWriteNewPost() {
     yield takeLatest(WRITE_NEW_POST_CALL, writeNewPost);
 }
 
+function uploadMyMediaFilesApi(data) {
+    return axios.post('/me/media', data, { withCredentials: true });
+}
+
+function* uploadMyMediaFiles(action) {
+    try {
+        const result = yield call(uploadMyMediaFilesApi, action.data);
+
+        yield put({
+            type: UPLOAD_MY_MEDIA_FILES_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: UPLOAD_MY_MEDIA_FILES_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchUploadMyMediaFiles() {
+    yield takeLatest(UPLOAD_MY_MEDIA_FILES_CALL, uploadMyMediaFiles);
+}
+
+function loadMediaFilesApi(pageToken, limit, keyword) {
+    return axios.get(
+        `/me/media/?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword,
+        )}`,
+        { withCredentials: true },
+    );
+}
+
+function* loadMediaFiles(action) {
+    try {
+        const { pageToken, limit, keyword } = action.data;
+        const result = yield call(
+            loadMediaFilesApi,
+            pageToken || '',
+            limit || 10,
+            keyword || '',
+        );
+        yield put({
+            type: LOAD_MY_MEDIA_FILES_DONE,
+            data: result.data,
+            mediaFilesNextPageToken: pageToken,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_MY_MEDIA_FILES_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadMediaFiles() {
+    yield takeLatest(LOAD_MY_MEDIA_FILES_CALL, loadMediaFiles);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -220,5 +289,7 @@ export default function* postSaga() {
         fork(watchLoadCategories),
         fork(watchLoadTags),
         fork(watchWriteNewPost),
+        fork(watchUploadMyMediaFiles),
+        fork(watchLoadMediaFiles),
     ]);
 }
