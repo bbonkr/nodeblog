@@ -80,6 +80,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
         const skip = pageToken ? 1 : 0;
 
         let where = { UserId: req.user.id };
+
         if (keyword) {
             Object.assign(where, {
                 [Op.or]: [
@@ -91,6 +92,32 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
                     },
                 ],
             });
+        }
+
+        const postsCount = await db.Post.findAll({
+            where: where,
+            attributes: ['id'],
+        });
+
+        if (pageToken) {
+            const basisPost = await db.Post.findOne({
+                where: {
+                    id: pageToken,
+                },
+            });
+
+            if (basisPost) {
+                Object.assign(where, {
+                    createdAt: {
+                        [db.Sequelize.Op.lt]: basisPost.createdAt,
+                    },
+                });
+                // where = {
+                //     createdAt: {
+                //         [db.Sequelize.Op.lt]: basisPost.createdAt,
+                //     },
+                // };
+            }
         }
 
         const posts = await db.Post.findAll({
@@ -129,7 +156,14 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
             ],
         });
 
-        return res.json(posts);
+        return res.json({ posts, postsCount: postsCount.length || 0 });
+    } catch (e) {
+        return next(e);
+    }
+});
+
+router.get('/media', isLoggedIn, async (req, res, next) => {
+    try {
     } catch (e) {
         return next(e);
     }

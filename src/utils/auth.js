@@ -1,6 +1,6 @@
 import React from 'react';
 import Router from 'next/router';
-import { normalizeReturnUrl } from '../helpers/url';
+import { normalizeReturnUrl } from '../helpers/stringHelper';
 const { Component } = React;
 
 const withAuth = WrappedComponent => {

@@ -11,10 +11,12 @@ import axios from 'axios';
 import AppLayout from '../components/AppLayout';
 import reducer from '../reducers/index';
 import rootSaga from '../sagas';
-import { LOAD_CATEGORIES_CALL } from '../reducers/category';
+import { normalizeReturnUrl } from '../reducers/category';
 import { ME_CALL } from '../reducers/user';
-import { normalizeReturnUrl } from '../helpers/url';
+import stringHelper from '../helpers/stringHelper';
 import { SET_CURRENT_URL } from '../reducers/settings';
+
+// const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
 
 const fbAdmin = process.env.FB_ADMIN;
 const siteName = process.env.SITE_NAME;

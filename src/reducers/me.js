@@ -7,6 +7,7 @@ export const initialState = {
     hasMorePost: false,
     searchKeyword: '',
     nextPageToken: '',
+    postsCount: 0,
     categories: [],
     tags: [],
     myPost: {},
@@ -67,9 +68,9 @@ const reducer = (state = initialState, action) =>
                 break;
             case LOAD_MY_POSTS_DONE:
                 draft.loadingMyPosts = false;
-                draft.myPosts = action.data;
+                // draft.myPosts = action.data;
 
-                action.data.forEach(v => {
+                action.data.posts.forEach(v => {
                     const postIndex = draft.myPosts.findIndex(
                         x => x.id === v.id,
                     );
@@ -81,7 +82,7 @@ const reducer = (state = initialState, action) =>
                 draft.hasMorePost = action.data.length === draft.postsLimit;
                 draft.loadingMyPosts = false;
                 draft.searchKeyword = action.keyword;
-
+                draft.postsCount = action.data.postsCount;
                 break;
             case LOAD_MY_POSTS_FAIL:
                 draft.loadingMyPosts = false;

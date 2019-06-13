@@ -9,7 +9,7 @@ const showdown = require('showdown');
 const xssFilter = require('showdown-xss-filter');
 const { isLoggedIn } = require('./middleware');
 const Op = Sequelize.Op;
-const { makeSlug } = require('../helpers/url');
+const { makeSlug } = require('../helpers/stringHelper');
 const EXCERPT_LENGTH = 200;
 
 const markdownConverter = new showdown.Converter(

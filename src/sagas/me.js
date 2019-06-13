@@ -50,7 +50,7 @@ function* loadMyPosts(action) {
 
         const result = yield call(
             loadMyPostsApi,
-            pageToken,
+            pageToken || '',
             limit || 10,
             keyword,
         );
