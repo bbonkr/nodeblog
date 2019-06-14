@@ -19,6 +19,7 @@ import {
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import MeLayout from '../../components/MeLayout';
 import moment from 'moment';
+import ImageViewer from '../../components/ImageViewer';
 
 const Paragraph = Typography.Paragraph;
 const Dragger = Upload.Dragger;
@@ -51,6 +52,11 @@ const Media = () => {
         uploading,
     } = useSelector(s => s.me);
     const [fileList, setFileList] = useState([]);
+    const [imageViewerVisible, setImageViewerVisible] = useState(false);
+    const [imageViewerFiles, setImageViewerFiles] = useState([]);
+    const closeImageviewer = useCallback(() => {
+        setImageViewerVisible(false);
+    }, []);
 
     const onBeforeUploadFiles = useCallback(
         (file, fileList, event) => {
@@ -88,6 +94,14 @@ const Media = () => {
             }
         },
         [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken],
+    );
+
+    const onClickImage = useCallback(
+        image => () => {
+            setImageViewerVisible(true);
+            setImageViewerFiles([image]);
+        },
+        [],
     );
 
     const onClickDeleteFile = useCallback(
@@ -185,6 +199,9 @@ const Media = () => {
                                                             item.src,
                                                         )}
                                                         alt={filename}
+                                                        onClick={onClickImage(
+                                                            item,
+                                                        )}
                                                     />
                                                 </figure>
                                             )
@@ -234,6 +251,11 @@ const Media = () => {
                         }}
                     />
                 </div>
+                <ImageViewer
+                    files={imageViewerFiles}
+                    visible={imageViewerVisible}
+                    closeImageviewer={closeImageviewer}
+                />
             </ContentWrapper>
         </MeLayout>
     );

@@ -221,12 +221,13 @@ router.get('/media', isLoggedIn, async (req, res, next) => {
         if (pageToken) {
             const id = parseInt(pageToken, 10);
             const latestImage = await db.Image.findOne({ where: { id: id } });
-
-            Object.assign(where, {
-                id: {
-                    [Op.lt]: latestImage.id,
-                },
-            });
+            if (latestImage) {
+                Object.assign(where, {
+                    id: {
+                        [Op.lt]: latestImage.id,
+                    },
+                });
+            }
         }
 
         if (keyword) {
