@@ -37,6 +37,9 @@ import {
     LOAD_MY_MEDIA_FILES_CALL,
     LOAD_MY_MEDIA_FILES_FAIL,
     LOAD_MY_MEDIA_FILES_DONE,
+    DELETE_MY_MEDIA_FILES_CALL,
+    DELETE_MY_MEDIA_FILES_FAIL,
+    DELETE_MY_MEDIA_FILES_DONE,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -280,6 +283,31 @@ function* watchLoadMediaFiles() {
     yield takeLatest(LOAD_MY_MEDIA_FILES_CALL, loadMediaFiles);
 }
 
+function deleteMediaFileApi(id) {
+    return axios.delete(`/me/media/${id}`, { withCredentials: true });
+}
+
+function* deleteMediaFile(action) {
+    try {
+        const result = yield call(deleteMediaFileApi, action.data);
+        yield put({
+            type: DELETE_MY_MEDIA_FILES_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: DELETE_MY_MEDIA_FILES_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchDeleteMediaFile() {
+    yield takeLatest(DELETE_MY_MEDIA_FILES_CALL, deleteMediaFile);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -291,5 +319,6 @@ export default function* postSaga() {
         fork(watchWriteNewPost),
         fork(watchUploadMyMediaFiles),
         fork(watchLoadMediaFiles),
+        fork(watchDeleteMediaFile),
     ]);
 }

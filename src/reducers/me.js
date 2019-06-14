@@ -31,6 +31,7 @@ export const initialState = {
     hasMoreMediaFiles: false,
     loadingMediaFiles: false,
     loadMediaFilesErrorReason: '',
+    uploading: false,
 };
 
 export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
@@ -228,11 +229,27 @@ const reducer = (state = initialState, action) =>
                 draft.loadMediaFilesErrorReason = action.reason;
                 break;
             case UPLOAD_MY_MEDIA_FILES_CALL:
+                draft.uploading = true;
                 break;
             case UPLOAD_MY_MEDIA_FILES_DONE:
                 draft.mediaFiles = action.data.concat(draft.mediaFiles);
+                draft.uploading = false;
                 break;
             case UPLOAD_MY_MEDIA_FILES_FAIL:
+                draft.uploading = false;
+                break;
+            case DELETE_MY_MEDIA_FILES_CALL:
+                draft.uploading = true;
+                break;
+            case DELETE_MY_MEDIA_FILES_DONE:
+                const foundId = draft.mediaFiles.findIndex(
+                    x => x.id === action.data.id,
+                );
+                draft.mediaFiles.splice(foundId, 1);
+                draft.uploading = false;
+                break;
+            case DELETE_MY_MEDIA_FILES_FAIL:
+                draft.uploading = false;
                 break;
             default:
                 break;

@@ -35,9 +35,7 @@ const upload = multer({
         },
         filename(req, file, done) {
             const ext = path.extname(file.originalname);
-            const basename = encodeURIComponent(
-                path.basename(file.originalname, ext),
-            );
+            const basename = path.basename(file.originalname, ext);
             // 저장되는 파일이름
             done(null, `${basename}${new Date().valueOf()}${ext}`);
         },
@@ -108,6 +106,16 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
     }
 });
 
+/**
+ * 나의 글 목록을 가져옵니다.
+ * ```
+ * query: {
+ *      pageToken : string // 목록의 마지막 글의 식별자,
+ *      limit: number // 가져올 글의 수,
+ *      keyword: string // 검색어,
+ * }
+ * ```
+ */
 router.get('/posts', isLoggedIn, async (req, res, next) => {
     try {
         const limit = (req.query.limit && parseInt(req.query.limit, 10)) || 10;
@@ -201,7 +209,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
 });
 
 /**
- * 첨부파일 조회
+ * 파일 목록을 가져옵니다.
  */
 router.get('/media', isLoggedIn, async (req, res, next) => {
     try {
@@ -251,6 +259,9 @@ router.get('/media', isLoggedIn, async (req, res, next) => {
     }
 });
 
+/**
+ * 파일을 추가합니다.
+ */
 router.post(
     '/media',
     isLoggedIn,
@@ -265,9 +276,29 @@ router.post(
                     const ext = path.extname(filename);
                     const basename = path.basename(filename, ext);
 
+                    const savedFileExt = path.extname(v.path);
+                    const savedFileBasename = encodeURIComponent(
+                        path.basename(v.path, savedFileExt),
+                    );
+                    const savedFileDir = path.dirname(v.path);
+                    const serverRootDir = path.normalize(
+                        path.join(__dirname, '..'),
+                    );
+                    const savedFileRelativeDir = path.relative(
+                        serverRootDir,
+                        savedFileDir,
+                    );
+
+                    const src = `/${replaceAll(
+                        savedFileRelativeDir,
+                        '\\\\',
+                        '/',
+                    )}/${savedFileBasename}${savedFileExt}`;
+                    console.log('file src: ', src);
+
                     return db.Image.create({
-                        src: `/${replaceAll(v.path, '\\\\', '/')}`,
-                        path: `${path.join(__dirname, v.path)}`,
+                        src: src,
+                        path: `${path.join(serverRootDir, v.path)}`,
                         fileName: basename,
                         fileExtension: ext,
                         size: v.size,
@@ -286,11 +317,13 @@ router.post(
                     },
                 },
                 attributes: [
+                    'id',
                     'src',
                     'fileName',
                     'fileExtension',
                     'size',
                     'contentType',
+                    'createdAt',
                 ],
             });
 
@@ -302,16 +335,26 @@ router.post(
     },
 );
 
-router.delete('/media/:src', isLoggedIn, async (req, res, next) => {
+router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
     try {
-        const { src } = req.params;
-        const deleteSrc = decodeURIComponent(src);
+        const { id } = req.params;
+        // const deleteSrc = decodeURIComponent(src);
 
         const foundImage = await db.Image.findOne({
             where: {
                 UserId: req.user.id,
-                src: deleteSrc,
+                id: id,
             },
+            attributes: [
+                'id',
+                'path',
+                'src',
+                'fileName',
+                'fileExtension',
+                'size',
+                'contentType',
+                'createdAt',
+            ],
         });
 
         if (!foundImage) {
@@ -322,7 +365,9 @@ router.delete('/media/:src', isLoggedIn, async (req, res, next) => {
 
         await foundImage.destroy();
 
-        return res.send('File is deleted.');
+        delete foundImage.path;
+
+        return res.json(foundImage);
     } catch (e) {
         console.error(e);
         return next(e);

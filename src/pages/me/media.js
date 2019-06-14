@@ -1,9 +1,20 @@
 import React, { useCallback, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Upload, Icon, message, List, Button, Card, Typography } from 'antd';
+import {
+    Upload,
+    Icon,
+    message,
+    List,
+    Button,
+    Card,
+    Typography,
+    Modal,
+    Divider,
+} from 'antd';
 import {
     UPLOAD_MY_MEDIA_FILES_CALL,
     LOAD_MY_MEDIA_FILES_CALL,
+    DELETE_MY_MEDIA_FILES_CALL,
 } from '../../reducers/me';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import MeLayout from '../../components/MeLayout';
@@ -37,22 +48,30 @@ const Media = () => {
         hasMoreMediaFiles,
         mediaFilesNextPageToken,
         mediaFilesLimit,
+        uploading,
     } = useSelector(s => s.me);
     const [fileList, setFileList] = useState([]);
 
     const onBeforeUploadFiles = useCallback(
-        file => {
-            // setFileList(files.fileList);
-            const formData = new FormData();
-            formData.append('files', file);
-            dispatch({
-                type: UPLOAD_MY_MEDIA_FILES_CALL,
-                data: formData,
-            });
+        (file, fileList, event) => {
+            if (!uploading) {
+                console.log('file: ==> ', file);
+                console.log('fileList: ==> ', fileList);
+                // setFileList(files.fileList);
 
+                const formData = new FormData();
+                fileList.forEach(f => {
+                    formData.append('files', f);
+                });
+
+                dispatch({
+                    type: UPLOAD_MY_MEDIA_FILES_CALL,
+                    data: formData,
+                });
+            }
             return false;
         },
-        [dispatch],
+        [dispatch, uploading],
     );
 
     const onClickLoadMore = useCallback(
@@ -71,14 +90,35 @@ const Media = () => {
         [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken],
     );
 
+    const onClickDeleteFile = useCallback(
+        media => () => {
+            // confirm
+            Modal.confirm({
+                title: 'Do you want to delete this file?',
+                content: `${media.fileName}${media.fileExtension}`,
+                onOk() {
+                    dispatch({
+                        type: DELETE_MY_MEDIA_FILES_CALL,
+                        data: media.id,
+                    });
+                },
+                onCancel() {},
+            });
+        },
+        [dispatch],
+    );
+
     return (
         <MeLayout>
             <ContentWrapper>
                 <div>
                     <h1>Media</h1>
                     <Dragger
+                        disabled={uploading}
+                        supportServerRender={true}
                         name="files"
                         multiple={true}
+                        showUploadList={false}
                         beforeUpload={onBeforeUploadFiles}>
                         <p className="ant-upload-drag-icon">
                             <Icon type="inbox" />
@@ -93,6 +133,7 @@ const Media = () => {
                         </p>
                     </Dragger>
                 </div>
+                <Divider />
                 <div>
                     <List
                         grid={{
@@ -106,7 +147,7 @@ const Media = () => {
                             type: 'flex',
                         }}
                         dataSource={mediaFiles}
-                        loading={loadingMediaFiles}
+                        loading={loadingMediaFiles || uploading}
                         loadMore={
                             <Button
                                 style={{ width: '100%' }}
@@ -140,7 +181,9 @@ const Media = () => {
                                                             margin:
                                                                 '0 -38.885%',
                                                         }}
-                                                        src={item.src}
+                                                        src={decodeURIComponent(
+                                                            item.src,
+                                                        )}
                                                         alt={filename}
                                                     />
                                                 </figure>
@@ -152,7 +195,12 @@ const Media = () => {
                                                     text: item.src,
                                                 }}
                                             />,
-                                            <Icon type="delete" />,
+                                            <Icon
+                                                type="delete"
+                                                onClick={onClickDeleteFile(
+                                                    item,
+                                                )}
+                                            />,
                                         ]}>
                                         <Card.Meta
                                             title={filename}
@@ -175,7 +223,9 @@ const Media = () => {
                                                     text: item.src,
                                                 }}
                                                 ellipsis={true}>
-                                                {item.src}
+                                                {`${item.fileName}${
+                                                    item.fileExtension
+                                                }`}
                                             </Paragraph>
                                         </div>
                                     </Card>
