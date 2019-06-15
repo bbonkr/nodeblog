@@ -62,6 +62,10 @@ export const EDIT_POST_CALL = 'EDIT_POST_CALL';
 export const EDIT_POST_DONE = 'EDIT_POST_DONE';
 export const EDIT_POST_FAIL = 'EDIT_POST_FAIL';
 
+export const DELETE_POST_CALL = 'DELETE_POST_CALL';
+export const DELETE_POST_DONE = 'DELETE_POST_DONE';
+export const DELETE_POST_FAIL = 'DELETE_POST_FAIL';
+
 export const LOAD_MY_MEDIA_FILES_CALL = 'LOAD_MY_MEDIA_FILES_CALL';
 export const LOAD_MY_MEDIA_FILES_DONE = 'LOAD_MY_MEDIA_FILES_DONE';
 export const LOAD_MY_MEDIA_FILES_FAIL = 'LOAD_MY_MEDIA_FILES_FAIL';
@@ -196,6 +200,21 @@ const reducer = (state = initialState, action) =>
                 draft.myPost = null;
                 break;
             case WRITE_NEW_POST_FAIL:
+                break;
+
+            case DELETE_POST_CALL:
+                draft.loadingMyPosts = true;
+                break;
+            case DELETE_POST_DONE:
+                const index = draft.myPosts.findIndex(
+                    x => x.id === action.data.id,
+                );
+                draft.myPosts.splice(index, 1);
+                draft.loadingMyPosts = false;
+                break;
+            case DELETE_POST_FAIL:
+                console.log(action.reason);
+                draft.loadingMyPosts = false;
                 break;
 
             case LOAD_MY_MEDIA_FILES_CALL:

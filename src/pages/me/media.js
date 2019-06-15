@@ -106,7 +106,6 @@ const Media = () => {
 
     const onClickDeleteFile = useCallback(
         media => () => {
-            // confirm
             Modal.confirm({
                 title: 'Do you want to delete this file?',
                 content: `${media.fileName}${media.fileExtension}`,

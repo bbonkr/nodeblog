@@ -40,6 +40,9 @@ import {
     DELETE_MY_MEDIA_FILES_CALL,
     DELETE_MY_MEDIA_FILES_FAIL,
     DELETE_MY_MEDIA_FILES_DONE,
+    DELETE_POST_CALL,
+    DELETE_POST_FAIL,
+    DELETE_POST_DONE,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -175,6 +178,37 @@ function* editPost(action) {
 
 function* watchEditPost() {
     yield takeLatest(EDIT_POST_CALL, editPost);
+}
+
+/**
+ * 글을 삭제합니다.
+ *
+ * @param {number} id 글 식별자 Post.Id
+ *
+ */
+function deletePostApi(id) {
+    return axios.delete(`/post/${id}`, { withCredentials: true });
+}
+
+function* deletePost(action) {
+    try {
+        const result = yield call(deletePostApi, action.data);
+        yield put({
+            type: DELETE_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: DELETE_POST_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchDeletePost() {
+    yield takeLatest(DELETE_POST_CALL, deletePost);
 }
 
 function loadMyPostApi(id) {
@@ -314,6 +348,7 @@ export default function* postSaga() {
         fork(watchLoadMyPost),
         fork(watchWritePost),
         fork(watchEditPost),
+        fork(watchDeletePost),
         fork(watchLoadCategories),
         fork(watchLoadTags),
         fork(watchWriteNewPost),

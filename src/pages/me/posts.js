@@ -1,13 +1,14 @@
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { List, Card, Tag, Table, Pagination } from 'antd';
+import { List, Card, Tag, Table, Pagination, Modal, Button, Icon } from 'antd';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
-import { LOAD_MY_POSTS_CALL } from '../../reducers/me';
+import { LOAD_MY_POSTS_CALL, DELETE_POST_CALL } from '../../reducers/me';
 import moment from 'moment';
 import { formatNumber } from '../../helpers/stringHelper';
+import Router from 'next/router';
 
 const Posts = () => {
     const dispatch = useDispatch();
@@ -51,6 +52,30 @@ const Posts = () => {
         [dispatch, nextPageToken],
     );
 
+    const onClickEditPost = useCallback(
+        post => () => {
+            Router.push({ pathname: '/me/write', query: { id: post.id } });
+        },
+        [],
+    );
+
+    const onClickDeletePost = useCallback(
+        post => () => {
+            Modal.confirm({
+                title: 'Do you want to delete this post?',
+                content: post.title,
+                onOk() {
+                    dispatch({
+                        type: DELETE_POST_CALL,
+                        data: post.id,
+                    });
+                },
+                onCancel() {},
+            });
+        },
+        [dispatch],
+    );
+
     const columns = [
         {
             key: 'title',
@@ -58,13 +83,14 @@ const Posts = () => {
             dataIndex: 'title',
             render: (text, record, index) => {
                 return (
-                    <Link
-                        href={{
-                            pathname: '/me/write',
-                            query: { id: record.id },
-                        }}>
-                        <a title={`Click to edit the ${text} post`}>{text}</a>
-                    </Link>
+                    <span onClick={onClickEditPost(record)}>{text}</span>
+                    // <Link
+                    //     href={{
+                    //         pathname: '/me/write',
+                    //         query: { id: record.id },
+                    //     }}>
+                    //     <a title={`Click to edit the ${text} post`}>{text}</a>
+                    // </Link>
                 );
             },
             whidh: '40%',
@@ -137,6 +163,27 @@ const Posts = () => {
                             onChange: onChangePagination,
                             onShowSizeChange: onShowSizeChangePagination,
                             position: 'both',
+                        }}
+                        expandedRowRender={record => {
+                            return (
+                                <div>
+                                    <Button.Group>
+                                        <Button
+                                            onClick={onClickEditPost(record)}>
+                                            <span>
+                                                <Icon type="edit" /> Edit
+                                            </span>
+                                        </Button>
+                                        <Button
+                                            type="danger"
+                                            onClick={onClickDeletePost(record)}>
+                                            <span>
+                                                <Icon type="delete" /> Delete
+                                            </span>
+                                        </Button>
+                                    </Button.Group>
+                                </div>
+                            );
                         }}
                     />
                 </div>

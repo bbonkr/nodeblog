@@ -1,7 +1,21 @@
 {
-    "name": "sample",
-    "version": "1.0.0",
-    "description": "",
+    "name": "nodeblog",
+    "version": "0.1.0",
+    "description": "document sharing service prototype app. node backend + react.js frontend",
+    "author": "Pon Cheol Ku",
+    "license": "MIT",
+    "homepage": "https://github.com/bbonkr/nodeblog",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/bbonkr/nodeblog.git"
+    },
+    "bugs": {
+        "url": "https: //github.com/bbonkr/nodeblog/issues"
+    },
+    "engines": {
+        "npm": ">=6.7.0",
+        "node": ">=11.13.0"
+    },
     "main": "index.js",
     "scripts": {
         "test": "react-scripts test --testMatch ./**/*.test.{js,jsx,ts,tsx}",
@@ -12,8 +26,6 @@
         "start": "cross-env NODE_ENV=production PORT=5000 node index.js",
         "next:start": "cross-env NODE_ENV=production next start -p 5000"
     },
-    "author": "",
-    "license": "MIT",
     "dependencies": {
         "@testing-library/react": "^8.0.1",
         "@types/jest": "^24.0.13",

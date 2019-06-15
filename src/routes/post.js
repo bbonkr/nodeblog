@@ -332,4 +332,82 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.delete('/:id', isLoggedIn, async (req, res, next) => {
+    try {
+        const id = parseInt(req.params.id, 10) || -1;
+        const post = await db.Post.findOne({
+            where: { id: id, UserId: req.user.id },
+            include: [
+                {
+                    model: db.User,
+                    attributes: ['id', 'displayName'],
+                },
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                },
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.Image,
+                    through: 'PostImage',
+                    as: 'Images',
+                    attributes: [
+                        'id',
+                        'src',
+                        'size',
+                        'fileName',
+                        'fileExtension',
+                        'contentType',
+                    ],
+                },
+                {
+                    model: db.Comment,
+                },
+            ],
+            attributes: [
+                'id',
+                'title',
+                'slug',
+                'content',
+                'UserId',
+                'createdAt',
+                'updatedAt',
+            ],
+        });
+
+        if (!post) {
+            return res.status(404).send('Could not find a post');
+        }
+        if (post.Categories) {
+            await post.removeCategories(post.Categories.map(x => x.id));
+        }
+        if (post.PostAccessLogs) {
+            await post.removePostAccessLogs(post.PostAccessLogs.map(x => x.id));
+        }
+        if (post.Tags) {
+            await post.removeTags(post.Tags.map(x => x.id));
+        }
+        if (post.Comments) {
+            await post.removeComments(post.Comments.map(x => x.id));
+        }
+        // await post.User.removePost(post.id);
+
+        await post.destroy();
+
+        return res.json({ id: id });
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
 module.exports = router;
