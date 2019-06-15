@@ -10,11 +10,15 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.STRING(500),
                 allowNull: true,
             },
+            userId: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
         },
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        },
+        }
     );
 
     PostAccessLog.associate = db => {

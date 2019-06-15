@@ -27,8 +27,8 @@ import {
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
+            keyword
+        )}`
     );
 }
 
@@ -39,7 +39,7 @@ function* loadPosts(action) {
             loadPostsApi,
             pageToken,
             limit || 10,
-            keyword,
+            keyword
         );
 
         yield put({
@@ -66,13 +66,17 @@ function* watchLoadPosts() {
     yield takeLatest(LOAD_POSTS_CALL, loadPosts);
 }
 
-function loadSinglePostApi(slug) {
-    return axios.get(`/posts/${encodeURIComponent(slug)}`);
+function loadSinglePostApi(user, slug) {
+    return axios.get(`/users/${user}/posts/${encodeURIComponent(slug)}`, {
+        withCredentials: true,
+    });
 }
 
 function* loadSinglePost(action) {
     try {
-        const result = yield call(loadSinglePostApi, action.data);
+        const { user, slug } = action.data;
+        const result = yield call(loadSinglePostApi, user, slug);
+
         yield put({
             type: LOAD_SINGLE_POST_DONE,
             data: result.data,
@@ -95,12 +99,12 @@ function loadCategoryPostsApi(
     category,
     pageToken = '',
     limit = 10,
-    keyword = '',
+    keyword = ''
 ) {
     return axios.get(
         `/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
+            keyword
+        )}`
     );
 }
 
@@ -112,7 +116,7 @@ function* loadCategoryPosts(action) {
             category,
             pageToken,
             limit,
-            keyword,
+            keyword
         );
         yield put({
             type: LOAD_CATEGORY_POSTS_DONE,
@@ -135,10 +139,10 @@ function* watchLoadCategoryPosts() {
 function loadTagPostsApi(tag, pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/posts/tag/${encodeURIComponent(
-            tag,
+            tag
         )}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
+            keyword
+        )}`
     );
 }
 
@@ -150,7 +154,7 @@ function* loadTagPosts(action) {
             tag,
             pageToken,
             limit,
-            keyword,
+            keyword
         );
         yield put({
             type: LOAD_TAG_POSTS_DONE,

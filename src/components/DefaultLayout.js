@@ -58,7 +58,7 @@ const DefaultLayout = ({ children }) => {
                     pathname: '/search',
                     query: { keyword: value },
                 },
-                `/search/${value}`,
+                `/search/${value}`
             );
         }
     }, []);
@@ -70,7 +70,7 @@ const DefaultLayout = ({ children }) => {
                 returnUrl: currentUrl,
             });
         },
-        [currentUrl, dispatch],
+        [currentUrl, dispatch]
     );
 
     return (
@@ -129,7 +129,7 @@ const DefaultLayout = ({ children }) => {
                         {me && (
                             <SubMenu
                                 key="user"
-                                title={<Avatar>{me.displayName[0]}</Avatar>}>
+                                title={<Avatar>{me.username[0]}</Avatar>}>
                                 <Menu.Item key="user-me">
                                     <Link href="/me">
                                         <a>Profile</a>

@@ -17,7 +17,7 @@ const Me = () => {
         <MeLayout>
             <ContentWrapper>
                 <h1>Me</h1>
-                <div>{me && me.displayName}</div>
+                <div>{me && me.username}</div>
             </ContentWrapper>
         </MeLayout>
     );

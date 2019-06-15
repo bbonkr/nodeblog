@@ -24,7 +24,7 @@ const handle = nextApp.getRequestHandler();
 
 db.sequelize.sync({
     // If force is true, each Model will run DROP TABLE IF EXISTS, before it tries to create its own table
-    force: false,
+    force: true,
 });
 
 passportConfig();
@@ -50,7 +50,7 @@ nextApp.prepare().then(() => {
         cors({
             origin: true,
             credentials: true,
-        }),
+        })
     );
     expressApp.use(cookieParser(process.env.COOKIE_SECRET));
     expressApp.use(
@@ -64,44 +64,13 @@ nextApp.prepare().then(() => {
                 secure: false, // https 사용시 true
             },
             store: dbSessionStore,
-        }),
+        })
     );
 
     expressApp.use(passport.initialize());
     expressApp.use(passport.session());
 
     expressApp.use('/api', require('./routes'));
-
-    // expressApp.get('/hashtag/:tag', (req, res) =>
-    //     nextApp.render(req, res, '/hashtag', { tag: req.params.tag }),
-    // );
-
-    // expressApp.get('/user/:id', (req, res) =>
-    //     nextApp.render(req, res, '/user', { id: req.params.id }),
-    // );
-
-    // expressApp.get('/post/:id', (req, res) =>
-    //     nextApp.render(req, res, '/post', { id: req.params.id }),
-    // );
-
-    // => /:slug URL은 /content/:slug 에서 처리합니다.
-    // expressApp.get('/post/:slug', (req, res) => {
-    //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
-    // });
-
-    // expressApp.get('/signin', (req, res) => {
-    //     return nextApp.render(req, res, '/signin', {
-    //         returnUrl: req.query.returnUrl,
-    //     });
-    // });
-
-    // expressApp.get('/signup', (req, res) => {
-    //     return nextApp.render(req, res, '/signup');
-    // });
-
-    // expressApp.get('/me', (req, res) => {
-    //     return nextApp.render(req, res, '/me');
-    // });
 
     expressApp.get('/category/:slug', (req, res) => {
         return nextApp.render(req, res, '/category', { slug: req.params.slug });
@@ -125,6 +94,17 @@ nextApp.prepare().then(() => {
 
     expressApp.get('/post/:slug', (req, res) => {
         return nextApp.render(req, res, '/post', { slug: req.params.slug });
+    });
+
+    expressApp.get('/users/:user/posts', (req, res) => {
+        return nextApp.render(req, res, '/post', { user: req.params.user });
+    });
+
+    expressApp.get('/users/:user/posts/:slug', (req, res) => {
+        return nextApp.render(req, res, '/post', {
+            user: req.params.user,
+            slug: req.params.slug,
+        });
     });
 
     // expressApp.get('/me/write/:id', (req, res) => {

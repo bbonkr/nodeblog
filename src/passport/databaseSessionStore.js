@@ -32,7 +32,7 @@ class DatabaseSessionStore extends expressSession.Store {
 
     destroy(sid, next) {
         try {
-            this.db.SessionStore.findOne({ where: { sid: sid } })
+            this.db.Session.findOne({ where: { sid: sid } })
                 .then(item => {
                     if (item) {
                         return item.destroy();
@@ -52,7 +52,7 @@ class DatabaseSessionStore extends expressSession.Store {
 
     get(sid, next) {
         try {
-            this.db.SessionStore.findOne({ where: { sid: sid } })
+            this.db.Session.findOne({ where: { sid: sid } })
                 .then(item => {
                     if (!item) {
                         // new Error('Could not find session')
@@ -82,7 +82,7 @@ class DatabaseSessionStore extends expressSession.Store {
         try {
             const expire = new Date().toJSON();
 
-            this.db.SessionStore.create({
+            this.db.Session.create({
                 sid: sid,
                 sess: JSON.stringify(sess),
                 expire: expire,
@@ -101,7 +101,7 @@ class DatabaseSessionStore extends expressSession.Store {
     }
 
     clearExpiredSessions() {
-        this.db.SessionStore.destroy({
+        this.db.Session.destroy({
             where: {
                 expire: {
                     [Op.le]: new Date().toJSON(),
@@ -113,7 +113,7 @@ class DatabaseSessionStore extends expressSession.Store {
     startClearExpiredSessions() {
         this._clearExpiredSessionsInterval = setInterval(
             this.clearExpiredSessions.bind(this),
-            this.options.clearInterval,
+            this.options.clearInterval
         );
     }
 }

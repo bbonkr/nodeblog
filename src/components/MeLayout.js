@@ -12,7 +12,7 @@ const MeLayout = ({ children }) => {
     const dispatch = useDispatch();
     const { me } = useSelector(state => state.user);
     const [menuCollapsed, setMenuCollapsed] = useState(false);
-    const [selectedMenuKey, setSelectedMenuKey] = useState('me');
+    const [selectedMenuKeys, setSelectedMenuKeys] = useState([]);
     const onMenuCollapsed = useCallback(collapsed => {
         setMenuCollapsed(collapsed);
     }, []);
@@ -32,7 +32,7 @@ const MeLayout = ({ children }) => {
                 key = paths[paths.length - 1];
             }
 
-            setSelectedMenuKey(key);
+            setSelectedMenuKeys([key]);
         }
     }, [me]);
 
@@ -45,11 +45,11 @@ const MeLayout = ({ children }) => {
             switch (key) {
                 case 'me':
                     Router.push('/me');
-                    setSelectedMenuKey('me');
+                    // setSelectedMenuKeys([key]);
                     break;
                 case 'posts':
                     Router.push('/me/posts');
-                    setSelectedMenuKey('posts');
+                    // setSelectedMenuKeys([key]);
                     break;
                 case 'signout':
                     dispatch({
@@ -74,7 +74,7 @@ const MeLayout = ({ children }) => {
                     mode="horizontal"
                     style={{ lineHeight: '64px' }}
                     defaultSelectedKeys={['me']}
-                    selectedKeys={[selectedMenuKey]}
+                    selectedKeys={selectedMenuKeys}
                     onClick={onClickMenu}>
                     <Menu.Item key="home">
                         <Link href="/">
@@ -106,7 +106,10 @@ const MeLayout = ({ children }) => {
                         collapsible={true}
                         collapsed={menuCollapsed}
                         onCollapse={onCollapse}>
-                        <Menu mode="inline" defaultSelectedKeys={['me']}>
+                        <Menu
+                            mode="inline"
+                            defaultSelectedKeys={['me']}
+                            selectedKeys={selectedMenuKeys}>
                             <Menu.Item key="me">
                                 <Link href="/me">
                                     <a>
@@ -117,39 +120,39 @@ const MeLayout = ({ children }) => {
                                     </a>
                                 </Link>
                             </Menu.Item>
-                            <Menu.SubMenu key="post" title="Posts">
-                                <Menu.Item key="posts">
-                                    <Link href="/me/posts">
-                                        <a>
-                                            <span>
-                                                <Icon type="project" />
-                                                My Posts
-                                            </span>
-                                        </a>
-                                    </Link>
-                                </Menu.Item>
-                                <Menu.Item key="write">
-                                    <Link
-                                        href={{
-                                            pathname: '/me/write',
-                                            query: { id: null },
-                                        }}
-                                        as="/me/write"
-                                        shallow={false}>
-                                        <a>
-                                            <span>
-                                                <Icon type="edit" /> New Post
-                                            </span>
-                                        </a>
-                                    </Link>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <span>
-                                        <Icon type="container" />
-                                        Category
-                                    </span>
-                                </Menu.Item>
-                            </Menu.SubMenu>
+
+                            <Menu.Item key="posts">
+                                <Link href="/me/posts">
+                                    <a>
+                                        <span>
+                                            <Icon type="project" />
+                                            My Posts
+                                        </span>
+                                    </a>
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item key="write">
+                                <Link
+                                    href={{
+                                        pathname: '/me/write',
+                                        query: { id: null },
+                                    }}
+                                    as="/me/write"
+                                    shallow={false}>
+                                    <a>
+                                        <span>
+                                            <Icon type="edit" /> New Post
+                                        </span>
+                                    </a>
+                                </Link>
+                            </Menu.Item>
+                            <Menu.Item>
+                                <span>
+                                    <Icon type="container" />
+                                    Category
+                                </span>
+                            </Menu.Item>
+
                             <Menu.Item key="media">
                                 <Link href="/me/media">
                                     <a>

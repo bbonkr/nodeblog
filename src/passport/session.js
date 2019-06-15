@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
-    const SessionStore = sequelize.define(
-        'SessionStore',
+    const Session = sequelize.define(
+        'Session',
         {
             sid: {
                 type: DataTypes.STRING(1000),
@@ -18,10 +18,10 @@ module.exports = (sequelize, DataTypes) => {
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        },
+        }
     );
 
-    SessionStore.associate = db => {};
+    Session.associate = db => {};
 
-    return SessionStore;
+    return Session;
 };

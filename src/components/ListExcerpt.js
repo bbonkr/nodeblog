@@ -2,13 +2,14 @@ import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import { List, Avatar, Button, Divider, Card } from 'antd';
+import { List, Avatar, Button, Divider, Card, Typography } from 'antd';
 import moment from 'moment';
 import styled from 'styled-components';
 import IconText from './IconText';
 import { LOAD_POSTS_CALL } from '../reducers/post';
 import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
+import LinkSinglePost from './LinkSinglePost';
 
 // import '../styles/styles.scss';
 
@@ -40,7 +41,7 @@ const ListExcerpt = () => {
                 },
             });
         },
-        [dispatch, nextPageToken, postsLimit, searchKeyword],
+        [dispatch, nextPageToken, postsLimit, searchKeyword]
     );
 
     return (
@@ -70,7 +71,7 @@ const ListExcerpt = () => {
                 dataSource={posts}
                 renderItem={post => {
                     const { slug, title, excerpt, createdAt } = post;
-                    const { displayName } = post.User;
+                    const { username } = post.User;
                     return (
                         <List.Item key={post.id}>
                             <Card
@@ -88,34 +89,41 @@ const ListExcerpt = () => {
                                 <Card.Meta
                                     avatar={
                                         <Avatar>
-                                            {displayName[0].toUpperCase()}
+                                            {username[0].toUpperCase()}
                                         </Avatar>
                                     }
                                     extra={
                                         <IconText
                                             type="clock-circle"
                                             text={moment(createdAt).format(
-                                                'YYYY-MM-DD HH:mm:ss',
+                                                'YYYY-MM-DD HH:mm:ss'
                                             )}
                                         />
                                     }
                                     title={
-                                        <Link
-                                            href={{
-                                                pathname: '/post',
-                                                query: { slug: slug },
-                                            }}
-                                            as={`/post/${slug}`}>
-                                            <a>
-                                                <h3
-                                                    style={{
-                                                        textOverflow:
-                                                            'ellipsis',
-                                                    }}>
-                                                    {title}
-                                                </h3>
-                                            </a>
-                                        </Link>
+                                        <LinkSinglePost post={post}>
+                                            <Typography.Title
+                                                level={3}
+                                                ellipsis={true}>
+                                                {title}
+                                            </Typography.Title>
+                                        </LinkSinglePost>
+                                        // <Link
+                                        //     href={{
+                                        //         pathname: '/post',
+                                        //         query: { slug: slug },
+                                        //     }}
+                                        //     as={`/post/${slug}`}>
+                                        //     <a>
+                                        //         <h3
+                                        //             style={{
+                                        //                 textOverflow:
+                                        //                     'ellipsis',
+                                        //             }}>
+                                        //             {title}
+                                        //         </h3>
+                                        //     </a>
+                                        // </Link>
                                     }
                                 />
                                 <div

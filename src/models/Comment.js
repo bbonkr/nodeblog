@@ -2,7 +2,15 @@ module.exports = (sequelize, DataTypes) => {
     const Comment = sequelize.define(
         'Comment',
         {
-            content: {
+            markdown: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            html: {
+                type: DataTypes.TEXT,
+                allowNull: false,
+            },
+            text: {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
@@ -10,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        },
+        }
     );
 
     Comment.associate = db => {

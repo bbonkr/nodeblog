@@ -14,7 +14,7 @@ const findUserById = async id => {
                 attributes: ['id'],
             },
         ],
-        attributes: ['id', 'displayName', 'email'],
+        attributes: ['id', 'username', 'email'],
     });
 
     return fullUser;

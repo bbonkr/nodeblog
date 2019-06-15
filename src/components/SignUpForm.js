@@ -9,19 +9,19 @@ import { ErrorMessageWrapper } from '../styledComponents/Wrapper';
 const PLACEHOLDER_EMAIL = 'Input your email address';
 const PLACEHOLDER_PASSWORD = 'Input your password';
 const PLACEHOLDER_PASSWORD_CONFIRM = 'Input your password again';
-const PLACEHOLDER_DISPLAYNAME = 'Input your display name';
+const PLACEHOLDER_USERNAME = 'Input your display name';
 
 const LABEL_EMAIL = 'E-mail';
 const LABEL_PASSWORD = 'Password';
 const LABEL_PASSWORD_CONFIRM = 'Confirm Password';
-const LABEL_DISPLAYNAME = 'Display name';
+const LABEL_USERNAME = 'Display name';
 
-const DISPLAYNAME_MIN_LENGTH = 4;
+const USERNAME_MIN_LENGTH = 3;
 const formValues = {
     email: '',
     password: '',
     passwordConfirm: '',
-    displayName: '',
+    username: '',
     agreement: false,
 };
 const formValidator = () => {
@@ -86,19 +86,27 @@ const formValidator = () => {
         return passwordCheck(formValues);
     };
 
-    const displayName = formValues => {
-        const { displayName } = formValues;
-        if (!displayName || displayName.trim().length === 0) {
+    const username = formValues => {
+        const { username } = formValues;
+        if (!username || username.trim().length === 0) {
             return {
                 valid: false,
-                message: 'Please input your display name',
+                message: 'Please input your username',
             };
         }
 
-        if (displayName.trim().length < DISPLAYNAME_MIN_LENGTH) {
+        if (!/^[a-z][a-z0-9_-]+[a-z0-9]$/i.test(username)) {
             return {
                 valid: false,
-                message: `Please input your display name longer than ${DISPLAYNAME_MIN_LENGTH}`,
+                message:
+                    'Please input your username with combining alphabet (lower-case), number, dash(-) and underscore(_). It should start with alphabet character. and it should end with alphabet or number character.',
+            };
+        }
+
+        if (username.trim().length < USERNAME_MIN_LENGTH) {
+            return {
+                valid: false,
+                message: `Please input your display name longer than ${USERNAME_MIN_LENGTH}`,
             };
         }
 
@@ -113,7 +121,7 @@ const formValidator = () => {
         results.push(email(formValues));
         results.push(password(formValues));
         results.push(passwordConfirm(formValues));
-        results.push(displayName(formValues));
+        results.push(username(formValues));
 
         let valid = true;
         const messages = [];
@@ -133,7 +141,7 @@ const formValidator = () => {
         email,
         password,
         passwordConfirm,
-        displayName,
+        username,
         validate,
     };
 };
@@ -150,8 +158,8 @@ const SignUpForm = () => {
         passwordConfirmErrorMessage,
         setPasswordConfirmErrorMessage,
     ] = useState('');
-    const [displayName, setDisplayName] = useState('');
-    const [displayNameErrorMessage, setDisplayNameErrorMessage] = useState('');
+    const [username, setUsername] = useState('');
+    const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
     const [agreement, setAgreement] = useState(false);
     const [agreementErrorMessage, setAgreementErrorMessage] = useState('');
 
@@ -184,7 +192,7 @@ const SignUpForm = () => {
             });
             setPasswordErrorMessage(message);
         },
-        [passwordConfirm],
+        [passwordConfirm]
     );
 
     const onChangePasswordConfirm = useCallback(
@@ -198,17 +206,17 @@ const SignUpForm = () => {
             });
             setPasswordConfirmErrorMessage(message);
         },
-        [password],
+        [password]
     );
 
-    const onChangeDisplayName = useCallback(e => {
+    const onChangeUsername = useCallback(e => {
         const newValue = e.target.value;
-        setDisplayName(newValue);
+        setUsername(newValue);
 
-        const { message } = formValidator().displayName({
-            displayName: newValue,
+        const { message } = formValidator().username({
+            username: newValue,
         });
-        setDisplayNameErrorMessage(message);
+        setUsernameErrorMessage(message);
     }, []);
 
     const onChangeAgreement = useCallback(e => {
@@ -220,11 +228,11 @@ const SignUpForm = () => {
             email,
             password,
             passwordConfirm,
-            displayName,
+            username,
         };
         const { valid, messages } = formValidator().validate(formValues);
         return valid && agreement;
-    }, [agreement, displayName, email, password, passwordConfirm]);
+    }, [agreement, username, email, password, passwordConfirm]);
 
     const onSubmit = useCallback(
         e => {
@@ -233,7 +241,7 @@ const SignUpForm = () => {
                 email,
                 password,
                 passwordConfirm,
-                displayName,
+                username,
             };
             const { valid, messages } = formValidator().validate(formValues);
 
@@ -247,7 +255,7 @@ const SignUpForm = () => {
                 });
             }
         },
-        [dispatch, displayName, email, password, passwordConfirm],
+        [dispatch, username, email, password, passwordConfirm]
     );
 
     if (me) {
@@ -292,14 +300,14 @@ const SignUpForm = () => {
                 />
             </Form.Item>
             <Form.Item
-                label={LABEL_DISPLAYNAME}
+                label={LABEL_USERNAME}
                 hasFeedback={true}
-                validateStatus={displayNameErrorMessage ? 'error' : 'success'}
-                help={displayNameErrorMessage}>
+                validateStatus={usernameErrorMessage ? 'error' : 'success'}
+                help={usernameErrorMessage}>
                 <Input
-                    value={displayName}
-                    onChange={onChangeDisplayName}
-                    placeholder={PLACEHOLDER_DISPLAYNAME}
+                    value={username}
+                    onChange={onChangeUsername}
+                    placeholder={PLACEHOLDER_USERNAME}
                 />
             </Form.Item>
             <Form.Item>

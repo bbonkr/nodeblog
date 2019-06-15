@@ -14,7 +14,7 @@ const { findUserById } = require('./helper');
 //                 model: db.Post,
 //             },
 //         ],
-//         attributes: ['id', 'email', 'displayName'],
+//         attributes: ['id', 'email', 'username'],
 //     });
 
 //     return me;
@@ -25,7 +25,7 @@ const { findUserById } = require('./helper');
  */
 router.post('/', async (req, res, next) => {
     try {
-        const { email, displayName, password } = req.body;
+        const { email, username, password } = req.body;
 
         const user = await db.User.findOne({
             where: {
@@ -40,7 +40,7 @@ router.post('/', async (req, res, next) => {
         const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await db.User.create({
             email: email,
-            displayName: displayName,
+            username: username,
             password: hashedPassword,
         });
 

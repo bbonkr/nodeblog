@@ -8,38 +8,39 @@ import { LOAD_SINGLE_POST_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
 import DefaultLayout from '../components/DefaultLayout';
 
-const Post = ({ slug }) => {
+const Post = () => {
     const { loadingPost, singlePost } = useSelector(s => s.post);
     return (
         <DefaultLayout>
             <ContentWrapper>
-                <Spin spinning={loadingPost} tip="loading ...">
-                    {singlePost ? (
+                {singlePost && <SinglePost post={singlePost} />}
+                {/* <Spin spinning={loadingPost} tip="loading ...">
+                    
+                    {singlePost && !loadingPost ? (
                         <SinglePost post={singlePost} />
                     ) : (
                         <Skeleton active paragraph={{ rows: 4 }} />
                     )}
-                </Spin>
+                </Spin> */}
             </ContentWrapper>
         </DefaultLayout>
     );
 };
 
-Post.propTypes = {
-    slug: PropTypes.string.isRequired,
-};
+Post.propTypes = {};
 
 Post.getInitialProps = async context => {
-    const { slug } = context.query;
+    const { user, slug } = context.query;
+    console.log('Post.getInitialize() ==> user: ', user);
+    console.log('Post.getInitialize() ==> slug: ', slug);
+    const decodedUser = user;
     const decodedSlug = decodeURIComponent(slug);
     context.store.dispatch({
         type: LOAD_SINGLE_POST_CALL,
-        data: decodedSlug,
+        data: { user: decodedUser, slug: decodedSlug },
     });
 
-    return {
-        slug: slug,
-    };
+    return {};
 };
 
 export default Post;

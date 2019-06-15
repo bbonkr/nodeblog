@@ -10,40 +10,41 @@ const xssFilter = require('showdown-xss-filter');
 const { isLoggedIn } = require('./middleware');
 const Op = Sequelize.Op;
 const { makeSlug } = require('../helpers/stringHelper');
+const { markdownConverter, stripHtml, getExcerpt } = require('./helper');
 const EXCERPT_LENGTH = 200;
 
-const markdownConverter = new showdown.Converter(
-    {
-        omitExtraWLInCodeBlocks: false,
-        noHeaderId: false,
-        ghCompatibleHeaderId: true,
-        prefixHeaderId: true,
-        headerLevelStart: 1,
-        parseImgDimensions: true,
-        simplifiedAutoLink: true,
-        excludeTrailingPunctuationFromURLs: true,
-        literalMidWordUnderscores: true,
-        strikethrough: true,
-        tables: true,
-        tasklists: true,
-        ghMentions: false,
-        ghMentionsLink: false,
-        ghCodeBlocks: true,
-        smartIndentationFix: true,
-        smoothLivePreview: true,
-        disableForced4SpacesIndentedSublists: true,
-        simpleLineBreaks: true,
-        requireSpaceBeforeHeadingText: true,
-        encodeEmails: true,
-    },
-    {
-        extensions: [xssFilter],
-    },
-);
+// const markdownConverter = new showdown.Converter(
+//     {
+//         omitExtraWLInCodeBlocks: false,
+//         noHeaderId: false,
+//         ghCompatibleHeaderId: true,
+//         prefixHeaderId: true,
+//         headerLevelStart: 1,
+//         parseImgDimensions: true,
+//         simplifiedAutoLink: true,
+//         excludeTrailingPunctuationFromURLs: true,
+//         literalMidWordUnderscores: true,
+//         strikethrough: true,
+//         tables: true,
+//         tasklists: true,
+//         ghMentions: false,
+//         ghMentionsLink: false,
+//         ghCodeBlocks: true,
+//         smartIndentationFix: true,
+//         smoothLivePreview: true,
+//         disableForced4SpacesIndentedSublists: true,
+//         simpleLineBreaks: true,
+//         requireSpaceBeforeHeadingText: true,
+//         encodeEmails: true,
+//     },
+//     {
+//         extensions: [xssFilter],
+//     },
+// );
 
-const stripHtml = html => {
-    return html.replace(/(<([^>]+)>)/gi, '');
-};
+// const stripHtml = html => {
+//     return html.replace(/(<([^>]+)>)/gi, '');
+// };
 
 router.post('/', isLoggedIn, async (req, res, next) => {
     try {
@@ -69,9 +70,9 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             title: title,
             slug: slugEdit,
             markdown: markdown,
-            content: html,
-            contentText: text,
-            excerpt: text.slice(0, EXCERPT_LENGTH),
+            html: html,
+            text: text,
+            excerpt: getExcerpt(text),
             UserId: req.user.id,
         });
 
@@ -79,7 +80,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             const foundCategories = await Promise.all(
                 categories.map(v => {
                     return db.Category.findOne({ where: { slug: v.slug } });
-                }),
+                })
             );
 
             // await Promise.all(
@@ -102,14 +103,14 @@ router.post('/', isLoggedIn, async (req, res, next) => {
                             slug: slug,
                         },
                     });
-                }),
+                })
             );
 
             await post.addTags(
                 foundTags.map(v => {
                     console.log('tag findOrCreate: ', v);
                     return v[0];
-                }),
+                })
             );
             // await Promise.all(
             //     foundTags.forEach(v => {
@@ -125,7 +126,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -147,7 +148,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
                 'id',
                 'title',
                 'slug',
-                'content',
+                'html',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -169,7 +170,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -219,8 +220,8 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 title: title,
                 slug: slugEdit,
                 markdown: markdown,
-                content: html,
-                contentText: text,
+                html: html,
+                text: text,
                 excerpt: text.slice(0, EXCERPT_LENGTH),
             },
             {
@@ -228,11 +229,11 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                     'title',
                     'slug',
                     'markdown',
-                    'content',
-                    'contentText',
+                    'html',
+                    'text',
                     'excerpt',
                 ],
-            },
+            }
         );
 
         if (!!post.Categories) {
@@ -247,7 +248,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             const foundCategories = await Promise.all(
                 categories.map(v => {
                     return db.Category.findOne({ where: { slug: v.slug } });
-                }),
+                })
             );
 
             // await Promise.all(
@@ -271,7 +272,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                             slug: slug,
                         },
                     });
-                }),
+                })
             );
 
             console.log('foundTags: ', foundTags);
@@ -280,7 +281,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 foundTags.map(v => {
                     console.log('tag findOrCreate: ', v);
                     return v[0];
-                }),
+                })
             );
             // await Promise.all(
             //     foundTags.forEach(v => {
@@ -296,7 +297,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -318,7 +319,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 'id',
                 'title',
                 'slug',
-                'content',
+                'html',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -340,7 +341,7 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -373,15 +374,7 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
                     model: db.Comment,
                 },
             ],
-            attributes: [
-                'id',
-                'title',
-                'slug',
-                'content',
-                'UserId',
-                'createdAt',
-                'updatedAt',
-            ],
+            attributes: ['id', 'title', 'slug', 'UserId'],
         });
 
         if (!post) {

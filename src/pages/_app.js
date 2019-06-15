@@ -18,8 +18,11 @@ import { SET_CURRENT_URL } from '../reducers/settings';
 
 // const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
 
+// FIXME:
+// 구성값을 데이터베이스에서 가져와야 합니다.
 const fbAdmin = process.env.FB_ADMIN;
 const siteName = process.env.SITE_NAME;
+
 const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
     // console.log('pageProps', pageProps);
     return (
@@ -85,12 +88,12 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                             type: 'text/css',
                             charset: 'UTF-8',
                         },
-                        {
-                            rel: 'stylesheet',
-                            href: '/_next/static/css/styles.chunk.css',
-                            type: 'text/css',
-                            charset: 'UTF-8',
-                        },
+                        // {
+                        //     rel: 'stylesheet',
+                        //     href: '/_next/static/css/styles.chunk.css',
+                        //     type: 'text/css',
+                        //     charset: 'UTF-8',
+                        // },
                     ]}
                     script={[
                         {
@@ -186,7 +189,7 @@ const configureStore = (initialState, options) => {
                   !options.isServer &&
                       window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
                       ? window.__REDUX_DEVTOOLS_EXTENSION__()
-                      : f => f,
+                      : f => f
               );
 
     const store = createStore(reducer, initialState, enhancers);

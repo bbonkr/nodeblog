@@ -18,7 +18,7 @@ const upload = multer({
             // 파일 저장 경로
             const mm = moment(Date.now()).format('MM');
             const yyyy = moment(Date.now()).format('YYYY');
-            const dest = path.join('uploads', yyyy, mm);
+            const dest = path.join('uploads', req.user.id, yyyy, mm);
             console.log('destination directory: ', dest);
 
             fs.exists(dest, exists => {
@@ -67,7 +67,7 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'displayName'],
+                    attributes: ['id', 'email', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -132,7 +132,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
                 [Op.or]: [
                     { title: { [Op.like]: `%${keyword}%` } },
                     {
-                        content: {
+                        text: {
                             [Op.like]: `%${keyword}%`,
                         },
                     },
@@ -171,7 +171,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'displayName'],
+                    attributes: ['id', 'email', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -279,21 +279,21 @@ router.post(
 
                     const savedFileExt = path.extname(v.path);
                     const savedFileBasename = encodeURIComponent(
-                        path.basename(v.path, savedFileExt),
+                        path.basename(v.path, savedFileExt)
                     );
                     const savedFileDir = path.dirname(v.path);
                     const serverRootDir = path.normalize(
-                        path.join(__dirname, '..'),
+                        path.join(__dirname, '..')
                     );
                     const savedFileRelativeDir = path.relative(
                         serverRootDir,
-                        savedFileDir,
+                        savedFileDir
                     );
 
                     const src = `/${replaceAll(
                         savedFileRelativeDir,
                         '\\\\',
-                        '/',
+                        '/'
                     )}/${savedFileBasename}${savedFileExt}`;
                     console.log('file src: ', src);
 
@@ -306,7 +306,7 @@ router.post(
                         contentType: v.mimetype,
                         UserId: req.user.id,
                     });
-                }),
+                })
             );
 
             console.log('Promise.all ==> images', images);
@@ -333,7 +333,7 @@ router.post(
             console.error(e);
             next(e);
         }
-    },
+    }
 );
 
 router.delete('/media/:id', isLoggedIn, async (req, res, next) => {

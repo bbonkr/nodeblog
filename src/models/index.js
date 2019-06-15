@@ -1,7 +1,7 @@
-const fs = require('fs');
+// const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
-const basename = path.basename(__filename);
+// const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
 const config = require('../config/config')[env];
 const db = {};
@@ -14,7 +14,7 @@ if (config.use_env_variable) {
         config.database,
         config.username,
         config.password,
-        config,
+        config
     );
 }
 
@@ -36,7 +36,7 @@ db.User = require('./User')(sequelize, Sequelize);
 db.Category = require('./Category')(sequelize, Sequelize);
 db.PostAccessLog = require('./PostAccessLog')(sequelize, Sequelize);
 /** passport store */
-db.SessionStore = require('../passport/sessionStore')(sequelize, Sequelize);
+db.Session = require('../passport/session')(sequelize, Sequelize);
 
 Object.keys(db).forEach(modelName => {
     if (db[modelName].associate) {

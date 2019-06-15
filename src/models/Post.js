@@ -1,3 +1,5 @@
+const { postState } = require('../helpers/constants');
+
 module.exports = (sequelize, DataTypes) => {
     const Post = sequelize.define(
         'Post',
@@ -15,11 +17,11 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            content: {
+            html: {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
-            contentText: {
+            text: {
                 type: DataTypes.TEXT,
                 allowNull: false,
             },
@@ -27,11 +29,39 @@ module.exports = (sequelize, DataTypes) => {
                 type: DataTypes.TEXT,
                 allowNull: true,
             },
+            isPublished: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            isPrivate: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            password: {
+                type: DataTypes.STRING(500),
+                allowNull: true,
+            },
+            isPinned: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            isDeleted: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+            deletedAt: {
+                type: DataTypes.DATE,
+                allowNull: true,
+            },
         },
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        },
+        }
     );
 
     Post.associate = db => {

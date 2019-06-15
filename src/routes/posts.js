@@ -38,7 +38,7 @@ router.get('/', async (req, res, next) => {
                 [Op.or]: [
                     { title: { [Op.like]: `%${keyword}%` } },
                     {
-                        content: {
+                        text: {
                             [Op.like]: `%${keyword}%`,
                         },
                     },
@@ -51,7 +51,7 @@ router.get('/', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -121,7 +121,7 @@ router.get('/category/:category', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -194,7 +194,7 @@ router.get('/tag/:tag', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -249,7 +249,7 @@ router.get('/:slug', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'displayName'],
+                    attributes: ['id', 'username'],
                 },
                 {
                     model: db.Tag,
@@ -271,7 +271,7 @@ router.get('/:slug', async (req, res, next) => {
                 'id',
                 'title',
                 'slug',
-                'content',
+                'html',
                 'UserId',
                 'createdAt',
                 'updatedAt',
