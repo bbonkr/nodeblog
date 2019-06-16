@@ -9,21 +9,27 @@ import { ErrorMessageWrapper } from '../styledComponents/Wrapper';
 const PLACEHOLDER_EMAIL = 'Input your email address';
 const PLACEHOLDER_PASSWORD = 'Input your password';
 const PLACEHOLDER_PASSWORD_CONFIRM = 'Input your password again';
-const PLACEHOLDER_USERNAME = 'Input your display name';
+const PLACEHOLDER_USERNAME = 'Input your name name';
+const PLACEHOLDER_DISPLAYNAME = 'Input your display name';
 
 const LABEL_EMAIL = 'E-mail';
 const LABEL_PASSWORD = 'Password';
 const LABEL_PASSWORD_CONFIRM = 'Confirm Password';
-const LABEL_USERNAME = 'Display name';
+const LABEL_USERNAME = 'User name';
+const LABEL_DISPLAYNAME = 'Display name';
 
 const USERNAME_MIN_LENGTH = 3;
+const DISPLAYNAME_MIN_LENGTH = 3;
+
 const formValues = {
     email: '',
     password: '',
     passwordConfirm: '',
     username: '',
+    displayName: '',
     agreement: false,
 };
+
 const formValidator = () => {
     const passwordCheck = formValues => {
         const { password, passwordConfirm } = formValues;
@@ -106,7 +112,7 @@ const formValidator = () => {
         if (username.trim().length < USERNAME_MIN_LENGTH) {
             return {
                 valid: false,
-                message: `Please input your display name longer than ${USERNAME_MIN_LENGTH}`,
+                message: `Please input your user name longer than ${USERNAME_MIN_LENGTH}`,
             };
         }
 
@@ -115,6 +121,30 @@ const formValidator = () => {
             message: '',
         };
     };
+
+    const displayName = formValues => {
+        const { displayName } = formValues;
+
+        if (!displayName || displayName.trim().length === 0) {
+            return {
+                valid: false,
+                message: 'Please input your display name.',
+            };
+        }
+
+        if (displayName.trim().length < DISPLAYNAME_MIN_LENGTH) {
+            return {
+                valid: false,
+                message: `Please input your display name longer than ${DISPLAYNAME_MIN_LENGTH}`,
+            };
+        }
+
+        return {
+            valid: true,
+            message: '',
+        };
+    };
+
     const validate = formValues => {
         const results = [];
 
@@ -122,6 +152,7 @@ const formValidator = () => {
         results.push(password(formValues));
         results.push(passwordConfirm(formValues));
         results.push(username(formValues));
+        results.push(displayName(formValues));
 
         let valid = true;
         const messages = [];
@@ -142,6 +173,7 @@ const formValidator = () => {
         password,
         passwordConfirm,
         username,
+        displayName,
         validate,
     };
 };
@@ -160,6 +192,9 @@ const SignUpForm = () => {
     ] = useState('');
     const [username, setUsername] = useState('');
     const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
+    const [displayName, setDisplayName] = useState('');
+    const [displayNameErrorMessage, setDisplayNameErrorMessage] = useState('');
+
     const [agreement, setAgreement] = useState(false);
     const [agreementErrorMessage, setAgreementErrorMessage] = useState('');
 
@@ -219,6 +254,15 @@ const SignUpForm = () => {
         setUsernameErrorMessage(message);
     }, []);
 
+    const onChangeDisplayName = useCallback(e => {
+        const newValue = e.target.value;
+        setDisplayName(newValue);
+        const { message } = formValidator().displayName({
+            displayName: newValue,
+        });
+        setDisplayNameErrorMessage(message);
+    }, []);
+
     const onChangeAgreement = useCallback(e => {
         setAgreement(e.target.checked);
     }, []);
@@ -229,10 +273,11 @@ const SignUpForm = () => {
             password,
             passwordConfirm,
             username,
+            displayName,
         };
         const { valid, messages } = formValidator().validate(formValues);
         return valid && agreement;
-    }, [agreement, username, email, password, passwordConfirm]);
+    }, [email, password, passwordConfirm, username, displayName, agreement]);
 
     const onSubmit = useCallback(
         e => {
@@ -242,11 +287,12 @@ const SignUpForm = () => {
                 password,
                 passwordConfirm,
                 username,
+                displayName,
             };
             const { valid, messages } = formValidator().validate(formValues);
 
-            console.log('valid: ', valid);
-            console.log('messages: ', messages);
+            // console.log('valid: ', valid);
+            // console.log('messages: ', messages);
 
             if (valid) {
                 dispatch({
@@ -255,7 +301,7 @@ const SignUpForm = () => {
                 });
             }
         },
-        [dispatch, username, email, password, passwordConfirm]
+        [email, password, passwordConfirm, username, displayName, dispatch]
     );
 
     if (me) {
@@ -267,7 +313,7 @@ const SignUpForm = () => {
             <Form.Item
                 label={LABEL_EMAIL}
                 hasFeedback={true}
-                validateStatus={emailErrorMessage ? 'error' : 'success'}
+                validateStatus={!emailErrorMessage ? 'success' : 'error'}
                 help={emailErrorMessage}>
                 <Input
                     value={email}
@@ -278,7 +324,7 @@ const SignUpForm = () => {
             <Form.Item
                 label={LABEL_PASSWORD}
                 hasFeedback={true}
-                validateStatus={passwordErrorMessage ? 'error' : 'success'}
+                validateStatus={!passwordErrorMessage ? 'success' : 'error'}
                 help={passwordErrorMessage}>
                 <Input.Password
                     value={password}
@@ -290,7 +336,7 @@ const SignUpForm = () => {
                 label={LABEL_PASSWORD_CONFIRM}
                 hasFeedback={true}
                 validateStatus={
-                    passwordConfirmErrorMessage ? 'error' : 'success'
+                    !passwordConfirmErrorMessage ? 'success' : 'error'
                 }
                 help={passwordConfirmErrorMessage}>
                 <Input.Password
@@ -302,12 +348,23 @@ const SignUpForm = () => {
             <Form.Item
                 label={LABEL_USERNAME}
                 hasFeedback={true}
-                validateStatus={usernameErrorMessage ? 'error' : 'success'}
+                validateStatus={!usernameErrorMessage ? 'success' : 'error'}
                 help={usernameErrorMessage}>
                 <Input
                     value={username}
                     onChange={onChangeUsername}
                     placeholder={PLACEHOLDER_USERNAME}
+                />
+            </Form.Item>
+            <Form.Item
+                label={LABEL_DISPLAYNAME}
+                hasFeedback={true}
+                validateStatus={!displayNameErrorMessage ? 'success' : 'error'}
+                help={displayNameErrorMessage}>
+                <Input
+                    value={displayName}
+                    onChange={onChangeDisplayName}
+                    placeholder={PLACEHOLDER_DISPLAYNAME}
                 />
             </Form.Item>
             <Form.Item>

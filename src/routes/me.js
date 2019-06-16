@@ -67,7 +67,7 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'username'],
+                    attributes: ['id', 'email', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -171,7 +171,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'username'],
+                    attributes: ['id', 'email', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,

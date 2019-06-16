@@ -24,6 +24,13 @@ export const initialState = {
     loadMyPostErrorReason: '',
 
     writingPost: false,
+
+    usersPosts: [],
+    usersPostsPageToken: '',
+    loadingUsersPosts: false,
+    loadUsersPostsErrorReason: '',
+    hasMoreUsersPosts: false,
+    currentUser: '', // 현재 선택된 사용자
 };
 
 export const LOAD_POSTS_CALL = 'LOAD_POSTS_CALL';
@@ -33,6 +40,10 @@ export const LOAD_POSTS_FAIL = 'LOAD_POSTS_FAIL';
 export const LOAD_SINGLE_POST_CALL = 'LOAD_SINGLE_POST_CALL';
 export const LOAD_SINGLE_POST_DONE = 'LOAD_SINGLE_POST_DONE';
 export const LOAD_SINGLE_POST_FAIL = 'LOAD_SINGLE_POST_FAIL';
+
+export const LOAD_USERS_POSTS_CALL = 'LOAD_USERS_POSTS_CALL';
+export const LOAD_USERS_POSTS_DONE = 'LOAD_USERS_POSTS_DONE';
+export const LOAD_USERS_POSTS_FAIL = 'LOAD_USERS_POSTS_FAIL';
 
 export const LOAD_CATEGORY_POSTS_CALL = 'LOAD_CATEGORY_POSTS_CALL';
 export const LOAD_CATEGORY_POSTS_DONE = 'LOAD_CATEGORY_POSTS_DONE';
@@ -81,6 +92,38 @@ const reducer = (state = initialState, action) =>
                 draft.loadingPosts = false;
                 draft.loadPostErrorReason = action.error;
                 break;
+
+            // users/:user/posts
+            case LOAD_USERS_POSTS_CALL:
+                draft.usersPosts = action.data.pageToken
+                    ? draft.usersPosts
+                    : [];
+                draft.hasMoreUsersPosts = action.data.pageToken
+                    ? draft.hasMoreUsersPosts
+                    : true;
+                draft.loadingUsersPosts = true;
+                draft.loadUsersPostsErrorReason = '';
+                draft.currentUser = action.data.user;
+                break;
+            case LOAD_USERS_POSTS_DONE:
+                action.data.forEach(v => {
+                    const postIndex = draft.usersPosts.findIndex(
+                        x => x.id === v.id
+                    );
+                    if (postIndex < 0) {
+                        draft.usersPosts.push(v);
+                        draft.usersPostsPageToken = `${v.id}`;
+                    }
+                });
+                draft.hasMoreUsersPosts =
+                    action.data.length === draft.postsLimit;
+                draft.loadingUsersPosts = false;
+                break;
+            case LOAD_USERS_POSTS_FAIL:
+                draft.loadingUsersPosts = false;
+                draft.loadUsersPostsErrorReason = action.reason;
+                break;
+
             case LOAD_SINGLE_POST_CALL:
                 draft.singlePost = null;
                 draft.isSinglePost = true;

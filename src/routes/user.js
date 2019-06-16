@@ -25,7 +25,7 @@ const { findUserById } = require('./helper');
  */
 router.post('/', async (req, res, next) => {
     try {
-        const { email, username, password } = req.body;
+        const { email, username, password, displayName } = req.body;
 
         const user = await db.User.findOne({
             where: {
@@ -41,6 +41,7 @@ router.post('/', async (req, res, next) => {
         const newUser = await db.User.create({
             email: email,
             username: username,
+            displayName: displayName,
             password: hashedPassword,
         });
 
@@ -54,5 +55,9 @@ router.post('/', async (req, res, next) => {
         return next(e);
     }
 });
+
+// TODO: change password
+
+// TODO: change Email, username, displayname, photo src
 
 module.exports = router;

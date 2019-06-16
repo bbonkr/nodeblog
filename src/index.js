@@ -24,7 +24,7 @@ const handle = nextApp.getRequestHandler();
 
 db.sequelize.sync({
     // If force is true, each Model will run DROP TABLE IF EXISTS, before it tries to create its own table
-    force: true,
+    force: false,
 });
 
 passportConfig();
@@ -97,11 +97,19 @@ nextApp.prepare().then(() => {
     });
 
     expressApp.get('/users/:user/posts', (req, res) => {
-        return nextApp.render(req, res, '/post', { user: req.params.user });
+        return nextApp.render(req, res, '/users/posts', {
+            user: req.params.user,
+        });
+    });
+
+    expressApp.get('/users/:user/posts', (req, res) => {
+        return nextApp.render(req, res, '/users/posts', {
+            user: req.params.user,
+        });
     });
 
     expressApp.get('/users/:user/posts/:slug', (req, res) => {
-        return nextApp.render(req, res, '/post', {
+        return nextApp.render(req, res, '/users/post', {
             user: req.params.user,
             slug: req.params.slug,
         });

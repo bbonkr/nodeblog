@@ -22,6 +22,9 @@ import {
     LOAD_TAG_POSTS_CALL,
     LOAD_TAG_POSTS_DONE,
     LOAD_TAG_POSTS_FAIL,
+    LOAD_USERS_POSTS_DONE,
+    LOAD_USERS_POSTS_FAIL,
+    LOAD_USERS_POSTS_CALL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -174,11 +177,48 @@ function* watchLoadTagPosts() {
     yield takeLatest(LOAD_TAG_POSTS_CALL, loadTagPosts);
 }
 
+function loadUsersPostsApi(user, pageToken = '', limit = 10, keyword = '') {
+    return axios.get(
+        `/users/${user}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword
+        )}`
+    );
+}
+
+function* loadUsersPosts(action) {
+    try {
+        const { user, pageToken, limit, keyword } = action.data;
+        const result = yield call(
+            loadUsersPostsApi,
+            user,
+            pageToken,
+            limit || 10,
+            keyword
+        );
+        yield put({
+            type: LOAD_USERS_POSTS_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_USERS_POSTS_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadUsersPosts() {
+    yield takeLatest(LOAD_USERS_POSTS_CALL, loadUsersPosts);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadPosts),
         fork(watchLoadSinglePost),
         fork(watchLoadCategoryPosts),
         fork(watchLoadTagPosts),
+        fork(watchLoadUsersPosts),
     ]);
 }

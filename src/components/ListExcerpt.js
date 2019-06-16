@@ -1,15 +1,14 @@
-import React, { useCallback } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { List, Avatar, Button, Divider, Card, Typography } from 'antd';
 import moment from 'moment';
 import styled from 'styled-components';
 import IconText from './IconText';
-import { LOAD_POSTS_CALL } from '../reducers/post';
 import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
+import LinkUsersPosts from './LinkUsersPosts';
 
 // import '../styles/styles.scss';
 
@@ -17,32 +16,8 @@ const FullWidthButton = styled(Button)`
     width: 100%;
 `;
 
-const ListExcerpt = () => {
-    const dispatch = useDispatch();
-    const {
-        posts,
-        loadingPosts,
-        nextPageToken,
-        postsLimit,
-        searchKeyword,
-        hasMorePost,
-    } = useSelector(s => s.post);
-
-    // console.log('hasMorePost:', hasMorePost);
-
-    const onClickLoadMorePosts = useCallback(
-        e => {
-            dispatch({
-                type: LOAD_POSTS_CALL,
-                data: {
-                    pageToken: nextPageToken,
-                    limit: postsLimit,
-                    keyword: searchKeyword,
-                },
-            });
-        },
-        [dispatch, nextPageToken, postsLimit, searchKeyword]
-    );
+const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
+    console.log('======> posts count: ', (posts && posts.length) || 0);
 
     return (
         <article>
@@ -50,10 +25,10 @@ const ListExcerpt = () => {
                 itemLayout="vertical"
                 size="large"
                 loadMore={
-                    hasMorePost && (
+                    hasMore && (
                         <FullWidthButton
-                            loading={loadingPosts}
-                            onClick={onClickLoadMorePosts}>
+                            loading={loading}
+                            onClick={loadMoreHandler}>
                             더 보기
                         </FullWidthButton>
                     )
@@ -67,11 +42,11 @@ const ListExcerpt = () => {
                     xl: 4,
                     xxl: 6,
                 }}
-                loading={loadingPosts}
+                loading={loading}
                 dataSource={posts}
                 renderItem={post => {
                     const { slug, title, excerpt, createdAt } = post;
-                    const { username } = post.User;
+                    const { username, displayName } = post.User;
                     return (
                         <List.Item key={post.id}>
                             <Card
@@ -88,9 +63,11 @@ const ListExcerpt = () => {
                                 ]}>
                                 <Card.Meta
                                     avatar={
-                                        <Avatar>
-                                            {username[0].toUpperCase()}
-                                        </Avatar>
+                                        <LinkUsersPosts user={`@${username}`}>
+                                            <Avatar>
+                                                {displayName[0].toUpperCase()}
+                                            </Avatar>
+                                        </LinkUsersPosts>
                                     }
                                     extra={
                                         <IconText
@@ -108,22 +85,6 @@ const ListExcerpt = () => {
                                                 {title}
                                             </Typography.Title>
                                         </LinkSinglePost>
-                                        // <Link
-                                        //     href={{
-                                        //         pathname: '/post',
-                                        //         query: { slug: slug },
-                                        //     }}
-                                        //     as={`/post/${slug}`}>
-                                        //     <a>
-                                        //         <h3
-                                        //             style={{
-                                        //                 textOverflow:
-                                        //                     'ellipsis',
-                                        //             }}>
-                                        //             {title}
-                                        //         </h3>
-                                        //     </a>
-                                        // </Link>
                                     }
                                 />
                                 <div
@@ -184,7 +145,10 @@ const ListExcerpt = () => {
 };
 
 ListExcerpt.propTypes = {
-    // post: PropTypes.object.isRequired,
+    posts: PropTypes.array.isRequired,
+    loading: PropTypes.bool.isRequired,
+    hasMore: PropTypes.bool.isRequired,
+    loadMoreHandler: PropTypes.func.isRequired,
 };
 
 export default ListExcerpt;

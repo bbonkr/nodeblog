@@ -51,7 +51,7 @@ router.get('/', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -121,7 +121,7 @@ router.get('/category/:category', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -194,7 +194,7 @@ router.get('/tag/:tag', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -249,7 +249,7 @@ router.get('/:slug', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,

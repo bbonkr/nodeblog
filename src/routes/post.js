@@ -126,7 +126,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -170,7 +170,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -297,7 +297,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -341,7 +341,7 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,

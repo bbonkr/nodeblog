@@ -7,6 +7,7 @@ import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
 import moment from 'moment';
+import LinkUsersPosts from './LinkUsersPosts';
 
 const SinglePost = ({ post }) => {
     console.log('post: ', post);
@@ -16,7 +17,11 @@ const SinglePost = ({ post }) => {
             <article>
                 <Card>
                     <Card.Meta
-                        avatar={<Avatar>{post.User.username[0]}</Avatar>}
+                        avatar={
+                            <LinkUsersPosts user={post.User.username}>
+                                <Avatar>{post.User.displayName[0]}</Avatar>
+                            </LinkUsersPosts>
+                        }
                         title={
                             <LinkSinglePost post={post}>
                                 <Typography.Title level={3} ellipsis={true}>

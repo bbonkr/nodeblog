@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import ListExcerpt from '../components/ListExcerpt';
 import PropTypes from 'prop-types';
 import { LOAD_POSTS_CALL } from '../reducers/post';
@@ -6,10 +7,38 @@ import { ContentWrapper } from '../styledComponents/Wrapper';
 import DefaultLayout from '../components/DefaultLayout';
 
 const Home = () => {
+    const dispatch = useDispatch();
+    const {
+        posts,
+        nextPageToken,
+        postsLimit,
+        loadingPosts,
+        hasMorePost,
+    } = useSelector(s => s.post);
+
+    const onClickLoadMorePosts = useCallback(
+        e => {
+            dispatch({
+                type: LOAD_POSTS_CALL,
+                data: {
+                    pageToken: nextPageToken,
+                    limit: postsLimit,
+                    keyword: '',
+                },
+            });
+        },
+        [dispatch, nextPageToken, postsLimit]
+    );
+
     return (
         <DefaultLayout>
             <ContentWrapper>
-                <ListExcerpt />
+                <ListExcerpt
+                    posts={posts}
+                    loading={loadingPosts}
+                    hasMore={hasMorePost}
+                    loadMoreHandler={onClickLoadMorePosts}
+                />
             </ContentWrapper>
         </DefaultLayout>
     );

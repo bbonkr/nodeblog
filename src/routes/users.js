@@ -67,7 +67,7 @@ router.get('/:user/posts', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                 },
                 {
                     model: db.Tag,
@@ -139,7 +139,7 @@ router.get('/:user/posts/:post', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username'],
+                    attributes: ['id', 'username', 'displayName'],
                     where: {
                         id: foundUser.id,
                     },
