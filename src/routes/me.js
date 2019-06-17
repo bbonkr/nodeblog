@@ -18,7 +18,7 @@ const upload = multer({
             // 파일 저장 경로
             const mm = moment(Date.now()).format('MM');
             const yyyy = moment(Date.now()).format('YYYY');
-            const dest = path.join('uploads', req.user.id, yyyy, mm);
+            const dest = path.join('uploads', `${req.user.id}`, yyyy, mm);
             console.log('destination directory: ', dest);
 
             fs.exists(dest, exists => {
@@ -362,7 +362,10 @@ router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
             return res.status(404).send('Could not find a file.');
         }
 
-        fs.unlinkSync(foundImage.path);
+        if(fs.existsSync(foundImage.path)){
+            // 파일이 있는 경우만 삭제합니다.
+            fs.unlinkSync(foundImage.path);
+        }
 
         await foundImage.destroy();
 

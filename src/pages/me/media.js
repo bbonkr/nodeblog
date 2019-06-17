@@ -19,27 +19,21 @@ import {
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import MeLayout from '../../components/MeLayout';
 import moment from 'moment';
+import styled from 'styled-components';
 import ImageViewer from '../../components/ImageViewer';
 
 const Paragraph = Typography.Paragraph;
 const Dragger = Upload.Dragger;
 
-const props = {
-    name: 'file',
-    multiple: true,
-    action: 'https://www.mocky.io/v2/5cc8019d300000980a055e76',
-    onChange(info) {
-        const status = info.file.status;
-        if (status !== 'uploading') {
-            console.log(info.file, info.fileList);
-        }
-        if (status === 'done') {
-            message.success(`${info.file.name} file uploaded successfully.`);
-        } else if (status === 'error') {
-            message.error(`${info.file.name} file upload failed.`);
-        }
-    },
-};
+const DropZoneDiv = styled.div`
+    border: '2px dashed gray';
+    height: '15rem';
+    width: '100%';
+    padding: '2rem';
+    text-align: 'center';
+    vertical-align: 'middle';
+`;
+
 const Media = () => {
     const dispatch = useDispatch();
 
@@ -51,6 +45,7 @@ const Media = () => {
         mediaFilesLimit,
         uploading,
     } = useSelector(s => s.me);
+
     const [fileList, setFileList] = useState([]);
     const [imageViewerVisible, setImageViewerVisible] = useState(false);
     const [imageViewerFiles, setImageViewerFiles] = useState([]);
@@ -58,26 +53,34 @@ const Media = () => {
         setImageViewerVisible(false);
     }, []);
 
+    const uploadBuffer = [];
+
     const onBeforeUploadFiles = useCallback(
-        (file, fileList, event) => {
+        (file, fileList) => {
+            console.log('==========> file: ', file);
+            console.log('==========> fileList: ', fileList);
+
             if (!uploading) {
-                console.log('file: ==> ', file);
-                console.log('fileList: ==> ', fileList);
-                // setFileList(files.fileList);
+                console.log('==========> file: ', file);
+                uploadBuffer.push(file);
 
-                const formData = new FormData();
-                fileList.forEach(f => {
-                    formData.append('files', f);
-                });
+                if (uploadBuffer.length === fileList.length) {
+                    const formData = new FormData();
+                    uploadBuffer.forEach(f => {
+                        formData.append('files', f);
+                    });
 
-                dispatch({
-                    type: UPLOAD_MY_MEDIA_FILES_CALL,
-                    data: formData,
-                });
+                    dispatch({
+                        type: UPLOAD_MY_MEDIA_FILES_CALL,
+                        data: formData,
+                    });
+
+                    uploadBuffer.splice(0, uploadBuffer.length);
+                }
             }
             return false;
         },
-        [dispatch, uploading],
+        [dispatch, uploadBuffer, uploading]
     );
 
     const onClickLoadMore = useCallback(
@@ -93,7 +96,7 @@ const Media = () => {
                 });
             }
         },
-        [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken],
+        [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken]
     );
 
     const onClickImage = useCallback(
@@ -101,7 +104,7 @@ const Media = () => {
             setImageViewerVisible(true);
             setImageViewerFiles([image]);
         },
-        [],
+        []
     );
 
     const onClickDeleteFile = useCallback(
@@ -118,7 +121,7 @@ const Media = () => {
                 onCancel() {},
             });
         },
-        [dispatch],
+        [dispatch]
     );
 
     return (
@@ -126,6 +129,7 @@ const Media = () => {
             <ContentWrapper>
                 <div>
                     <h1>Media</h1>
+
                     <Dragger
                         disabled={uploading}
                         supportServerRender={true}
@@ -195,11 +199,11 @@ const Media = () => {
                                                                 '0 -38.885%',
                                                         }}
                                                         src={decodeURIComponent(
-                                                            item.src,
+                                                            item.src
                                                         )}
                                                         alt={filename}
                                                         onClick={onClickImage(
-                                                            item,
+                                                            item
                                                         )}
                                                     />
                                                 </figure>
@@ -214,7 +218,7 @@ const Media = () => {
                                             <Icon
                                                 type="delete"
                                                 onClick={onClickDeleteFile(
-                                                    item,
+                                                    item
                                                 )}
                                             />,
                                         ]}>
@@ -225,15 +229,17 @@ const Media = () => {
                                                     <Icon type="clock-circle" />{' '}
                                                     {moment(
                                                         new Date(
-                                                            item.createdAt,
+                                                            item.createdAt
                                                         ),
-                                                        'YYYY-MM-DD HH:mm:ss',
+                                                        'YYYY-MM-DD HH:mm:ss'
                                                     ).fromNow()}
                                                 </span>
                                             }
                                         />
                                         <div
-                                            tyle={{ textOverflow: 'ellipsis' }}>
+                                            tyle={{
+                                                textOverflow: 'ellipsis',
+                                            }}>
                                             <Paragraph
                                                 copyable={{
                                                     text: item.src,

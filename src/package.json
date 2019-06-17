@@ -95,7 +95,8 @@
     },
     "devDependencies": {
         "@next/bundle-analyzer": "^8.1.0",
-        "eslint-plugin-react-hooks": "^1.6.0"
+        "eslint-plugin-react-hooks": "^1.6.0",
+        "typescript": "^3.5.2"
     },
     "eslintConfig": {
         "extends": "react-app",

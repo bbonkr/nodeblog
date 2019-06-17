@@ -48,11 +48,11 @@ import {
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/me/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
+            keyword
         )}`,
         {
             withCredentials: true,
-        },
+        }
     );
 }
 
@@ -64,7 +64,7 @@ function* loadMyPosts(action) {
             loadMyPostsApi,
             pageToken || '',
             limit || 10,
-            keyword,
+            keyword
         );
         yield put({
             type: LOAD_MY_POSTS_DONE,
@@ -283,9 +283,9 @@ function* watchUploadMyMediaFiles() {
 function loadMediaFilesApi(pageToken, limit, keyword) {
     return axios.get(
         `/me/media/?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
+            keyword
         )}`,
-        { withCredentials: true },
+        { withCredentials: true }
     );
 }
 
@@ -296,7 +296,7 @@ function* loadMediaFiles(action) {
             loadMediaFilesApi,
             pageToken || '',
             limit || 10,
-            keyword || '',
+            keyword || ''
         );
         yield put({
             type: LOAD_MY_MEDIA_FILES_DONE,
