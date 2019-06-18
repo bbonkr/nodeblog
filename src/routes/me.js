@@ -362,7 +362,7 @@ router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
             return res.status(404).send('Could not find a file.');
         }
 
-        if(fs.existsSync(foundImage.path)){
+        if (fs.existsSync(foundImage.path)) {
             // 파일이 있는 경우만 삭제합니다.
             fs.unlinkSync(foundImage.path);
         }
@@ -375,6 +375,35 @@ router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
     } catch (e) {
         console.error(e);
         return next(e);
+    }
+});
+
+/**
+ * 나의 분류를 가져옵니다.
+ */
+router.get('/categories', isLoggedIn, async (req, res, next) => {
+    try {
+        const categories = await db.Category.findAll({
+            include: [
+                {
+                    model: db.User,
+                    where: { id: req.user.id },
+                    attributes: ['id'],
+                },
+                {
+                    model: db.Post,
+                    through: 'PostCategory',
+                    as: 'Posts',
+                    attributes: ['id'],
+                },
+            ],
+            order: [['ordinal', 'ASC']],
+        });
+
+        return res.json(categories);
+    } catch (e) {
+        console.error(e);
+        next(e);
     }
 });
 

@@ -12,6 +12,8 @@ import {
     EDIT_POST_CALL,
     WRITE_NEW_POST_CALL,
 } from '../reducers/me';
+import FullSizeModal from '../styledComponents/FullSizeModal';
+import FileList from './FileList';
 
 const PLACEHOLDER_MARKDOWN = 'Write your thought!';
 
@@ -45,7 +47,7 @@ const WritePostForm = ({ id }) => {
         },
         {
             extensions: [xssFilter],
-        },
+        }
     );
     // const { myPost } = useSelector(s => s.me);
 
@@ -85,8 +87,14 @@ const WritePostForm = ({ id }) => {
             setMarkdown(text);
             setHtml(markdownConverter.makeHtml(text));
         },
-        [markdownConverter],
+        [markdownConverter]
     );
+
+    const [fileListVisible, setFileListVisible] = useState(false);
+
+    const closeFileList = useCallback(() => {
+        setFileListVisible(false);
+    }, []);
 
     useEffect(() => {
         console.log('/me/write => useEffect id: ', id);
@@ -100,17 +108,17 @@ const WritePostForm = ({ id }) => {
             setSlug(myPost.slug);
             setMarkdown(myPost.markdown);
             setSelectedCategoryValues(
-                !!myPost.Categories ? myPost.Categories.map(v => v.slug) : [],
+                !!myPost.Categories ? myPost.Categories.map(v => v.slug) : []
             );
             setSelectedTagValues(
-                !!myPost.Tags ? myPost.Tags.map(v => v.slug) : [],
+                !!myPost.Tags ? myPost.Tags.map(v => v.slug) : []
             );
             setSelectedCategories(
                 myPost.Categories
                     ? myPost.Categories.map(v => {
                           return { name: v.name, slug: v.slug };
                       })
-                    : [],
+                    : []
             );
             setSelectedTags(
                 myPost.Tags
@@ -120,7 +128,7 @@ const WritePostForm = ({ id }) => {
                               slug: v.slug,
                           };
                       })
-                    : [],
+                    : []
             );
         } else {
             /** reset */
@@ -142,8 +150,8 @@ const WritePostForm = ({ id }) => {
         const text = e.target.value;
         setMarkdown(
             `${text.substring(0, startIndex)}${indent}${text.substring(
-                endIndex,
-            )} `,
+                endIndex
+            )} `
         );
     }, []);
 
@@ -153,7 +161,7 @@ const WritePostForm = ({ id }) => {
         setSelectedCategories(
             options.map(v => {
                 return { name: v.props.value, slug: v.key };
-            }),
+            })
         );
         setSelectedCategoryValues(values);
     }, []);
@@ -168,7 +176,7 @@ const WritePostForm = ({ id }) => {
                     name: v.props.value,
                     slug: v.key,
                 };
-            }),
+            })
         );
         setSelectedTagValues(values);
     }, []);
@@ -209,88 +217,110 @@ const WritePostForm = ({ id }) => {
                 });
             }
         },
-        [dispatch, id, markdown, selectedCategories, selectedTags, slug, title],
+        [dispatch, id, markdown, selectedCategories, selectedTags, slug, title]
     );
 
     return (
-        <Form onSubmit={onSubmit}>
-            <Form.Item label="Title">
-                <Input value={title} onChange={onChangeTitle} />
-            </Form.Item>
-            <Form.Item label="Slug">
-                <Input value={slug} onChange={onChangeSlug} />
-            </Form.Item>
-            <Form.Item label="Content">
-                <Tabs>
-                    <Tabs.TabPane
-                        tab={
-                            <span>
-                                <Icon type="file-markdown" /> Markdown
-                            </span>
-                        }
-                        key="markdown">
-                        <Input.TextArea
-                            value={markdown}
-                            onChange={onChangeMarkdown}
-                            placeholder={PLACEHOLDER_MARKDOWN}
-                            autosize={{ minRows: 10 }}
-                        />
-                    </Tabs.TabPane>
-                    <Tabs.TabPane
-                        tab={
-                            <span>
-                                <Icon type="eye" /> Preview
-                            </span>
-                        }
-                        key="preview">
-                        <Markdown source={markdown} escapeHtml={false} />
-                    </Tabs.TabPane>
-                </Tabs>
-            </Form.Item>
-            <Form.Item label="Categories">
-                <Select
-                    mode="multiple"
-                    onChange={onChangeCategories}
-                    style={{ width: '100%' }}
-                    loading={loadingCategories}
-                    value={selectedCategoryValues}>
-                    {categories.map(c => {
-                        return (
-                            <Select.Option
-                                key={c.slug}
-                                value={c.slug}
-                                label={c.name}>
-                                {c.name}
-                            </Select.Option>
-                        );
-                    })}
-                </Select>
-            </Form.Item>
-            <Form.Item label="Tags">
-                <Select
-                    mode="tags"
-                    onChange={onChangeTags}
-                    style={{ width: '100%' }}
-                    loading={loadingTags}
-                    value={selectedTagValues}>
-                    {tags.map(t => {
-                        return (
-                            <Select.Option
-                                key={t.slug}
-                                value={t.slug}
-                                label={t.name}>
-                                {t.name}
-                            </Select.Option>
-                        );
-                    })}
-                </Select>
-            </Form.Item>
-            <Form.Item>
-                <Button type="primary" htmlType="submit">
-                    Save
-                </Button>
-            </Form.Item>
-        </Form>
+        <>
+            <Form onSubmit={onSubmit}>
+                <Form.Item label="Title">
+                    <Input value={title} onChange={onChangeTitle} />
+                </Form.Item>
+                <Form.Item label="Slug">
+                    <Input value={slug} onChange={onChangeSlug} />
+                </Form.Item>
+                <Form.Item label="Content">
+                    <Tabs>
+                        <Tabs.TabPane
+                            tab={
+                                <span>
+                                    <Icon type="file-markdown" /> Markdown
+                                </span>
+                            }
+                            key="markdown">
+                            <Input.TextArea
+                                value={markdown}
+                                onChange={onChangeMarkdown}
+                                placeholder={PLACEHOLDER_MARKDOWN}
+                                autosize={{ minRows: 10 }}
+                            />
+                        </Tabs.TabPane>
+                        <Tabs.TabPane
+                            tab={
+                                <span>
+                                    <Icon type="eye" /> Preview
+                                </span>
+                            }
+                            key="preview">
+                            <Markdown source={markdown} escapeHtml={false} />
+                        </Tabs.TabPane>
+                        <Tabs.TabPane
+                            tab={
+                                <span>
+                                    <Icon type="file-image" /> Media
+                                </span>
+                            }
+                            key="media">
+                            <div>
+                                <FileList />
+                            </div>
+                        </Tabs.TabPane>
+                    </Tabs>
+                </Form.Item>
+                <Form.Item label="Categories">
+                    <Select
+                        mode="multiple"
+                        onChange={onChangeCategories}
+                        style={{ width: '100%' }}
+                        loading={loadingCategories}
+                        value={selectedCategoryValues}>
+                        {categories.map(c => {
+                            return (
+                                <Select.Option
+                                    key={c.slug}
+                                    value={c.slug}
+                                    label={c.name}>
+                                    {c.name}
+                                </Select.Option>
+                            );
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item label="Tags">
+                    <Select
+                        mode="tags"
+                        onChange={onChangeTags}
+                        style={{ width: '100%' }}
+                        loading={loadingTags}
+                        value={selectedTagValues}>
+                        {tags.map(t => {
+                            return (
+                                <Select.Option
+                                    key={t.slug}
+                                    value={t.slug}
+                                    label={t.name}>
+                                    {t.name}
+                                </Select.Option>
+                            );
+                        })}
+                    </Select>
+                </Form.Item>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit">
+                        Save
+                    </Button>
+                </Form.Item>
+            </Form>
+
+            <FullSizeModal
+                footer={false}
+                visible={fileListVisible}
+                maskClosable={true}
+                onCancel={closeFileList}
+                width="100%">
+                <FileList />
+            </FullSizeModal>
+        </>
     );
 };
 

@@ -16,6 +16,7 @@ import { ME_CALL } from '../reducers/user';
 import stringHelper from '../helpers/stringHelper';
 import { SET_CURRENT_URL } from '../reducers/settings';
 
+import '../styles/styles.scss';
 // const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
 
 // FIXME:

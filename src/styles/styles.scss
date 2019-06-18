@@ -1,8 +1,25 @@
 $red: #ff0000;
 
-* {
-    color: #ff0000;
+html,
+body {
+    height: 100%;
+    margin: 0;
 }
 
-.sample-test-color { 
-    color: $red;}
+.sample-test-color {
+    color: $red;
+}
+
+.write-container {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: 40px 100px 40px;
+
+    .write-editor {
+        grid-column: span 8;
+    }
+
+    .write-toolbar {
+        grid-column: span 4;
+    }
+}

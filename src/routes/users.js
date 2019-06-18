@@ -190,4 +190,8 @@ router.get('/:user/posts/:post', async (req, res, next) => {
     }
 });
 
+router.get('/:user/categories', async (req, res, next) => {});
+
+router.get('/:user/categories/:category/posts', async (req, res, next) => {});
+
 module.exports = router;
