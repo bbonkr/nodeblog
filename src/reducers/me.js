@@ -346,7 +346,10 @@ const reducer = (state = initialState, action) =>
                     })
                     .map((v, i) => {
                         v.ordinal = i + 1;
+                        return v;
                     });
+
+                draft.categoriesCount = draft.categories.length;
                 draft.loadingCategories = false;
                 break;
             case EDIT_MY_CATEGORY_FAIL:
@@ -370,8 +373,9 @@ const reducer = (state = initialState, action) =>
                     })
                     .map((v, i) => {
                         v.ordinal = i + 1;
+                        return v;
                     });
-
+                draft.categoriesCount = draft.categories.length;
                 draft.loadingCategories = false;
                 break;
             case DELETE_MY_CATEGORY_FAIL:

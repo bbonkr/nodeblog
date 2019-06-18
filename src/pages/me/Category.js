@@ -7,6 +7,7 @@ import { withAuth } from '../../utils/auth';
 import {
     LOAD_MY_CATEGORIES_CALL,
     EDIT_MY_CATEGORY_CALL,
+    DELETE_MY_CATEGORY_CALL,
 } from '../../reducers/me';
 import { formatNumber, makeSlug } from '../../helpers/stringHelper';
 
