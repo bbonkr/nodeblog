@@ -14,7 +14,10 @@ const expressApp = express();
 
 dotenv.config();
 
-const serverPort = process.env.PORT || 3000;
+const port = process.env.PORT || 3000;
+const host = process.env.HOST || 'localhost';
+const protocol = process.env.PROTOCOL || 'http';
+// const serverPort = process.env.PORT || 3000;
 
 const dev = process.env.NODE_ENV !== 'production';
 const prod = process.env.NODE_ENV === 'production';
@@ -96,11 +99,11 @@ nextApp.prepare().then(() => {
         return nextApp.render(req, res, '/post', { slug: req.params.slug });
     });
 
-    expressApp.get('/users/:user/posts', (req, res) => {
-        return nextApp.render(req, res, '/users/posts', {
-            user: req.params.user,
-        });
-    });
+    // expressApp.get('/users/:user/posts', (req, res) => {
+    //     return nextApp.render(req, res, '/users/posts', {
+    //         user: req.params.user,
+    //     });
+    // });
 
     expressApp.get('/users/:user/posts', (req, res) => {
         return nextApp.render(req, res, '/users/posts', {
@@ -125,7 +128,7 @@ nextApp.prepare().then(() => {
     const { seed } = require('./config/seed');
     seed();
 
-    expressApp.listen(serverPort, () => {
-        console.log(`server is running on http://localhost:${serverPort}`);
+    expressApp.listen(port, '0.0.0.0', () => {
+        console.log(`server is running on ${protocol}://${host}:${port}`);
     });
 });

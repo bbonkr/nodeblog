@@ -89,12 +89,12 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                             type: 'text/css',
                             charset: 'UTF-8',
                         },
-                        // {
-                        //     rel: 'stylesheet',
-                        //     href: '/_next/static/css/styles.chunk.css',
-                        //     type: 'text/css',
-                        //     charset: 'UTF-8',
-                        // },
+                        {
+                            rel: 'stylesheet',
+                            href: '/_next/static/css/styles.chunk.css',
+                            type: 'text/css',
+                            charset: 'UTF-8',
+                        },
                     ]}
                     script={[
                         {
@@ -121,6 +121,16 @@ NodeBlog.getInitialProps = async context => {
     const { me } = state.user;
 
     let url = '';
+
+    let apiBaseUrl = '';
+    if (ctx.isServer) {
+        const { req } = ctx;
+        apiBaseUrl = `${req.protocol}://${req.get('host')}/api`;
+    } else {
+        apiBaseUrl = '/api';
+    }
+
+    axios.defaults.baseURL = apiBaseUrl;
 
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {
@@ -173,7 +183,7 @@ NodeBlog.propTypes = {
 const loggingMiddleware = store => next => action => {
     // 액션확인
     // console.log(action);
-    console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
+    // console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
     next(action);
 };
 

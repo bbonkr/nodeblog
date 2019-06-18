@@ -10,8 +10,6 @@ import moment from 'moment';
 import LinkUsersPosts from './LinkUsersPosts';
 
 const SinglePost = ({ post }) => {
-    console.log('post: ', post);
-
     return (
         <>
             <article>
