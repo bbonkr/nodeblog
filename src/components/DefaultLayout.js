@@ -90,7 +90,7 @@ const DefaultLayout = ({ children }) => {
                             </Link>
                         </Menu.Item>
                         <Menu.Item key="profile">
-                            <Link href="/profile">
+                            <Link href="/me">
                                 <a>Profile</a>
                             </Link>
                         </Menu.Item>
