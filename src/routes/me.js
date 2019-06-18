@@ -8,7 +8,8 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const moment = require('moment');
-const { replaceAll } = require('../helpers/stringHelper');
+const { replaceAll, makeSlug } = require('../helpers/stringHelper');
+const { tryParseInt } = require('./helper');
 
 const Op = Sequelize.Op;
 
@@ -42,6 +43,22 @@ const upload = multer({
     }),
     limits: { fileSize: 20 * 1024 * 1024 },
 });
+
+const normalizeCategoryOrder = async userId => {
+    // normalize
+    const categoriesSort = await db.Category.findAll({
+        where: { UserId: userId },
+        order: [['ordinal', 'ASC']],
+    });
+
+    if (categoriesSort) {
+        await Promise.all(
+            categoriesSort.map((v, i) => {
+                return v.update({ ordinal: i + 1 });
+            })
+        );
+    }
+};
 
 router.get('/', isLoggedIn, async (req, res, next) => {
     try {
@@ -383,11 +400,42 @@ router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
  */
 router.get('/categories', isLoggedIn, async (req, res, next) => {
     try {
+        const { pageToken, limit, keyword } = req.query;
+        // const skip = pageToken ? 1 : 0;
+        let where = { UserId: req.user.id };
+
+        if (keyword) {
+            Object.assign(where, {
+                name: {
+                    [Op.like]: `%${decodeURIComponent(keyword)}%`,
+                },
+            });
+        }
+
+        const { count } = await db.Category.findAndCountAll({ where: where });
+
+        if (!!pageToken) {
+            const lastCategory = await db.Category.findOne({
+                where: {
+                    UserId: req.user.id,
+                    id: tryParseInt(`${pageToken}`, 10, 0),
+                },
+            });
+            if (!!lastCategory) {
+                Object.assign(where, {
+                    ordinal: {
+                        [Op.gt]: lastCategory.ordinal,
+                    },
+                });
+            }
+        }
+
         const categories = await db.Category.findAll({
+            where: where,
             include: [
                 {
                     model: db.User,
-                    where: { id: req.user.id },
+                    // where: { id: req.user.id },
                     attributes: ['id'],
                 },
                 {
@@ -398,12 +446,245 @@ router.get('/categories', isLoggedIn, async (req, res, next) => {
                 },
             ],
             order: [['ordinal', 'ASC']],
+            limit: limit && tryParseInt(limit, 10, 10),
+            // skip: skip,
         });
 
-        return res.json(categories);
+        return res.json({
+            items: categories,
+            total: count,
+        });
     } catch (e) {
         console.error(e);
         next(e);
+    }
+});
+
+/**
+ * 나의 분류를 추가합니다.
+ */
+router.post('/category', isLoggedIn, async (req, res, next) => {
+    try {
+        const { name, slug, ordinal } = req.body;
+        const slugValue = slug || makeSlug(name);
+        let ordinalValue = tryParseInt(`${ordinal}`, 10, 0);
+        const duplicatedCategory = await db.Category.findOne({
+            where: { slug: slugValue },
+            include: [
+                {
+                    model: db.User,
+                    where: { id: req.user.id },
+                    attributes: ['id'],
+                },
+            ],
+        });
+
+        if (!!duplicatedCategory) {
+            const message = `Duplicated item found. It may be '${
+                duplicatedCategory.name
+            }'.`;
+            return res.status(400).send(message);
+        }
+
+        if (ordinalValue < 1) {
+            const maxOridinal = await db.Category.max('ordinal', {
+                include: [{ model: db.User, where: { id: req.user.id } }],
+            });
+
+            ordinalValue = maxOridinal || 1;
+        }
+
+        const addedCategory = await db.Category.create({
+            name,
+            slug: slugValue,
+            ordinal: ordinalValue,
+            UserId: req.user.id,
+        });
+
+        const adjustOridnal = await db.Category.findAll({
+            where: {
+                UserId: req.user.id,
+                id: {
+                    [Op.not]: addedCategory.id,
+                },
+                ordinal: {
+                    [Op.gte]: addedCategory.ordinal,
+                },
+            },
+        });
+
+        if (adjustOridnal) {
+            await Promise.all(
+                adjustOridnal.map(v => {
+                    return v.update({
+                        ordinal: ordinal + 1,
+                    });
+                })
+            );
+        }
+
+        // normalize
+        normalizeCategoryOrder(req.user.id);
+
+        return res.json(addedCategory);
+    } catch (e) {
+        console.error(e);
+        next(e);
+    }
+});
+
+router.patch('/category/:id', isLoggedIn, async (req, res, next) => {
+    try {
+        const { id, name, slug, ordinal } = req.body;
+        let ordinalValue = tryParseInt(`${ordinal}`, 10, 0);
+        const foundCategory = await db.Category.findOne({
+            where: { id: id },
+            include: [{ model: db.User, where: { id: req.user.id } }],
+        });
+
+        if (!foundCategory) {
+            return res.status(404).send('Could not find a category.');
+        }
+
+        const slugValue = slug || makeSlug(name);
+
+        const duplicatedCategory = await db.Category.findOne({
+            where: {
+                slug: slugValue,
+                id: {
+                    [Op.not]: id,
+                },
+            },
+            include: [
+                {
+                    model: db.User,
+                    where: { id: req.user.id },
+                    attributes: ['id'],
+                },
+            ],
+        });
+
+        if (!!duplicatedCategory) {
+            const message = `Duplicated item found. It may be '${
+                duplicatedCategory.name
+            }'.`;
+            return res.status(400).send(message);
+        }
+
+        if (ordinalValue < 1) {
+            const maxOridinal = await db.Category.max('ordinal', {
+                include: [{ model: db.User, where: { id: req.user.id } }],
+            });
+
+            ordinalValue = maxOridinal || 1;
+        }
+
+        await foundCategory.update({
+            name: name,
+            slug: slug || makeSlug(name),
+            ordinal: ordinalValue,
+        });
+
+        const updatedCategory = await db.Category.findOne({
+            where: { id: id },
+            include: [
+                {
+                    model: db.User,
+                    where: { id: req.user.id },
+                },
+                {
+                    model: db.Post,
+                    through: 'PostCategory',
+                    as: 'Posts',
+                    attributes: ['id'],
+                },
+            ],
+        });
+
+        const adjustOridnal = await db.Category.findAll({
+            where: {
+                UserId: req.user.id,
+                id: {
+                    [Op.not]: updatedCategory.id,
+                },
+                ordinal: {
+                    [Op.gte]: updatedCategory.ordinal,
+                },
+            },
+        });
+
+        if (adjustOridnal) {
+            await Promise.all(
+                adjustOridnal.map(v => {
+                    return v.update({
+                        ordinal: ordinal + 1,
+                    });
+                })
+            );
+        }
+
+        // normalize
+        normalizeCategoryOrder(req.user.id);
+        // const categoriesSort = await db.Category.findAll({
+        //     where: { UserId: req.user.id },
+        //     order: [['ordinal', 'ASC']],
+        // });
+
+        // if (categoriesSort){
+        //     await Promise.all(
+        //         categoriesSort.map((v, i) => {
+        //             return v.update({ ordinal: i + 1 });
+        //         })
+        //     );
+        // }
+
+        return res.json(updatedCategory);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+router.delete('/category/:id', isLoggedIn, async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const foundCategory = await db.Category.findOne({
+            where: { id: id },
+            include: [
+                { model: db.User, where: { id: req.user.id } },
+                {
+                    model: db.Post,
+                    through: 'PostCategory',
+                    as: 'Posts',
+                    attributes: ['id'],
+                },
+            ],
+        });
+
+        if (!foundCategory) {
+            return res.status(404).send('Could not find a category.');
+        }
+
+        // if (foundCategory.Posts.length > 0) {
+        //     return res
+        //         .status(400)
+        //         .send(
+        //             `Could not delete this category. It includes ${
+        //                 foundCategory.Posts.length
+        //             } post(s).`
+        //         );
+        // }
+
+        await foundCategory.destroy();
+
+        // normalize
+        normalizeCategoryOrder(req.user.id);
+
+        return res.json({ id: id });
+    } catch (e) {
+        console.error(e);
+        return next(e);
     }
 });
 

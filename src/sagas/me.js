@@ -43,6 +43,12 @@ import {
     DELETE_POST_CALL,
     DELETE_POST_FAIL,
     DELETE_POST_DONE,
+    EDIT_MY_CATEGORY_CALL,
+    EDIT_MY_CATEGORY_DONE,
+    EDIT_MY_CATEGORY_FAIL,
+    DELETE_MY_CATEGORY_CALL,
+    DELETE_MY_CATEGORY_DONE,
+    DELETE_MY_CATEGORY_FAIL,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -108,16 +114,30 @@ function* watchWritePost() {
     yield takeLatest(WRITE_POST_CALL, writePost);
 }
 
-function loadCategoriesApi() {
-    return axios.get('/categories', { withCredentials: true });
+function loadCategoriesApi(query) {
+    const { pageToken, limit, keyword } = query;
+    return axios.get(
+        `/me/categories?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword
+        )}`,
+        { withCredentials: true }
+    );
 }
 
 function* loadCategories(action) {
     try {
-        const result = yield call(loadCategoriesApi);
+        const { pageToken, limit, keyword } = action.data;
+        const result = yield call(loadCategoriesApi, {
+            pageToken,
+            limit,
+            keyword,
+        });
         yield put({
             type: LOAD_MY_CATEGORIES_DONE,
-            data: result.data,
+            data: {
+                items: result.data.items,
+                total: result.data.total,
+            },
         });
     } catch (e) {
         yield put({
@@ -342,6 +362,37 @@ function* watchDeleteMediaFile() {
     yield takeLatest(DELETE_MY_MEDIA_FILES_CALL, deleteMediaFile);
 }
 
+function editCategoryApi(formData) {
+    if (!!formData.id) {
+        return axios.patch(`/me/category/${formData.id}`, formData, {
+            withCredentials: true,
+        });
+    } else {
+        return axios.post('/me/category', formData, { withCredentials: true });
+    }
+}
+
+function* editCategory(action) {
+    try {
+        const result = yield call(editCategoryApi, action.data);
+        yield put({
+            type: EDIT_MY_CATEGORY_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: EDIT_MY_CATEGORY_FAIL,
+            error: e,
+            reason: e.respnse && e.response.data,
+        });
+    }
+}
+
+function* wacthEditCategory() {
+    yield takeLatest(EDIT_MY_CATEGORY_CALL, editCategory);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -355,5 +406,6 @@ export default function* postSaga() {
         fork(watchUploadMyMediaFiles),
         fork(watchLoadMediaFiles),
         fork(watchDeleteMediaFile),
+        fork(wacthEditCategory),
     ]);
 }

@@ -53,6 +53,11 @@ Write.getInitialProps = async context => {
 
     context.store.dispatch({
         type: LOAD_MY_CATEGORIES_CALL,
+        data: {
+            pageToken: null,
+            limit: 0,
+            keyword: '',
+        },
     });
 
     context.store.dispatch({

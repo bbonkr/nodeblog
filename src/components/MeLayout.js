@@ -61,7 +61,7 @@ const MeLayout = ({ children }) => {
                     break;
             }
         },
-        [dispatch],
+        [dispatch]
     );
 
     return (
@@ -147,10 +147,14 @@ const MeLayout = ({ children }) => {
                                 </Link>
                             </Menu.Item>
                             <Menu.Item>
-                                <span>
-                                    <Icon type="container" />
-                                    Category
-                                </span>
+                                <Link href="/me/category">
+                                    <a>
+                                        <span>
+                                            <Icon type="container" />
+                                            Category
+                                        </span>
+                                    </a>
+                                </Link>
                             </Menu.Item>
 
                             <Menu.Item key="media">

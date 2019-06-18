@@ -9,20 +9,32 @@ export const initialState = {
     searchKeyword: '',
     nextPageToken: '',
     postsCount: 0,
+
+    // category
     categories: [],
+    loadingCategories: false,
+    loadCategoriesErrorReason: '',
+    hasMoreCategories: false,
+    categorySearchKeyword: '',
+    categoryNextPageToken: '',
+    categoryLimit: 10,
+    categoriesCount: 0,
+
+    // tag
     tags: [],
     myPost: {},
     loadingMyPost: false,
-    loadingCategories: false,
+
     loadingTags: false,
     loadingMyPosts: false,
-    loadCategoriesErrorReason: '',
+
     loadTagsErrorReason: '',
     loadMyPostsErrorReason: '',
     loadMyPostErrorReadon: '',
     writingPost: false,
     writePostErrorReason: '',
 
+    // media
     mediaFiles: [],
     mediaFilesNextPageToken: '',
     mediaFilesSearchKeyword: '',
@@ -82,6 +94,14 @@ export const DELETE_MY_MEDIA_FILES_CALL = 'DELETE_MY_MEDIA_FILES_CALL';
 export const DELETE_MY_MEDIA_FILES_DONE = 'DELETE_MY_MEDIA_FILES_DONE';
 export const DELETE_MY_MEDIA_FILES_FAIL = 'DELETE_MY_MEDIA_FILES_FAIL';
 
+export const EDIT_MY_CATEGORY_CALL = 'EDIT_MY_CATEGORY_CALL';
+export const EDIT_MY_CATEGORY_DONE = 'EDIT_MY_CATEGORY_DONE';
+export const EDIT_MY_CATEGORY_FAIL = 'EDIT_MY_CATEGORY_FAIL';
+
+export const DELETE_MY_CATEGORY_CALL = 'DELETE_MY_CATEGORY_CALL';
+export const DELETE_MY_CATEGORY_DONE = 'DELETE_MY_CATEGORY_DONE';
+export const DELETE_MY_CATEGORY_FAIL = 'DELETE_MY_CATEGORY_FAIL';
+
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // https://lannstark.github.io/nodejs/console/3
@@ -103,7 +123,7 @@ const reducer = (state = initialState, action) =>
 
                 action.data.posts.forEach(v => {
                     const postIndex = draft.myPosts.findIndex(
-                        x => x.id === v.id,
+                        x => x.id === v.id
                     );
                     if (postIndex < 0) {
                         draft.myPosts.push(v);
@@ -135,13 +155,38 @@ const reducer = (state = initialState, action) =>
 
             case LOAD_MY_CATEGORIES_CALL:
                 draft.loadingCategories = true;
+                draft.categories = action.data.pageToken
+                    ? draft.categories
+                    : [];
+                draft.hasMoreCategories = action.data.pageToken
+                    ? draft.hasMoreCategories
+                    : true;
+                draft.loadingCategories = true;
+                draft.loadCategoriesErrorReason = '';
                 break;
             case LOAD_MY_CATEGORIES_DONE:
                 draft.loadingCategories = false;
-                draft.categories = action.data;
+                // draft.categories = action.data;
+
+                action.data.items.forEach(v => {
+                    const postIndex = draft.categories.findIndex(
+                        x => x.id === v.id
+                    );
+                    if (postIndex < 0) {
+                        draft.categories.push(v);
+                        draft.categoryNextPageToken = `${v.id}`;
+                    }
+                });
+                draft.categoriesCount = action.data.total;
+                draft.hasMoreCategories =
+                    action.data.items.length === draft.categoryLimit;
+                draft.categorySearchKeyword = action.keyword;
+                draft.categoriesCount = action.data.total;
+
                 break;
             case LOAD_MY_CATEGORIES_FAIL:
                 draft.loadingCategories = false;
+                draft.loadCategoriesErrorReason = action.reason;
                 break;
 
             case LOAD_MY_TAGS_CALL:
@@ -207,7 +252,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_POST_DONE:
                 const index = draft.myPosts.findIndex(
-                    x => x.id === action.data.id,
+                    x => x.id === action.data.id
                 );
                 draft.myPosts.splice(index, 1);
                 draft.loadingMyPosts = false;
@@ -230,7 +275,7 @@ const reducer = (state = initialState, action) =>
             case LOAD_MY_MEDIA_FILES_DONE:
                 action.data.forEach(v => {
                     const mediaIndex = draft.mediaFiles.findIndex(
-                        x => x.id === v.id,
+                        x => x.id === v.id
                     );
                     if (mediaIndex < 0) {
                         draft.mediaFiles.push(v);
@@ -262,13 +307,75 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_MY_MEDIA_FILES_DONE:
                 const foundId = draft.mediaFiles.findIndex(
-                    x => x.id === action.data.id,
+                    x => x.id === action.data.id
                 );
                 draft.mediaFiles.splice(foundId, 1);
                 draft.uploading = false;
                 break;
             case DELETE_MY_MEDIA_FILES_FAIL:
                 draft.uploading = false;
+                break;
+
+            // edit category
+            case EDIT_MY_CATEGORY_CALL:
+                draft.loadingCategories = true;
+                break;
+            case EDIT_MY_CATEGORY_DONE:
+                const foundCategoryIndex = draft.categories.findIndex(
+                    v => v.id === action.data.id
+                );
+                if (foundCategoryIndex < 0) {
+                    draft.categories.push(action.data);
+                } else {
+                    draft.categories[foundCategoryIndex] = action.data;
+                }
+
+                draft.categories
+                    .filter(
+                        v =>
+                            v.id !== action.data.id &&
+                            v.ordinal >= action.data.ordinal
+                    )
+                    .forEach(v => {
+                        v.ordinal = v.ordinal + 1;
+                    });
+
+                draft.categories = draft.categories
+                    .sort((a, b) => {
+                        return a.ordinal > b.ordinal ? 1 : -1;
+                    })
+                    .map((v, i) => {
+                        v.ordinal = i + 1;
+                    });
+                draft.loadingCategories = false;
+                break;
+            case EDIT_MY_CATEGORY_FAIL:
+                draft.loadingCategories = false;
+
+                break;
+
+            // delete category
+            case DELETE_MY_CATEGORY_CALL:
+                draft.loadingCategories = true;
+                break;
+            case DELETE_MY_CATEGORY_DONE:
+                const foundDeletedCategoryIndex = draft.categories.findIndex(
+                    v => v.id === action.data.id
+                );
+                draft.categories.splice(foundDeletedCategoryIndex, 1);
+
+                draft.categories = draft.categories
+                    .sort((a, b) => {
+                        return a.ordinal > b.ordinal ? 1 : -1;
+                    })
+                    .map((v, i) => {
+                        v.ordinal = i + 1;
+                    });
+
+                draft.loadingCategories = false;
+                break;
+            case DELETE_MY_CATEGORY_FAIL:
+                draft.loadingCategories = false;
                 break;
             default:
                 break;
