@@ -647,7 +647,7 @@ router.patch('/category/:id', isLoggedIn, async (req, res, next) => {
 
 router.delete('/category/:id', isLoggedIn, async (req, res, next) => {
     try {
-        const { id } = req.params;
+        const id = tryParseInt(req.params.id, 10, 0);
 
         const foundCategory = await db.Category.findOne({
             where: { id: id },

@@ -326,6 +326,7 @@ const reducer = (state = initialState, action) =>
                 );
                 if (foundCategoryIndex < 0) {
                     draft.categories.push(action.data);
+                    draft.categoriesCount = draft.categoriesCount + 1;
                 } else {
                     draft.categories[foundCategoryIndex] = action.data;
                 }
@@ -349,7 +350,6 @@ const reducer = (state = initialState, action) =>
                         return v;
                     });
 
-                draft.categoriesCount = draft.categories.length;
                 draft.loadingCategories = false;
                 break;
             case EDIT_MY_CATEGORY_FAIL:
@@ -375,7 +375,7 @@ const reducer = (state = initialState, action) =>
                         v.ordinal = i + 1;
                         return v;
                     });
-                draft.categoriesCount = draft.categories.length;
+                draft.categoriesCount = draft.categoriesCount - 1;
                 draft.loadingCategories = false;
                 break;
             case DELETE_MY_CATEGORY_FAIL:

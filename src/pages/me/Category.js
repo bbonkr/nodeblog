@@ -165,7 +165,22 @@ const MyCategory = () => {
         []
     );
 
-    const onClickDeleteCategory = useCallback(record => () => {}, []);
+    const onClickDeleteCategory = useCallback(
+        record => () => {
+            Modal.confirm({
+                title: 'Do you want to delete this category?',
+                content: record.name,
+                onOk() {
+                    dispatch({
+                        type: DELETE_MY_CATEGORY_CALL,
+                        data: record,
+                    });
+                },
+                onCancel() {},
+            });
+        },
+        [dispatch]
+    );
 
     const onChangeName = useCallback(e => {
         const newValue = e.target.value;

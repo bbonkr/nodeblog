@@ -393,6 +393,32 @@ function* wacthEditCategory() {
     yield takeLatest(EDIT_MY_CATEGORY_CALL, editCategory);
 }
 
+function deleteCategoryApi(id) {
+    return axios.delete(`/me/category/${id}`, { withCredentials: true });
+}
+
+function* deleteCategory(action) {
+    try {
+        const { id } = action.data;
+        const result = yield call(deleteCategoryApi, id);
+        yield put({
+            type: DELETE_MY_CATEGORY_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: DELETE_MY_CATEGORY_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchDeleteCategory() {
+    yield takeLatest(DELETE_MY_CATEGORY_CALL, deleteCategory);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -407,5 +433,6 @@ export default function* postSaga() {
         fork(watchLoadMediaFiles),
         fork(watchDeleteMediaFile),
         fork(wacthEditCategory),
+        fork(watchDeleteCategory),
     ]);
 }
