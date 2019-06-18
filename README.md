@@ -36,6 +36,25 @@ npm run start
 npm run test
 ```
 
+## Docker
+
+### Build Image
+
+```basg
+$ cd src/
+$ docker build -t bbonkr/nodeblog .
+```
+
+### Run
+
+```bash
+$ docker images # 이미지 확인
+$ docker run -p 3000:3000 -v /c/app/uploads:/usr/src/app/uploads -v /c/app/public:/usr/src/app/public -d bbonkr/nodeblog
+```
+
+> Edit src/settings.js
+> Set base url of web app
+
 ## Author
 
 👤 **구본철 **
