@@ -19,7 +19,7 @@
     "main": "index.js",
     "scripts": {
         "test": "react-scripts test --testMatch ./**/*.test.{js,jsx,ts,tsx}",
-        "dev": "cross-env PORT=5000 HOST=localhost PROTOCOl=http nodemon",
+        "dev": "cross-env PORT=5000 nodemon",
         "sequelize": "node_modules/.bin/sequelize",
         "build": "cross-env BUNDLE_ANALYZER=both next build",
         "prestart": "npm run build",
