@@ -172,7 +172,15 @@ const MeLayout = ({ children }) => {
                                     Settings
                                 </span>
                             </Menu.Item>
-                            <Menu.Item>Menu 3</Menu.Item>
+                            <Menu.Item key="changepassword">
+                                <Link href="/me/changepassword">
+                                    <a>
+                                        <span>
+                                            <Icon type="lock" /> Change Password
+                                        </span>
+                                    </a>
+                                </Link>
+                            </Menu.Item>
                         </Menu>
                     </Sider>
                     <Layout style={{ marginLeft: '200px' }}>

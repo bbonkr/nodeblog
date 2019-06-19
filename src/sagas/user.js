@@ -22,6 +22,9 @@ import {
     SIGN_UP_CALL,
     SIGN_UP_FAIL,
     SIGN_UP_DONE,
+    CHANGE_PASSWORD_CALL,
+    CHANGE_PASSWORD_FAIL,
+    CHANGE_PASSWORD_DONE,
 } from '../reducers/user';
 
 function getMyInfoApi() {
@@ -126,11 +129,39 @@ function* watchSignUp() {
     yield takeLatest(SIGN_UP_CALL, signUp);
 }
 
+function changePasswordApi(formData) {
+    return axios.patch('/user/changepassword', formData, {
+        withCredentials: true,
+    });
+}
+
+function* changePassword(action) {
+    try {
+        const result = yield call(changePasswordApi, action.data);
+        yield put({
+            type: CHANGE_PASSWORD_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: CHANGE_PASSWORD_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchChangePassword() {
+    yield takeLatest(CHANGE_PASSWORD_CALL, changePassword);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchGetMyInfo),
         fork(watchSignIn),
         fork(watchSignOut),
         fork(watchSignUp),
+        fork(watchChangePassword),
     ]);
 }

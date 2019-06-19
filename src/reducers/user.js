@@ -1,11 +1,16 @@
 import produce from 'immer';
 import Router from 'next/router';
+import { ShowNotification } from '../components/ShowNotification';
+
 export const initialState = {
     me: null,
     signInFailMessage: '',
     signInInProcess: false,
     signUpFailMessage: '',
     signUpInProcess: false,
+
+    loadingChangePassword: false,
+    changePasswordSuccess: false,
 };
 
 export const SIGN_IN_CALL = 'SIGN_IN_CALL';
@@ -20,6 +25,10 @@ export const SIGN_UP_FAIL = 'SIGN_UP_FAIL';
 export const ME_CALL = 'ME_CALL';
 export const ME_DONE = 'ME_DONE';
 export const ME_FAIL = 'ME_FAIL';
+
+export const CHANGE_PASSWORD_CALL = 'CHANGE_PASSWORD_CALL';
+export const CHANGE_PASSWORD_DONE = 'CHANGE_PASSWORD_DONE';
+export const CHANGE_PASSWORD_FAIL = 'CHANGE_PASSWORD_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -66,6 +75,25 @@ const reducer = (state = initialState, action) =>
                 draft.signUpFailMessage = action.reason
                     ? action.reason
                     : action.error;
+                break;
+            case CHANGE_PASSWORD_CALL:
+                draft.loadingChangePassword = true;
+                draft.changePasswordSuccess = false;
+                break;
+            case CHANGE_PASSWORD_DONE:
+                draft.loadingChangePassword = false;
+                draft.changePasswordSuccess = true;
+                ShowNotification({
+                    title: 'Your password was Changed.',
+                });
+                break;
+            case CHANGE_PASSWORD_FAIL:
+                draft.loadingChangePassword = false;
+                draft.changePasswordSuccess = false;
+                ShowNotification({
+                    title: 'Fail to change a password.',
+                    message: action.reason,
+                });
                 break;
             default:
                 break;

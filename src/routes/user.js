@@ -27,21 +27,31 @@ router.post('/', async (req, res, next) => {
     try {
         const { email, username, password, displayName } = req.body;
 
-        const user = await db.User.findOne({
+        let user = {};
+
+        user = await db.User.findOne({
             where: {
                 email: email,
             },
         });
 
         if (user) {
-            return res.status(400).send('동일한 전자우편주소가 사용중입니다.');
+            return res.status(400).send(`${email} used by other account.`);
         }
 
-        const hashedPassword = await bcrypt.hash(password, 12);
+        user = await db.User.findOne({
+            where: { username: username.trim() },
+        });
+
+        if (user) {
+            return res.status(400).send(`${username} used by other account.`);
+        }
+
+        const hashedPassword = await bcrypt.hash(password.trim(), 12);
         const newUser = await db.User.create({
-            email: email,
-            username: username,
-            displayName: displayName,
+            email: email.trim(),
+            username: username.trim(),
+            displayName: displayName.trim(),
             password: hashedPassword,
         });
 
@@ -57,7 +67,41 @@ router.post('/', async (req, res, next) => {
 });
 
 // TODO: change password
+router.patch('/changepassword', isLoggedIn, async (req, res, next) => {
+    try {
+        const { currentPassword, password, passwordConfirm } = req.body;
 
+        const me = await db.User.findOne({
+            where: { id: req.user.id },
+        });
+
+        const result = await bcrypt.compare(
+            currentPassword.trim(),
+            me.password
+        );
+
+        if (!result) {
+            return res.status(401).send('Password does not match.');
+        }
+
+        if (password.trim() !== passwordConfirm.trim()) {
+            return res
+                .status(400)
+                .send('Password and confirm password is different.');
+        }
+
+        const hashedPassword = await bcrypt.hash(password.trim(), 12);
+
+        const updatedMe = await me.update({ password: hashedPassword });
+
+        delete updatedMe.password;
+
+        return res.json(updatedMe);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
 // TODO: change Email, username, displayname, photo src
 
 module.exports = router;
