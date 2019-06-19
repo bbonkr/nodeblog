@@ -22,15 +22,27 @@ const upload = multer({
             const dest = path.join('uploads', `${req.user.id}`, yyyy, mm);
             console.log('destination directory: ', dest);
 
-            fs.exists(dest, exists => {
-                if (!exists) {
-                    fs.mkdir(dest, { recursive: true }, err => {
-                        if (!err) {
-                            console.error(err);
-                        }
-                    });
-                }
-            });
+            // asynchronous
+            // fs.exists(dest, exists => {
+            //     if (!exists) {
+            //         // asynchronous
+            //         fs.mkdir(dest, { recursive: true }, err => {
+
+            //             if (err) {
+            //                 console.error(err);
+            //             }
+
+            //             done(err, dest);
+            //         });
+
+            //     }
+            // });
+
+            // synchronous
+            const existsDir = fs.existsSync(dest);
+            if (!existsDir) {
+                fs.mkdirSync(dest, { recursive: true });
+            }
 
             done(null, dest);
         },
