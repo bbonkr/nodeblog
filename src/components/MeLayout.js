@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Router from 'next/router';
 import { withAuth } from '../utils/auth';
 import { SIGN_OUT_CALL } from '../reducers/user';
+import UserAvatar from './UserAvatar';
 const { Header, Content, Sider } = Layout;
 
 const MeLayout = ({ children }) => {
@@ -61,7 +62,7 @@ const MeLayout = ({ children }) => {
                     break;
             }
         },
-        [dispatch]
+        [dispatch],
     );
 
     return (
@@ -106,6 +107,17 @@ const MeLayout = ({ children }) => {
                         collapsible={true}
                         collapsed={menuCollapsed}
                         onCollapse={onCollapse}>
+                        <div
+                            style={{
+                                textAlign: 'center',
+                                color: '#9f9f9f',
+                                padding: '1.0rem',
+                            }}>
+                            <UserAvatar user={me} />
+
+                            <div>{me.username}</div>
+                            <div>{me.displayName}</div>
+                        </div>
                         <Menu
                             mode="inline"
                             defaultSelectedKeys={['me']}
@@ -171,6 +183,16 @@ const MeLayout = ({ children }) => {
                                     <Icon type="setting" />
                                     Settings
                                 </span>
+                            </Menu.Item>
+                            <Menu.Item key="changeinfo">
+                                <Link href="/me/changeinfo">
+                                    <a>
+                                        <span>
+                                            <Icon type="user" /> Change
+                                            Infomation
+                                        </span>
+                                    </a>
+                                </Link>
                             </Menu.Item>
                             <Menu.Item key="changepassword">
                                 <Link href="/me/changepassword">

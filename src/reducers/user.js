@@ -11,6 +11,9 @@ export const initialState = {
 
     loadingChangePassword: false,
     changePasswordSuccess: false,
+
+    loadingChangeInfo: false,
+    changeInfoSuccess: false,
 };
 
 export const SIGN_IN_CALL = 'SIGN_IN_CALL';
@@ -29,6 +32,10 @@ export const ME_FAIL = 'ME_FAIL';
 export const CHANGE_PASSWORD_CALL = 'CHANGE_PASSWORD_CALL';
 export const CHANGE_PASSWORD_DONE = 'CHANGE_PASSWORD_DONE';
 export const CHANGE_PASSWORD_FAIL = 'CHANGE_PASSWORD_FAIL';
+
+export const CHANGE_INFO_CALL = 'CHANGE_INFO_CALL';
+export const CHANGE_INFO_DONE = 'CHANGE_INFO_DONE';
+export const CHANGE_INFO_FAIL = 'CHANGE_INFO_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -95,6 +102,20 @@ const reducer = (state = initialState, action) =>
                     message: action.reason,
                 });
                 break;
+            case CHANGE_INFO_CALL:
+                draft.loadingChangeInfo = true;
+                draft.changeInfoSuccess = false;
+                break;
+            case CHANGE_INFO_DONE:
+                draft.loadingChangeInfo = false;
+                draft.changeInfoSuccess = true;
+                draft.me = action.data;
+                break;
+            case CHANGE_INFO_FAIL:
+                draft.loadingChangeInfo = false;
+                draft.changeInfoSuccess = false;
+                break;
+
             default:
                 break;
         }

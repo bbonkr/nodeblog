@@ -2,6 +2,9 @@ const db = require('../models');
 const showdown = require('showdown');
 const xssFilter = require('showdown-xss-filter');
 
+/**
+ * 사용자 정보를 조회합니다.
+ */
 module.exports.findUserById = async id => {
     const me = await db.User.findOne({
         where: {
@@ -12,7 +15,14 @@ module.exports.findUserById = async id => {
                 model: db.Post,
             },
         ],
-        attributes: ['id', 'email', 'username'],
+        attributes: [
+            'id',
+            'email',
+            'username',
+            'displayName',
+            'photo',
+            'isEmailConfirmed',
+        ],
     });
 
     return me;
@@ -73,7 +83,7 @@ module.exports.markdownConverter = new showdown.Converter(
     },
     {
         extensions: [xssFilter],
-    }
+    },
 );
 
 /**

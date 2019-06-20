@@ -9,7 +9,7 @@ import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
-
+import UserAvatar from './UserAvatar';
 // import '../styles/styles.scss';
 
 const FullWidthButton = styled(Button)`
@@ -64,16 +64,14 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                 <Card.Meta
                                     avatar={
                                         <LinkUsersPosts user={`@${username}`}>
-                                            <Avatar>
-                                                {displayName[0].toUpperCase()}
-                                            </Avatar>
+                                            <UserAvatar user={post.User} />
                                         </LinkUsersPosts>
                                     }
                                     extra={
                                         <IconText
                                             type="clock-circle"
                                             text={moment(createdAt).format(
-                                                'YYYY-MM-DD HH:mm:ss'
+                                                'YYYY-MM-DD HH:mm:ss',
                                             )}
                                         />
                                     }

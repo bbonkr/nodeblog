@@ -1,8 +1,10 @@
 const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const db = require('../models');
+const Sequelize = require('sequelize');
 const { isLoggedIn } = require('./middleware');
 const { findUserById } = require('./helper');
+const Op = Sequelize.Op;
 
 // const findUserById = async id => {
 //     const me = await db.User.findOne({
@@ -66,7 +68,9 @@ router.post('/', async (req, res, next) => {
     }
 });
 
-// TODO: change password
+/**
+ * 비밀번호 변경
+ */
 router.patch('/changepassword', isLoggedIn, async (req, res, next) => {
     try {
         const { currentPassword, password, passwordConfirm } = req.body;
@@ -77,7 +81,7 @@ router.patch('/changepassword', isLoggedIn, async (req, res, next) => {
 
         const result = await bcrypt.compare(
             currentPassword.trim(),
-            me.password
+            me.password,
         );
 
         if (!result) {
@@ -103,5 +107,43 @@ router.patch('/changepassword', isLoggedIn, async (req, res, next) => {
     }
 });
 // TODO: change Email, username, displayname, photo src
+router.patch('/info', isLoggedIn, async (req, res, next) => {
+    try {
+        const { username, displayName, photo } = req.body;
+        const me = await db.User.findOne({
+            where: { id: req.user.id },
+        });
+
+        if (!me) {
+            return res.status(404).send('Could not find account.');
+        }
+
+        let user = await db.User.findOne({
+            where: {
+                id: { [Op.not]: req.user.id },
+                username: username.trim(),
+            },
+        });
+
+        if (user) {
+            return res
+                .status(400)
+                .send(`${username.trim()} used by other account.`);
+        }
+
+        const updatedMe = await me.update({
+            username: username.trim(),
+            displayName: displayName.trim(),
+            photo: photo.trim(),
+        });
+
+        delete updatedMe.password;
+
+        return res.json(updatedMe);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
 
 module.exports = router;

@@ -6,6 +6,7 @@ import { Card, Divider, Avatar, Typography, Icon } from 'antd';
 import CategoryLink from './CategoryLink';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
+import UserAvatar from './UserAvatar';
 import moment from 'moment';
 import LinkUsersPosts from './LinkUsersPosts';
 
@@ -17,7 +18,7 @@ const SinglePost = ({ post }) => {
                     <Card.Meta
                         avatar={
                             <LinkUsersPosts user={post.User.username}>
-                                <Avatar>{post.User.displayName[0]}</Avatar>
+                                <UserAvatar user={post.User} />
                             </LinkUsersPosts>
                         }
                         title={
@@ -32,7 +33,7 @@ const SinglePost = ({ post }) => {
                                 <Icon type="clock-circle" />{' '}
                                 {moment(
                                     new Date(post.createdAt),
-                                    'YYYY-MM-DD HH:mm:ss'
+                                    'YYYY-MM-DD HH:mm:ss',
                                 ).fromNow()}
                             </span>
                         }
