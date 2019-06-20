@@ -107,3 +107,7 @@ __snapshots__/
 # files
 public/
 uploads/
+
+
+# macos
+.DS_Store
