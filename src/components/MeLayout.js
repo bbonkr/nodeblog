@@ -139,7 +139,7 @@ const MeLayout = ({ children }) => {
         const current = menusSide.find(v => v.key === key);
         const { path, pathAs } = current;
         if (!!path) {
-            Router.push(path, pathAs);
+            Router.push(path, pathAs || path);
         }
     }, []);
 

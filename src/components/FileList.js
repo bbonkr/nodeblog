@@ -49,12 +49,15 @@ const FileList = () => {
                 keyword: '',
             },
         });
-    }, [dispatch, mediaFilesLimit]);
+    }, [dispatch, mediaFilesLimit, uploadBuffer, uploading]);
 
     const uploadBuffer = [];
 
     const onBeforeUploadFiles = useCallback(
         (file, fileList) => {
+            console.log('==========> file:', file);
+            console.log('==========> file list:', fileList);
+
             if (!uploading) {
                 uploadBuffer.push(file);
 
@@ -74,7 +77,7 @@ const FileList = () => {
             }
             return false;
         },
-        [dispatch, uploadBuffer, uploading]
+        [dispatch, uploadBuffer, uploading],
     );
 
     const onClickLoadMore = useCallback(
@@ -90,7 +93,7 @@ const FileList = () => {
                 });
             }
         },
-        [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken]
+        [dispatch, hasMoreMediaFiles, mediaFilesLimit, mediaFilesNextPageToken],
     );
 
     const onClickImage = useCallback(
@@ -98,7 +101,7 @@ const FileList = () => {
             setImageViewerVisible(true);
             setImageViewerFiles([image]);
         },
-        []
+        [],
     );
 
     const onClickDeleteFile = useCallback(
@@ -115,7 +118,7 @@ const FileList = () => {
                 onCancel() {},
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     return (
@@ -214,7 +217,7 @@ const FileList = () => {
                                             <Icon type="clock-circle" />{' '}
                                             {moment(
                                                 new Date(item.createdAt),
-                                                'YYYY-MM-DD HH:mm:ss'
+                                                'YYYY-MM-DD HH:mm:ss',
                                             ).fromNow()}
                                         </span>
                                     }

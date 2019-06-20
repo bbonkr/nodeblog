@@ -54,11 +54,11 @@ import {
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/me/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
+            keyword,
         )}`,
         {
             withCredentials: true,
-        }
+        },
     );
 }
 
@@ -70,7 +70,7 @@ function* loadMyPosts(action) {
             loadMyPostsApi,
             pageToken || '',
             limit || 10,
-            keyword
+            keyword,
         );
         yield put({
             type: LOAD_MY_POSTS_DONE,
@@ -118,9 +118,9 @@ function loadCategoriesApi(query) {
     const { pageToken, limit, keyword } = query;
     return axios.get(
         `/me/categories?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
+            keyword,
         )}`,
-        { withCredentials: true }
+        { withCredentials: true },
     );
 }
 
@@ -280,6 +280,7 @@ function uploadMyMediaFilesApi(data) {
 
 function* uploadMyMediaFiles(action) {
     try {
+        console.log('==========> form data:', action.data);
         const result = yield call(uploadMyMediaFilesApi, action.data);
 
         yield put({
@@ -303,9 +304,9 @@ function* watchUploadMyMediaFiles() {
 function loadMediaFilesApi(pageToken, limit, keyword) {
     return axios.get(
         `/me/media/?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
+            keyword,
         )}`,
-        { withCredentials: true }
+        { withCredentials: true },
     );
 }
 
@@ -316,7 +317,7 @@ function* loadMediaFiles(action) {
             loadMediaFilesApi,
             pageToken || '',
             limit || 10,
-            keyword || ''
+            keyword || '',
         );
         yield put({
             type: LOAD_MY_MEDIA_FILES_DONE,
