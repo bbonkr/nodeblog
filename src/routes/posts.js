@@ -5,6 +5,7 @@ const express = require('express');
 const router = express.Router();
 const db = require('../models');
 const Sequelize = require('sequelize');
+const { defualtUserAttributes } = require('./helper');
 const Op = Sequelize.Op;
 
 router.get('/', async (req, res, next) => {
@@ -51,7 +52,7 @@ router.get('/', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defualtUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -121,7 +122,7 @@ router.get('/category/:category', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defualtUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -194,7 +195,7 @@ router.get('/tag/:tag', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defualtUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -249,7 +250,7 @@ router.get('/:slug', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defualtUserAttributes,
                 },
                 {
                     model: db.Tag,

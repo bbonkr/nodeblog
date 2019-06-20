@@ -3,7 +3,12 @@ const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const db = require('../models');
 const { isLoggedIn } = require('./middleware');
-const { findUserById, normalizeUsername, tryParseInt } = require('./helper');
+const {
+    findUserById,
+    normalizeUsername,
+    tryParseInt,
+    defualtUserAttributes,
+} = require('./helper');
 
 const Op = Sequelize.Op;
 
@@ -67,7 +72,7 @@ router.get('/:user/posts', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName', 'photo'],
+                    attributes: defualtUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -139,7 +144,7 @@ router.get('/:user/posts/:post', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName', 'photo'],
+                    attributes: defualtUserAttributes,
                     where: {
                         id: foundUser.id,
                     },

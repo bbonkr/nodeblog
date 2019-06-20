@@ -7,16 +7,75 @@ import Router from 'next/router';
 import { withAuth } from '../utils/auth';
 import { SIGN_OUT_CALL } from '../reducers/user';
 import UserAvatar from './UserAvatar';
+import { SIDE_MENU_COLLAPSE } from '../reducers/me';
 const { Header, Content, Sider } = Layout;
+
+const menusSide = [
+    {
+        key: 'dashboard',
+        caption: 'Dashboard',
+        path: '/me',
+        pathAs: '',
+        icon: 'dashboard',
+    },
+    {
+        key: 'posts',
+        caption: 'Posts',
+        path: '/me/posts',
+        pathAs: '',
+        icon: 'book',
+    },
+    {
+        key: 'write',
+        caption: 'New Post',
+        path: '/me/write?id=',
+        pathAs: '',
+        icon: 'edit',
+    },
+    {
+        key: 'category',
+        caption: 'Categories',
+        path: '/me/category',
+        pathAs: '',
+        icon: 'container',
+    },
+    {
+        key: 'media',
+        caption: 'Media',
+        path: '/me/media',
+        pathAs: '',
+        icon: 'picture',
+    },
+    {
+        key: 'settings',
+        caption: 'Settings',
+        path: '/me/settings',
+        pathAs: '',
+        icon: 'setting',
+    },
+    {
+        key: 'changeinfo',
+        caption: 'Change Information',
+        path: '/me/changeinfo',
+        pathAs: '',
+        icon: 'user',
+    },
+    {
+        key: 'changepassword',
+        caption: 'Change Password',
+        path: '/me/changepassword',
+        pathAs: '',
+        icon: 'lock',
+    },
+];
 
 const MeLayout = ({ children }) => {
     const dispatch = useDispatch();
     const { me } = useSelector(state => state.user);
-    const [menuCollapsed, setMenuCollapsed] = useState(false);
+    const { sideMenuCollapsed } = useSelector(s => s.me);
+
+    // const [menuCollapsed, setMenuCollapsed] = useState(false);
     const [selectedMenuKeys, setSelectedMenuKeys] = useState([]);
-    const onMenuCollapsed = useCallback(collapsed => {
-        setMenuCollapsed(collapsed);
-    }, []);
 
     useEffect(() => {
         if (me) {
@@ -28,7 +87,7 @@ const MeLayout = ({ children }) => {
             }
             let paths = pathnameOnly.split('/').filter(c => !!c);
 
-            let key = 'me';
+            let key = 'dashboard';
             if (paths.length > 0) {
                 key = paths[paths.length - 1];
             }
@@ -37,13 +96,23 @@ const MeLayout = ({ children }) => {
         }
     }, [me]);
 
-    const onCollapse = useCallback((collapsed, type) => {
-        setMenuCollapsed(collapsed);
-    }, []);
+    const onCollapse = useCallback(
+        (collapsed, type) => {
+            // setMenuCollapsed(collapsed);
+            dispatch({
+                type: SIDE_MENU_COLLAPSE,
+                data: collapsed,
+            });
+        },
+        [dispatch],
+    );
     const onBreakPoint = useCallback(broken => {}, []);
     const onClickMenu = useCallback(
         ({ item, key, keyPath, domEvent }) => {
-            switch (key) {
+            switch (key.toLowerCase()) {
+                case 'home':
+                    Router.push('/');
+                    break;
                 case 'me':
                     Router.push('/me');
                     // setSelectedMenuKeys([key]);
@@ -65,6 +134,15 @@ const MeLayout = ({ children }) => {
         [dispatch],
     );
 
+    const onClickSideMenu = useCallback(menu => {
+        const { item, key, keyPath, domEvent } = menu;
+        const current = menusSide.find(v => v.key === key);
+        const { path, pathAs } = current;
+        if (!!path) {
+            Router.push(path, pathAs);
+        }
+    }, []);
+
     return (
         <Layout style={{ minHeight: '100%' }}>
             <Layout.Header
@@ -77,11 +155,7 @@ const MeLayout = ({ children }) => {
                     defaultSelectedKeys={['me']}
                     selectedKeys={selectedMenuKeys}
                     onClick={onClickMenu}>
-                    <Menu.Item key="home">
-                        <Link href="/">
-                            <a>NodeBlog</a>
-                        </Link>
-                    </Menu.Item>
+                    <Menu.Item key="home">NodeBlog</Menu.Item>
                     <Menu.Item key="me">
                         <Icon type="user" /> <span>Me</span>
                     </Menu.Item>
@@ -96,16 +170,10 @@ const MeLayout = ({ children }) => {
                     marginTop: '64px',
                     minHeight: '100vh',
                 }}>
-                <Layout>
+                <Layout style={{ minHeight: '100vh' }}>
                     <Sider
-                        style={{
-                            overflow: 'auto',
-                            height: '100vh',
-                            position: 'fixed',
-                            left: '0',
-                        }}
                         collapsible={true}
-                        collapsed={menuCollapsed}
+                        collapsed={sideMenuCollapsed}
                         onCollapse={onCollapse}>
                         <div
                             style={{
@@ -115,97 +183,25 @@ const MeLayout = ({ children }) => {
                             }}>
                             <UserAvatar user={me} />
 
-                            <div>{me.username}</div>
-                            <div>{me.displayName}</div>
+                            <div>{!sideMenuCollapsed && me.username}</div>
+                            <div>{!sideMenuCollapsed && me.displayName}</div>
                         </div>
                         <Menu
                             mode="inline"
                             defaultSelectedKeys={['me']}
-                            selectedKeys={selectedMenuKeys}>
-                            <Menu.Item key="me">
-                                <Link href="/me">
-                                    <a>
-                                        <span>
-                                            <Icon type="dashboard" />
-                                            Dashboard
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-
-                            <Menu.Item key="posts">
-                                <Link href="/me/posts">
-                                    <a>
-                                        <span>
-                                            <Icon type="project" />
-                                            My Posts
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item key="write">
-                                <Link
-                                    href={{
-                                        pathname: '/me/write',
-                                        query: { id: null },
-                                    }}
-                                    as="/me/write"
-                                    shallow={false}>
-                                    <a>
-                                        <span>
-                                            <Icon type="edit" /> New Post
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <Link href="/me/category">
-                                    <a>
-                                        <span>
-                                            <Icon type="container" />
-                                            Category
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-
-                            <Menu.Item key="media">
-                                <Link href="/me/media">
-                                    <a>
-                                        <span>
-                                            <Icon type="picture" /> Media
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item>
-                                <span>
-                                    <Icon type="setting" />
-                                    Settings
-                                </span>
-                            </Menu.Item>
-                            <Menu.Item key="changeinfo">
-                                <Link href="/me/changeinfo">
-                                    <a>
-                                        <span>
-                                            <Icon type="user" /> Change
-                                            Infomation
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
-                            <Menu.Item key="changepassword">
-                                <Link href="/me/changepassword">
-                                    <a>
-                                        <span>
-                                            <Icon type="lock" /> Change Password
-                                        </span>
-                                    </a>
-                                </Link>
-                            </Menu.Item>
+                            selectedKeys={selectedMenuKeys}
+                            onClick={onClickSideMenu}>
+                            {menusSide.map(v => {
+                                return (
+                                    <Menu.Item key={v.key}>
+                                        {v.icon && <Icon type={v.icon} />}
+                                        <span>{v.caption}</span>
+                                    </Menu.Item>
+                                );
+                            })}
                         </Menu>
                     </Sider>
-                    <Layout style={{ marginLeft: '200px' }}>
+                    <Layout style={{ minHeight: '100vh' }}>
                         {/* <Layout.Header /> */}
                         <Layout.Content>
                             <article>{children}</article>

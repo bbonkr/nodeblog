@@ -1,7 +1,17 @@
 import React, { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useSelector, useDispatch } from 'react-redux';
-import { List, Card, Tag, Table, Pagination, Modal, Button, Icon } from 'antd';
+import {
+    List,
+    Card,
+    Tag,
+    Table,
+    Pagination,
+    Modal,
+    Button,
+    Icon,
+    PageHeader,
+} from 'antd';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
@@ -34,7 +44,7 @@ const Posts = () => {
                 },
             });
         },
-        [dispatch, nextPageToken, postsLimit]
+        [dispatch, nextPageToken, postsLimit],
     );
 
     const onShowSizeChangePagination = useCallback(
@@ -49,14 +59,18 @@ const Posts = () => {
                 },
             });
         },
-        [dispatch, nextPageToken]
+        [dispatch, nextPageToken],
     );
+
+    const onClickNewPost = useCallback(() => {
+        Router.push('/me/write');
+    }, []);
 
     const onClickEditPost = useCallback(
         post => () => {
             Router.push({ pathname: '/me/write', query: { id: post.id } });
         },
-        []
+        [],
     );
 
     const onClickDeletePost = useCallback(
@@ -73,7 +87,7 @@ const Posts = () => {
                 onCancel() {},
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const columns = [
@@ -103,7 +117,7 @@ const Posts = () => {
                 <span>
                     {moment(
                         new Date(createdAt),
-                        'YYYY-MM-DD HH:mm:ss'
+                        'YYYY-MM-DD HH:mm:ss',
                     ).fromNow()}
                 </span>
             ),
@@ -139,13 +153,22 @@ const Posts = () => {
     return (
         <MeLayout>
             <ContentWrapper>
-                <h1>Posts</h1>
+                <PageHeader title="Posts" />
                 <div>
                     <Table
                         title={currentPageData => {
                             return (
                                 <div>
-                                    {`Total: ${formatNumber(postsCount)}`}
+                                    <div>
+                                        <Button
+                                            type="primary"
+                                            onClick={onClickNewPost}>
+                                            New Post
+                                        </Button>
+                                    </div>
+                                    <div>{`Total: ${formatNumber(
+                                        postsCount,
+                                    )}`}</div>
                                 </div>
                             );
                         }}

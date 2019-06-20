@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
+import { PageHeader } from 'antd';
 
 const Me = () => {
     const { me } = useSelector(state => state.user);
@@ -16,7 +17,7 @@ const Me = () => {
     return (
         <MeLayout>
             <ContentWrapper>
-                <h1>Me</h1>
+                <PageHeader title="Dashboard" />
                 <div>{me && me.username}</div>
             </ContentWrapper>
         </MeLayout>

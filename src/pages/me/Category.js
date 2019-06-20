@@ -1,6 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Table, Button, Icon, Modal, Form, Input, InputNumber } from 'antd';
+import {
+    Table,
+    Button,
+    Icon,
+    Modal,
+    Form,
+    Input,
+    InputNumber,
+    PageHeader,
+} from 'antd';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
@@ -126,7 +135,7 @@ const MyCategory = () => {
                 },
             });
         },
-        [categoryLimit, categoryNextPageToken, dispatch]
+        [categoryLimit, categoryNextPageToken, dispatch],
     );
 
     const onShowSizeChangePagination = useCallback(
@@ -141,7 +150,7 @@ const MyCategory = () => {
                 },
             });
         },
-        [categoryNextPageToken, dispatch]
+        [categoryNextPageToken, dispatch],
     );
 
     const onClickNewCategory = useCallback(() => {
@@ -162,7 +171,7 @@ const MyCategory = () => {
 
             setEditFormVisible(true);
         },
-        []
+        [],
     );
 
     const onClickDeleteCategory = useCallback(
@@ -179,7 +188,7 @@ const MyCategory = () => {
                 onCancel() {},
             });
         },
-        [dispatch]
+        [dispatch],
     );
 
     const onChangeName = useCallback(e => {
@@ -222,7 +231,7 @@ const MyCategory = () => {
                 setEditFormVisible(false);
             }
         },
-        [dispatch, id, name, ordinal, slug]
+        [dispatch, id, name, ordinal, slug],
     );
 
     const onClickCancelEditForm = useCallback(e => {
@@ -232,20 +241,21 @@ const MyCategory = () => {
     return (
         <MeLayout>
             <ContentWrapper>
-                <h1>Categories</h1>
+                <PageHeader title="Categories" />
+
                 <Table
                     title={currentPageData => {
                         return (
                             <div>
-                                <div>
-                                    {`Total: ${formatNumber(categoriesCount)}`}
-                                </div>
                                 <div>
                                     <Button
                                         type="primary"
                                         onClick={onClickNewCategory}>
                                         New category
                                     </Button>
+                                </div>
+                                <div>
+                                    {`Total: ${formatNumber(categoriesCount)}`}
                                 </div>
                             </div>
                         );

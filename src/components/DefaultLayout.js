@@ -8,6 +8,7 @@ import styled from 'styled-components';
 import CategoryList from '../components/CategoryList';
 import SubMenu from 'antd/lib/menu/SubMenu';
 import { SIGN_OUT_CALL } from '../reducers/user';
+import UserAvatar from './UserAvatar';
 
 const ContentLeft = styled(Col)`
     padding: 0.6em 1em 0.6em;
@@ -58,7 +59,7 @@ const DefaultLayout = ({ children }) => {
                     pathname: '/search',
                     query: { keyword: value },
                 },
-                `/search/${value}`
+                `/search/${value}`,
             );
         }
     }, []);
@@ -70,7 +71,7 @@ const DefaultLayout = ({ children }) => {
                 returnUrl: currentUrl,
             });
         },
-        [currentUrl, dispatch]
+        [currentUrl, dispatch],
     );
 
     return (
@@ -129,7 +130,7 @@ const DefaultLayout = ({ children }) => {
                         {me && (
                             <SubMenu
                                 key="user"
-                                title={<Avatar>{me.username[0]}</Avatar>}>
+                                title={<UserAvatar user={me} />}>
                                 <Menu.Item key="user-me">
                                     <Link href="/me">
                                         <a>Profile</a>

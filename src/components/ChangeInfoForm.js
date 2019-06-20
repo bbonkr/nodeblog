@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Form, Input, Button, Modal, Icon } from 'antd';
+import { Form, Input, Button, Modal, Icon, AutoComplete } from 'antd';
 import { signUpFormValidator } from '../helpers/formValidators';
 import { CHANGE_INFO_CALL } from '../reducers/user';
 import FileList from './FileList';
@@ -49,6 +49,7 @@ const ChangeInfoForm = () => {
         if (me && me.id) {
             setUsername(me.username);
             setDisplayName(me.displayName);
+            setPhoto(me.photo);
         }
     }, [me]);
 
@@ -143,6 +144,18 @@ const ChangeInfoForm = () => {
                 </Form.Item>
             </Form>
             <Modal
+                width="100%"
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    overflow: 'auto',
+                }}
+                title="Files"
+                content={<div>Copy image file url.</div>}
+                footer={false}
                 visible={fileListModalVisible}
                 onCancel={onClickHideFileListModal}>
                 <FileList />

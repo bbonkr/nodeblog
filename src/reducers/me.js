@@ -44,6 +44,9 @@ export const initialState = {
     loadingMediaFiles: false,
     loadMediaFilesErrorReason: '',
     uploading: false,
+
+    // menu
+    sideMenuCollapsed: false,
 };
 
 export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
@@ -102,6 +105,8 @@ export const DELETE_MY_CATEGORY_CALL = 'DELETE_MY_CATEGORY_CALL';
 export const DELETE_MY_CATEGORY_DONE = 'DELETE_MY_CATEGORY_DONE';
 export const DELETE_MY_CATEGORY_FAIL = 'DELETE_MY_CATEGORY_FAIL';
 
+export const SIDE_MENU_COLLAPSE = 'SIDE_MENU_COLLAPSE';
+
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // https://lannstark.github.io/nodejs/console/3
@@ -123,7 +128,7 @@ const reducer = (state = initialState, action) =>
 
                 action.data.posts.forEach(v => {
                     const postIndex = draft.myPosts.findIndex(
-                        x => x.id === v.id
+                        x => x.id === v.id,
                     );
                     if (postIndex < 0) {
                         draft.myPosts.push(v);
@@ -170,7 +175,7 @@ const reducer = (state = initialState, action) =>
 
                 action.data.items.forEach(v => {
                     const postIndex = draft.categories.findIndex(
-                        x => x.id === v.id
+                        x => x.id === v.id,
                     );
                     if (postIndex < 0) {
                         draft.categories.push(v);
@@ -252,7 +257,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_POST_DONE:
                 const index = draft.myPosts.findIndex(
-                    x => x.id === action.data.id
+                    x => x.id === action.data.id,
                 );
                 draft.myPosts.splice(index, 1);
                 draft.loadingMyPosts = false;
@@ -275,7 +280,7 @@ const reducer = (state = initialState, action) =>
             case LOAD_MY_MEDIA_FILES_DONE:
                 action.data.forEach(v => {
                     const mediaIndex = draft.mediaFiles.findIndex(
-                        x => x.id === v.id
+                        x => x.id === v.id,
                     );
                     if (mediaIndex < 0) {
                         draft.mediaFiles.push(v);
@@ -307,7 +312,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_MY_MEDIA_FILES_DONE:
                 const foundId = draft.mediaFiles.findIndex(
-                    x => x.id === action.data.id
+                    x => x.id === action.data.id,
                 );
                 draft.mediaFiles.splice(foundId, 1);
                 draft.uploading = false;
@@ -322,7 +327,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case EDIT_MY_CATEGORY_DONE:
                 const foundCategoryIndex = draft.categories.findIndex(
-                    v => v.id === action.data.id
+                    v => v.id === action.data.id,
                 );
                 if (foundCategoryIndex < 0) {
                     draft.categories.push(action.data);
@@ -335,7 +340,7 @@ const reducer = (state = initialState, action) =>
                     .filter(
                         v =>
                             v.id !== action.data.id &&
-                            v.ordinal >= action.data.ordinal
+                            v.ordinal >= action.data.ordinal,
                     )
                     .forEach(v => {
                         v.ordinal = v.ordinal + 1;
@@ -363,7 +368,7 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_MY_CATEGORY_DONE:
                 const foundDeletedCategoryIndex = draft.categories.findIndex(
-                    v => v.id === action.data.id
+                    v => v.id === action.data.id,
                 );
                 draft.categories.splice(foundDeletedCategoryIndex, 1);
 
@@ -380,6 +385,9 @@ const reducer = (state = initialState, action) =>
                 break;
             case DELETE_MY_CATEGORY_FAIL:
                 draft.loadingCategories = false;
+                break;
+            case SIDE_MENU_COLLAPSE:
+                draft.sideMenuCollapsed = action.data;
                 break;
             default:
                 break;

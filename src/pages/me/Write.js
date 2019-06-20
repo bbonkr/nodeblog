@@ -1,6 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Input, Divider, Select, Form, Button, Tabs, Icon } from 'antd';
+import {
+    Input,
+    Divider,
+    Select,
+    Form,
+    Button,
+    Tabs,
+    Icon,
+    PageHeader,
+} from 'antd';
 import Markdown from 'react-markdown';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import MeLayout from '../../components/MeLayout';
@@ -28,7 +37,7 @@ const Write = ({ id }) => {
     return (
         <MeLayout>
             <ContentWrapper>
-                <h1> new post</h1>
+                <PageHeader title="Write" />
                 <WritePostForm key={`post-${id}`} id={id} />
             </ContentWrapper>
         </MeLayout>

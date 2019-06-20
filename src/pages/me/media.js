@@ -10,6 +10,7 @@ import {
     Typography,
     Modal,
     Divider,
+    PageHeader,
 } from 'antd';
 import {
     UPLOAD_MY_MEDIA_FILES_CALL,
@@ -39,10 +40,8 @@ const Media = () => {
     return (
         <MeLayout>
             <ContentWrapper>
-                <div>
-                    <h1>Media</h1>
-                    <FileList />
-                </div>
+                <PageHeader title="Media" />
+                <FileList />
             </ContentWrapper>
         </MeLayout>
     );

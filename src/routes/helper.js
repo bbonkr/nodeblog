@@ -2,6 +2,16 @@ const db = require('../models');
 const showdown = require('showdown');
 const xssFilter = require('showdown-xss-filter');
 
+const defaultUserAttributes = [
+    'id',
+    'email',
+    'username',
+    'displayName',
+    'photo',
+    'isEmailConfirmed',
+];
+
+module.exports.defaultUserAttributes = defaultUserAttributes;
 /**
  * 사용자 정보를 조회합니다.
  */
@@ -15,14 +25,7 @@ module.exports.findUserById = async id => {
                 model: db.Post,
             },
         ],
-        attributes: [
-            'id',
-            'email',
-            'username',
-            'displayName',
-            'photo',
-            'isEmailConfirmed',
-        ],
+        attributes: defaultUserAttributes,
     });
 
     return me;
@@ -31,7 +34,7 @@ module.exports.findUserById = async id => {
 /**
  * 입력된 사용자 이름의 값을 정리합니다.
  *
- * @param {string} 시작문자가 포함된 사용자 이름 문자열
+ * @param {string} username 시작문자가 포함된 사용자 이름 문자열
  * @returns {string} 시작문자가 제거된 사용자이름 문자열
  */
 module.exports.normalizeUsername = (username = '') => {
