@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Input, Divider } from 'antd';
 import ListExcerpt from '../components/ListExcerpt';
-import { LOAD_POSTS_CALL } from '../reducers/post';
+import { LOAD_POSTS_CALL, LOAD_SEARCH_POSTS_CALL } from '../reducers/post';
 import { ContentWrapper } from '../styledComponents/Wrapper';
 import DefaultLayout from '../components/DefaultLayout';
 
@@ -12,7 +12,13 @@ const KEYWORD_INPUT_PLACEHOLDER = 'Searching keyword';
 const Search = ({ keyword }) => {
     const dispatch = useDispatch();
     const [keywordText, setKeywordText] = useState(keyword);
-    const { pageToken, postsLimit } = useSelector(s => s.post);
+    const {
+        searchPosts,
+        searchPostsHasMore,
+        searchPostsLoading,
+        searchPostsKeyword,
+        postsLimit,
+    } = useSelector(s => s.post);
     const onChangeKeyword = useCallback(e => {
         setKeywordText(e.target.value);
     }, []);
@@ -21,7 +27,7 @@ const Search = ({ keyword }) => {
         (value, e) => {
             if (value) {
                 dispatch({
-                    type: LOAD_POSTS_CALL,
+                    type: LOAD_SEARCH_POSTS_CALL,
                     data: {
                         pageToken: null,
                         limit: postsLimit,
@@ -32,6 +38,21 @@ const Search = ({ keyword }) => {
         },
         [dispatch, postsLimit],
     );
+
+    const loadMoreHandler = useCallback(() => {
+        const pageToken =
+            searchPosts &&
+            searchPosts.length > 0 &&
+            searchPosts[searchPosts.length - 1].id;
+        dispatch({
+            type: LOAD_SEARCH_POSTS_CALL,
+            data: {
+                pageToken: `${pageToken}`,
+                limit: postsLimit,
+                keyword: searchPostsKeyword,
+            },
+        });
+    }, [dispatch, postsLimit, searchPosts, searchPostsKeyword]);
 
     return (
         <DefaultLayout>
@@ -46,22 +67,25 @@ const Search = ({ keyword }) => {
                 />
 
                 <Divider />
-                <ListExcerpt />
+                <ListExcerpt
+                    posts={searchPosts}
+                    hasMore={searchPostsHasMore}
+                    loading={searchPostsLoading}
+                    loadMoreHandler={loadMoreHandler}
+                />
             </ContentWrapper>
         </DefaultLayout>
     );
 };
 
 Search.getInitialProps = async context => {
-    const { keyword } = context.query;
-
-    console.log('keyword', keyword);
+    const keyword = decodeURIComponent(context.query.keyword);
 
     if (keyword) {
         const state = context.store.getState();
         const { postsLimit } = state.post;
         context.store.dispatch({
-            type: LOAD_POSTS_CALL,
+            type: LOAD_SEARCH_POSTS_CALL,
             data: {
                 pageToken: null,
                 limit: postsLimit,

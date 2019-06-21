@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Card, Divider, Avatar, Typography, Icon } from 'antd';
-import CategoryLink from './CategoryLink';
-import TagLink from './TagLink';
+import LinkCategory from './LinkCategory';
+import LinkTag from './LinkTag';
 import LinkSinglePost from './LinkSinglePost';
 import UserAvatar from './UserAvatar';
 import moment from 'moment';
@@ -17,7 +17,7 @@ const SinglePost = ({ post }) => {
                 <Card>
                     <Card.Meta
                         avatar={
-                            <LinkUsersPosts user={post.User.username}>
+                            <LinkUsersPosts user={post.User}>
                                 <UserAvatar user={post.User} />
                             </LinkUsersPosts>
                         }
@@ -47,25 +47,19 @@ const SinglePost = ({ post }) => {
 
                     <Divider />
                     {post.Categories &&
-                        post.Categories.map(v => {
+                        post.Categories.map(category => {
                             return (
-                                <CategoryLink
-                                    key={v.slug}
-                                    name={v.name}
-                                    slug={v.slug}
+                                <LinkCategory
+                                    key={category.slug}
+                                    user={post.User}
+                                    category={category}
                                 />
                             );
                         })}
                     <Divider dashed={true} />
                     {post.Tags &&
                         post.Tags.map(v => {
-                            return (
-                                <TagLink
-                                    key={v.slug}
-                                    name={v.name}
-                                    slug={v.slug}
-                                />
-                            );
+                            return <LinkTag key={v.slug} tag={v} />;
                         })}
                 </Card>
             </article>

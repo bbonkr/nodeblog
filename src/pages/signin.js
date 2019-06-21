@@ -34,6 +34,11 @@ const SignIn = ({ returnUrl }) => {
         if (me && me.id) {
             console.log('returnUrl', returnUrl);
             Router.push(!!returnUrl ? returnUrl : '/');
+        } else {
+            setEmail('');
+            setEmailError('');
+            setPassword('');
+            setPasswordError('');
         }
     }, [me, returnUrl]);
 

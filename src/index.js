@@ -53,7 +53,7 @@ nextApp.prepare().then(() => {
         cors({
             origin: true,
             credentials: true,
-        })
+        }),
     );
     expressApp.use(cookieParser(process.env.COOKIE_SECRET));
     expressApp.use(
@@ -67,7 +67,7 @@ nextApp.prepare().then(() => {
                 secure: false, // https 사용시 true
             },
             store: dbSessionStore,
-        })
+        }),
     );
 
     expressApp.use(passport.initialize());
@@ -95,9 +95,9 @@ nextApp.prepare().then(() => {
         });
     });
 
-    expressApp.get('/post/:slug', (req, res) => {
-        return nextApp.render(req, res, '/post', { slug: req.params.slug });
-    });
+    // expressApp.get('/post/:slug', (req, res) => {
+    //     return nextApp.render(req, res, '/post', { slug: req.params.slug });
+    // });
 
     // expressApp.get('/users/:user/posts', (req, res) => {
     //     return nextApp.render(req, res, '/users/posts', {
@@ -108,6 +108,13 @@ nextApp.prepare().then(() => {
     expressApp.get('/users/:user/posts', (req, res) => {
         return nextApp.render(req, res, '/users/posts', {
             user: req.params.user,
+        });
+    });
+
+    expressApp.get('/users/:user/categories/:category/posts', (req, res) => {
+        return nextApp.render(req, res, '/users/categoryposts', {
+            user: req.params.user,
+            category: req.params.category,
         });
     });
 
