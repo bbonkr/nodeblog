@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 import { Card, Divider, Avatar, Typography, Icon } from 'antd';
-import CategoryLink from './CategoryLink';
+import LinkCategory from './LinkCategory';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
 import UserAvatar from './UserAvatar';
@@ -49,8 +49,9 @@ const SinglePost = ({ post }) => {
                     {post.Categories &&
                         post.Categories.map(v => {
                             return (
-                                <CategoryLink
+                                <LinkCategory
                                     key={v.slug}
+                                    user={post.User.username}
                                     name={v.name}
                                     slug={v.slug}
                                 />

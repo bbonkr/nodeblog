@@ -7,7 +7,7 @@ const {
     findUserById,
     normalizeUsername,
     tryParseInt,
-    defualtUserAttributes,
+    defaultUserAttributes,
 } = require('./helper');
 
 const Op = Sequelize.Op;
@@ -72,7 +72,7 @@ router.get('/:user/posts', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: defualtUserAttributes,
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -144,7 +144,7 @@ router.get('/:user/posts/:post', async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: defualtUserAttributes,
+                    attributes: defaultUserAttributes,
                     where: {
                         id: foundUser.id,
                     },
@@ -197,6 +197,131 @@ router.get('/:user/posts/:post', async (req, res, next) => {
 
 router.get('/:user/categories', async (req, res, next) => {});
 
-router.get('/:user/categories/:category/posts', async (req, res, next) => {});
+router.get('/:user/categories/:category/posts', async (req, res, next) => {
+    try {
+        /** 사용자 username :==> @userName */
+        const user = decodeURIComponent(req.params.user);
+        const category = decodeURIComponent(req.params.category);
+        const limit = tryParseInt(req.query.limit, 10, 10);
+        const keyword =
+            req.query.keyword && decodeURIComponent(req.query.keyword);
+        const pageToken = tryParseInt(req.query.pageToken, 10, -1);
+        const skip = pageToken ? 1 : 0;
+
+        const username = normalizeUsername(user);
+
+        const foundUser = await db.User.findOne({
+            where: { username: username },
+            attributes: ['id'],
+        });
+
+        if (!foundUser) {
+            return res.status(404).send(`Could not find user [${user}]`);
+        }
+
+        let where = { UserId: foundUser.id };
+        if (pageToken) {
+            const basisPost = await db.Post.findOne({
+                where: {
+                    id: pageToken,
+                },
+            });
+
+            if (basisPost) {
+                Object.assign(where, {
+                    createdAt: {
+                        [db.Sequelize.Op.lt]: basisPost.createdAt,
+                    },
+                });
+            }
+        }
+
+        if (keyword) {
+            Object.assign(where, {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${keyword}%` } },
+                    {
+                        text: {
+                            [Op.like]: `%${keyword}%`,
+                        },
+                    },
+                ],
+            });
+        }
+
+        const { count } = await db.Post.findAndCountAll({
+            where: where,
+            include: [
+                {
+                    model: db.User,
+                    attributes: defaultUserAttributes,
+                },
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                },
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                    where: {
+                        slug: category,
+                    },
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+            attributes: ['id', 'UserId'],
+        });
+
+        const posts = await db.Post.findAll({
+            where: where,
+            include: [
+                {
+                    model: db.User,
+                    attributes: defaultUserAttributes,
+                },
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                },
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                    where: {
+                        slug: category,
+                    },
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+            limit: limit,
+            skip: skip,
+            attributes: [
+                'id',
+                'title',
+                'slug',
+                'excerpt',
+                'UserId',
+                'createdAt',
+                'updatedAt',
+            ],
+        });
+
+        return res.json({ items: posts, total: count });
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
 
 module.exports = router;

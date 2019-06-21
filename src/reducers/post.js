@@ -7,7 +7,7 @@ export const initialState = {
     loadingPosts: false,
     hasMorePost: true,
     loadPostErrorReason: '',
-    postsLimit: 3,
+    postsLimit: 10,
     nextPageToken: '',
     searchKeyword: '',
     /** singlePost */
@@ -19,18 +19,23 @@ export const initialState = {
     currentCategory: '',
     currentTag: '',
 
-    myPosts: [],
-    loadingMyPosts: false,
-    loadMyPostErrorReason: '',
-
     writingPost: false,
 
+    /** users posts */
     usersPosts: [],
     usersPostsPageToken: '',
     loadingUsersPosts: false,
     loadUsersPostsErrorReason: '',
     hasMoreUsersPosts: false,
-    currentUser: '', // 현재 선택된 사용자
+    currentUser: '', // 현재 선택된 사용자; 데이터 소스 초기화에 사용
+
+    /** users category posts */
+    userCategoryPosts: [],
+    userCategoryPostsPageToken: '',
+    userCategoryPostsLoading: false,
+    userCategoryPostsErrorReason: '',
+    userCategoryPostsHasMore: false,
+    currentUserCategory: '', // 현재 사용자 분류; `${user}${category}`; 데이터 소스 초기화에 사용
 };
 
 export const LOAD_POSTS_CALL = 'LOAD_POSTS_CALL';
@@ -52,6 +57,10 @@ export const LOAD_CATEGORY_POSTS_FAIL = 'LOAD_CATEGORY_POSTS_FAIL';
 export const LOAD_TAG_POSTS_CALL = 'LOAD_TAG_POSTS_CALL';
 export const LOAD_TAG_POSTS_DONE = 'LOAD_TAG_POSTS_DONE';
 export const LOAD_TAG_POSTS_FAIL = 'LOAD_TAG_POSTS_FAIL';
+
+export const LOAD_USER_CATEGORY_POSTS_CALL = 'LOAD_USER_CATEGORY_POSTS_CALL';
+export const LOAD_USER_CATEGORY_POSTS_DONE = 'LOAD_USER_CATEGORY_POSTS_DONE';
+export const LOAD_USER_CATEGORY_POSTS_FAIL = 'LOAD_USER_CATEGORY_POSTS_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -108,7 +117,7 @@ const reducer = (state = initialState, action) =>
             case LOAD_USERS_POSTS_DONE:
                 action.data.forEach(v => {
                     const postIndex = draft.usersPosts.findIndex(
-                        x => x.id === v.id
+                        x => x.id === v.id,
                     );
                     if (postIndex < 0) {
                         draft.usersPosts.push(v);
@@ -124,6 +133,37 @@ const reducer = (state = initialState, action) =>
                 draft.loadUsersPostsErrorReason = action.reason;
                 break;
 
+            case LOAD_USER_CATEGORY_POSTS_CALL:
+                draft.userCategoryPosts = action.data.pageToken
+                    ? draft.userCategoryPosts
+                    : [];
+                draft.userCategoryPostsHasMore = action.data.pageToken
+                    ? draft.userCategoryPostsHasMore
+                    : true;
+                draft.userCategoryPostsErrorReason = '';
+                draft.userCategoryPostsLoading = true;
+                draft.currentUserCategory = `${action.data.user}${
+                    action.data.category
+                }`;
+                break;
+            case LOAD_USER_CATEGORY_POSTS_DONE:
+                action.data.items.forEach(v => {
+                    const index = draft.userCategoryPosts.findIndex(
+                        x => x.id === v.id,
+                    );
+                    if (index < 0) {
+                        draft.userCategoryPosts.push(v);
+                        draft.userCategoryPostsPageToken = `${v.id}`;
+                    }
+                });
+                draft.userCategoryPostsHasMore =
+                    action.data.items.length === draft.postsLimit;
+                draft.userCategoryPostsLoading = false;
+                break;
+            case LOAD_USER_CATEGORY_POSTS_FAIL:
+                draft.userCategoryPostsErrorReason = action.reason;
+                draft.userCategoryPostsLoading = false;
+                break;
             case LOAD_SINGLE_POST_CALL:
                 draft.singlePost = null;
                 draft.isSinglePost = true;

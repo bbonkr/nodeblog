@@ -12,11 +12,10 @@ import { Skeleton, Spin } from 'antd';
 
 const UsersPost = ({ user, slug }) => {
     const { loadingPost, singlePost } = useSelector(s => s.post);
-    console.log('==========> ENV:PORT ', process.env.PORT);
+
     return (
         <DefaultLayout>
             <ContentWrapper>
-                <div>/users/:user/posts/:slug</div>
                 <Spin spinning={loadingPost} tip="loading ...">
                     {singlePost && !loadingPost ? (
                         <SinglePost post={singlePost} />

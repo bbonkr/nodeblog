@@ -25,13 +25,16 @@ import {
     LOAD_USERS_POSTS_DONE,
     LOAD_USERS_POSTS_FAIL,
     LOAD_USERS_POSTS_CALL,
+    LOAD_USER_CATEGORY_POSTS_CALL,
+    LOAD_USER_CATEGORY_POSTS_DONE,
+    LOAD_USER_CATEGORY_POSTS_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
-        )}`
+            keyword,
+        )}`,
     );
 }
 
@@ -42,7 +45,7 @@ function* loadPosts(action) {
             loadPostsApi,
             pageToken,
             limit || 10,
-            keyword
+            keyword,
         );
 
         yield put({
@@ -102,12 +105,12 @@ function loadCategoryPostsApi(
     category,
     pageToken = '',
     limit = 10,
-    keyword = ''
+    keyword = '',
 ) {
     return axios.get(
         `/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
-        )}`
+            keyword,
+        )}`,
     );
 }
 
@@ -119,7 +122,7 @@ function* loadCategoryPosts(action) {
             category,
             pageToken,
             limit,
-            keyword
+            keyword,
         );
         yield put({
             type: LOAD_CATEGORY_POSTS_DONE,
@@ -142,10 +145,10 @@ function* watchLoadCategoryPosts() {
 function loadTagPostsApi(tag, pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/posts/tag/${encodeURIComponent(
-            tag
+            tag,
         )}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
-        )}`
+            keyword,
+        )}`,
     );
 }
 
@@ -157,7 +160,7 @@ function* loadTagPosts(action) {
             tag,
             pageToken,
             limit,
-            keyword
+            keyword,
         );
         yield put({
             type: LOAD_TAG_POSTS_DONE,
@@ -180,8 +183,8 @@ function* watchLoadTagPosts() {
 function loadUsersPostsApi(user, pageToken = '', limit = 10, keyword = '') {
     return axios.get(
         `/users/${user}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword
-        )}`
+            keyword,
+        )}`,
     );
 }
 
@@ -193,7 +196,7 @@ function* loadUsersPosts(action) {
             user,
             pageToken,
             limit || 10,
-            keyword
+            keyword,
         );
         yield put({
             type: LOAD_USERS_POSTS_DONE,
@@ -213,6 +216,36 @@ function* watchLoadUsersPosts() {
     yield takeLatest(LOAD_USERS_POSTS_CALL, loadUsersPosts);
 }
 
+function loadUserCategoryPostsApi(query) {
+    const { user, category, pageToken, limit, keyword } = query;
+    return axios.get(
+        `/users/${user}/categories/${category}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${keyword}`,
+        {
+            withCredentials: true,
+        },
+    );
+}
+
+function* loadUserCategoryPosts(action) {
+    try {
+        const result = yield call(loadUserCategoryPostsApi, action.data);
+        yield put({
+            type: LOAD_USER_CATEGORY_POSTS_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        yield put({
+            type: LOAD_USER_CATEGORY_POSTS_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLaodUserCatetoryPosts() {
+    yield takeLatest(LOAD_USER_CATEGORY_POSTS_CALL, loadUserCategoryPosts);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadPosts),
@@ -220,5 +253,6 @@ export default function* postSaga() {
         fork(watchLoadCategoryPosts),
         fork(watchLoadTagPosts),
         fork(watchLoadUsersPosts),
+        fork(watchLaodUserCatetoryPosts),
     ]);
 }

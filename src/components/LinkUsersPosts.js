@@ -3,16 +3,16 @@ import Link from 'next/link';
 import PropTypes from 'prop-types';
 
 const LinkUsersPosts = ({ user, children }) => {
-    console.log('==========> LinkUsersPosts:  user: ', user);
+    const username = `@${user}`;
     return (
         <Link
             href={{
                 pathname: '/users/posts',
                 query: {
-                    user: user,
+                    user: username,
                 },
             }}
-            as={`/users/${user}/posts`}>
+            as={`/users/${username}/posts`}>
             <a>{children}</a>
         </Link>
     );

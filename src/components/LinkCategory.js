@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
+import { Icon } from 'antd';
 import styled from 'styled-components';
-import IconText from './IconText';
 
 const LinkWrapper = styled.span`
     margin-right: 1em;
@@ -14,23 +14,28 @@ const LinkWrapper = styled.span`
  * @param {string} 분류 이름
  * @param {string} 분류 슬러그
  */
-const CategoryLink = ({ name, slug }) => {
+const LinkCategory = ({ user, name, slug }) => {
+    const username = `@${user}`;
     return (
         <LinkWrapper>
             <Link
-                href={{ pathname: '/category', query: { slug: slug } }}
-                as={`/category/${slug}`}>
+                href={{
+                    pathname: '/users/categoryposts',
+                    query: { user: username, category: slug },
+                }}
+                as={`/users/${username}/categories/${slug}/posts`}>
                 <a>
-                    <IconText type="container" text={name} />
+                    <Icon type="container" />
+                    <span>{name}</span>
                 </a>
             </Link>
         </LinkWrapper>
     );
 };
 
-CategoryLink.propTypes = {
+LinkCategory.propTypes = {
     name: PropTypes.string.isRequired,
     slug: PropTypes.string.isRequired,
 };
 
-export default CategoryLink;
+export default LinkCategory;

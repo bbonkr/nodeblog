@@ -5,7 +5,7 @@ import { List, Avatar, Button, Divider, Card, Typography } from 'antd';
 import moment from 'moment';
 import styled from 'styled-components';
 import IconText from './IconText';
-import CategoryLink from './CategoryLink';
+import LinkCategory from './LinkCategory';
 import TagLink from './TagLink';
 import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
@@ -63,7 +63,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                 ]}>
                                 <Card.Meta
                                     avatar={
-                                        <LinkUsersPosts user={`@${username}`}>
+                                        <LinkUsersPosts user={username}>
                                             <UserAvatar user={post.User} />
                                         </LinkUsersPosts>
                                     }
@@ -95,8 +95,11 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                         {post.Categories &&
                                             post.Categories.map(v => {
                                                 return (
-                                                    <CategoryLink
+                                                    <LinkCategory
                                                         key={v.slug}
+                                                        user={
+                                                            post.User.username
+                                                        }
                                                         name={v.name}
                                                         slug={v.slug}
                                                     />
