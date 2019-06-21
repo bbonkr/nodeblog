@@ -14,19 +14,21 @@ const LinkWrapper = styled.span`
  * @param {string} 분류 이름
  * @param {string} 분류 슬러그
  */
-const LinkCategory = ({ user, name, slug }) => {
-    const username = `@${user}`;
+const LinkCategory = ({ user, category }) => {
+    const { username } = user;
+    const { name, slug } = category;
+    const displayUsername = `@${username}`;
+
     return (
         <LinkWrapper>
             <Link
                 href={{
                     pathname: '/users/categoryposts',
-                    query: { user: username, category: slug },
+                    query: { user: displayUsername, category: slug },
                 }}
-                as={`/users/${username}/categories/${slug}/posts`}>
+                as={`/users/${displayUsername}/categories/${slug}/posts`}>
                 <a>
-                    <Icon type="container" />
-                    <span>{name}</span>
+                    <Icon type="container" /> <span>{name}</span>
                 </a>
             </Link>
         </LinkWrapper>
@@ -34,8 +36,8 @@ const LinkCategory = ({ user, name, slug }) => {
 };
 
 LinkCategory.propTypes = {
-    name: PropTypes.string.isRequired,
-    slug: PropTypes.string.isRequired,
+    user: PropTypes.object.isRequired,
+    category: PropTypes.object.isRequired,
 };
 
 export default LinkCategory;

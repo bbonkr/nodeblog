@@ -18,6 +18,32 @@ router.get('/', async (req, res, next) => {
         const skip = pageToken ? 1 : 0;
 
         let where = {};
+
+        if (keyword) {
+            Object.assign(where, {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${keyword}%` } },
+                    {
+                        text: {
+                            [Op.like]: `%${keyword}%`,
+                        },
+                    },
+                ],
+            });
+        }
+
+        const { count } = await db.Post.findAndCountAll({
+            where: where,
+            include: [
+                {
+                    model: db.User,
+                    attributes: defaultUserAttributes,
+                },
+            ],
+
+            attributes: ['id', 'UserId'],
+        });
+
         if (pageToken) {
             const basisPost = await db.Post.findOne({
                 where: {
@@ -32,19 +58,6 @@ router.get('/', async (req, res, next) => {
                     },
                 };
             }
-        }
-
-        if (keyword) {
-            Object.assign(where, {
-                [Op.or]: [
-                    { title: { [Op.like]: `%${keyword}%` } },
-                    {
-                        text: {
-                            [Op.like]: `%${keyword}%`,
-                        },
-                    },
-                ],
-            });
         }
 
         const posts = await db.Post.findAll({
@@ -83,7 +96,7 @@ router.get('/', async (req, res, next) => {
             ],
         });
 
-        return res.json(posts);
+        return res.json({ records: posts, total: count });
     } catch (e) {
         console.error(e);
         return next(e);
@@ -173,6 +186,14 @@ router.get('/tag/:tag', async (req, res, next) => {
             (req.query.pageToken && parseInt(req.query.pageToken)) || 0;
         const skip = pageToken ? 1 : 0;
 
+        const tagRef = await db.Tag.findOne({
+            where: { slug: tag },
+        });
+
+        if (!tagRef) {
+            return res.status(404).send(`Could not find tag. [${tag}]`);
+        }
+
         let where = {};
         if (pageToken) {
             const basisPost = await db.Post.findOne({
@@ -190,6 +211,24 @@ router.get('/tag/:tag', async (req, res, next) => {
             }
         }
 
+        const { count, rows } = await db.Post.findAndCountAll({
+            include: [
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                    where: {
+                        id: tagRef.id,
+                    },
+                },
+            ],
+            attributes: ['id'],
+        });
+
+        Object.assign(where, {
+            id: { [Op.in]: rows.map(r => r.id) },
+        });
+
         const posts = await db.Post.findAll({
             where: where,
             include: [
@@ -201,9 +240,6 @@ router.get('/tag/:tag', async (req, res, next) => {
                     model: db.Tag,
                     as: 'Tags',
                     through: 'PostTag',
-                    where: {
-                        slug: tag,
-                    },
                 },
                 {
                     model: db.Category,
@@ -229,7 +265,7 @@ router.get('/tag/:tag', async (req, res, next) => {
             ],
         });
 
-        return res.json(posts);
+        return res.json({ records: posts, total: count, tag: tagRef });
     } catch (e) {
         console.error(e);
         return next(e);

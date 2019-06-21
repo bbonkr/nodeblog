@@ -6,7 +6,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import IconText from './IconText';
 import LinkCategory from './LinkCategory';
-import TagLink from './TagLink';
+import LinkTag from './LinkTag';
 import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
 import UserAvatar from './UserAvatar';
@@ -63,7 +63,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                 ]}>
                                 <Card.Meta
                                     avatar={
-                                        <LinkUsersPosts user={username}>
+                                        <LinkUsersPosts user={post.User}>
                                             <UserAvatar user={post.User} />
                                         </LinkUsersPosts>
                                     }
@@ -93,15 +93,12 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                     <Divider dashed={true} />
                                     <div>
                                         {post.Categories &&
-                                            post.Categories.map(v => {
+                                            post.Categories.map(category => {
                                                 return (
                                                     <LinkCategory
-                                                        key={v.slug}
-                                                        user={
-                                                            post.User.username
-                                                        }
-                                                        name={v.name}
-                                                        slug={v.slug}
+                                                        key={category.slug}
+                                                        user={post.User}
+                                                        category={category}
                                                     />
                                                 );
                                             })}
@@ -127,10 +124,9 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                         {post.Tags &&
                                             post.Tags.map(v => {
                                                 return (
-                                                    <TagLink
+                                                    <LinkTag
+                                                        tag={v}
                                                         key={v.slug}
-                                                        name={v.name}
-                                                        slug={v.slug}
                                                     />
                                                 );
                                             })}

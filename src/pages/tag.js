@@ -1,18 +1,47 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Card, Divider } from 'antd';
+import { Divider, PageHeader } from 'antd';
 import ListExcerpt from '../components/ListExcerpt';
 import { LOAD_TAG_POSTS_CALL } from '../reducers/post';
 import DefaultLayout from '../components/DefaultLayout';
 import { ContentWrapper } from '../styledComponents/Wrapper';
 
 const Tag = ({ slug }) => {
+    const dispatch = useDispatch();
+    const {
+        tagPosts,
+        tagPostKeyword,
+        tagPostsLoading,
+        tagPostsHasMore,
+        postsLimit,
+        currentTag,
+    } = useSelector(s => s.post);
+    const loadMoreHandler = useCallback(() => {
+        const pageToken =
+            tagPosts && tagPosts.length > 0 && tagPosts[tagPosts.length - 1].id;
+
+        dispatch({
+            type: LOAD_TAG_POSTS_CALL,
+            data: {
+                pageToken: `${pageToken}`,
+                limit: postsLimit || 10,
+                keyword: '',
+                tag: slug,
+            },
+        });
+    }, [dispatch, postsLimit, slug, tagPosts]);
     return (
         <DefaultLayout>
             <ContentWrapper>
-                <Card title={slug} />
+                <PageHeader title={`TAG: ${!!currentTag && currentTag.name}`} />
                 <Divider />
-                <ListExcerpt />
+                <ListExcerpt
+                    posts={tagPosts}
+                    hasMore={tagPostsHasMore}
+                    loading={tagPostsLoading}
+                    loadMoreHandler={loadMoreHandler}
+                />
             </ContentWrapper>
         </DefaultLayout>
     );
@@ -24,9 +53,9 @@ Tag.propTypes = {
 
 Tag.getInitialProps = async context => {
     const state = context.store.getState();
-    const { slug } = context.query;
-    const { postsLimit, posts } = state.post;
-    const lastPost = posts && posts.length > 0 && posts[posts.length - 1];
+    const slug = decodeURIComponent(context.query.slug);
+    const { postsLimit } = state.post;
+
     context.store.dispatch({
         type: LOAD_TAG_POSTS_CALL,
         data: {

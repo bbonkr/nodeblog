@@ -5,6 +5,9 @@ import DefaultLayout from '../../components/DefaultLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import ListExcerpt from '../../components/ListExcerpt';
 import { LOAD_USER_CATEGORY_POSTS_CALL } from '../../reducers/post';
+import { PageHeader, Divider } from 'antd';
+import UserAvatar from '../../components/UserAvatar';
+import LinkUsersPosts from '../../components/LinkUsersPosts';
 
 const UserCategoryPosts = ({ user, category }) => {
     const dispatch = useDispatch();
@@ -13,6 +16,8 @@ const UserCategoryPosts = ({ user, category }) => {
         userCategoryPostsHasMore,
         userCategoryPostsLoading,
         postsLimit,
+        userCategoryPostsCategory,
+        userCategoryPostsUser,
     } = useSelector(s => s.post);
 
     const onClickLoadMore = useCallback(() => {
@@ -36,6 +41,21 @@ const UserCategoryPosts = ({ user, category }) => {
     return (
         <DefaultLayout>
             <ContentWrapper>
+                <PageHeader
+                    title={
+                        <div>
+                            <span>CATEGORY: </span>
+                            <LinkUsersPosts user={userCategoryPostsUser}>
+                                <UserAvatar user={userCategoryPostsUser} />
+                            </LinkUsersPosts>
+                            <span>
+                                {!!userCategoryPostsCategory &&
+                                    userCategoryPostsCategory.name}
+                            </span>
+                        </div>
+                    }
+                />
+                <Divider />
                 <ListExcerpt
                     posts={userCategoryPosts}
                     hasMore={userCategoryPostsHasMore}

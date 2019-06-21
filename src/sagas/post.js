@@ -28,6 +28,9 @@ import {
     LOAD_USER_CATEGORY_POSTS_CALL,
     LOAD_USER_CATEGORY_POSTS_DONE,
     LOAD_USER_CATEGORY_POSTS_FAIL,
+    LOAD_SEARCH_POSTS_CALL,
+    LOAD_SEARCH_POSTS_DONE,
+    LOAD_SEARCH_POSTS_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -51,10 +54,6 @@ function* loadPosts(action) {
         yield put({
             type: LOAD_POSTS_DONE,
             data: result.data,
-            nextPageToken:
-                result.data &&
-                result.data.length > 0 &&
-                result.data[result.data.length - 1].id,
             limit: limit,
             keyword: keyword,
         });
@@ -246,6 +245,38 @@ function* watchLaodUserCatetoryPosts() {
     yield takeLatest(LOAD_USER_CATEGORY_POSTS_CALL, loadUserCategoryPosts);
 }
 
+function loadSearchPostsApi(query) {
+    const { pageToken, limit, keyword } = query;
+    return axios.get(
+        `/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword,
+        )}`,
+    );
+}
+
+function* loadSearchPosts(action) {
+    try {
+        const { keyword } = action.data;
+        const result = yield call(loadSearchPostsApi, action.data);
+        yield put({
+            type: LOAD_SEARCH_POSTS_DONE,
+            data: result.data,
+            keyword: keyword,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_SEARCH_POSTS_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadSearchPosts() {
+    yield takeLatest(LOAD_SEARCH_POSTS_CALL, loadSearchPosts);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadPosts),
@@ -254,5 +285,6 @@ export default function* postSaga() {
         fork(watchLoadTagPosts),
         fork(watchLoadUsersPosts),
         fork(watchLaodUserCatetoryPosts),
+        fork(watchLoadSearchPosts),
     ]);
 }

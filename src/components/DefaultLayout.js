@@ -59,7 +59,7 @@ const DefaultLayout = ({ children }) => {
                     pathname: '/search',
                     query: { keyword: value },
                 },
-                `/search/${value}`,
+                `/search/${encodeURIComponent(value)}`,
             );
         }
     }, []);

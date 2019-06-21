@@ -212,14 +212,55 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
 
         const foundUser = await db.User.findOne({
             where: { username: username },
-            attributes: ['id'],
+            attributes: defaultUserAttributes,
         });
 
         if (!foundUser) {
             return res.status(404).send(`Could not find user [${user}]`);
         }
 
+        const foundCategory = await db.Category.findOne({
+            where: {
+                slug: category,
+                userId: foundUser.id,
+            },
+        });
+
+        if (!foundCategory) {
+            return res
+                .status(404)
+                .send(`Could not find a category [${category}]`);
+        }
+
         let where = { UserId: foundUser.id };
+
+        if (keyword) {
+            Object.assign(where, {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${keyword}%` } },
+                    {
+                        text: {
+                            [Op.like]: `%${keyword}%`,
+                        },
+                    },
+                ],
+            });
+        }
+
+        const { count, rows } = await db.Post.findAndCountAll({
+            where: where,
+            include: [
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                    where: {
+                        slug: category,
+                    },
+                },
+            ],
+        });
+
         if (pageToken) {
             const basisPost = await db.Post.findOne({
                 where: {
@@ -236,46 +277,10 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
             }
         }
 
-        if (keyword) {
-            Object.assign(where, {
-                [Op.or]: [
-                    { title: { [Op.like]: `%${keyword}%` } },
-                    {
-                        text: {
-                            [Op.like]: `%${keyword}%`,
-                        },
-                    },
-                ],
-            });
-        }
-
-        const { count } = await db.Post.findAndCountAll({
-            where: where,
-            include: [
-                {
-                    model: db.User,
-                    attributes: defaultUserAttributes,
-                },
-                {
-                    model: db.Tag,
-                    as: 'Tags',
-                    through: 'PostTag',
-                },
-                {
-                    model: db.Category,
-                    as: 'Categories',
-                    through: 'PostCategory',
-                    where: {
-                        slug: category,
-                    },
-                },
-                {
-                    model: db.PostAccessLog,
-                    attributes: ['id'],
-                },
-            ],
-            order: [['createdAt', 'DESC']],
-            attributes: ['id', 'UserId'],
+        Object.assign(where, {
+            id: {
+                [Op.in]: rows.map(r => r.id),
+            },
         });
 
         const posts = await db.Post.findAll({
@@ -294,9 +299,6 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
                     model: db.Category,
                     as: 'Categories',
                     through: 'PostCategory',
-                    where: {
-                        slug: category,
-                    },
                 },
                 {
                     model: db.PostAccessLog,
@@ -317,7 +319,12 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
             ],
         });
 
-        return res.json({ items: posts, total: count });
+        return res.json({
+            records: posts,
+            total: count,
+            user: foundUser,
+            category: foundCategory,
+        });
     } catch (e) {
         console.error(e);
         return next(e);
