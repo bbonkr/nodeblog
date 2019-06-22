@@ -14,7 +14,7 @@ if (config.use_env_variable) {
         config.database,
         config.username,
         config.password,
-        config
+        config,
     );
 }
 
@@ -36,7 +36,7 @@ db.User = require('./User')(sequelize, Sequelize);
 db.Category = require('./Category')(sequelize, Sequelize);
 db.PostAccessLog = require('./PostAccessLog')(sequelize, Sequelize);
 db.UserVerifyCode = require('./UserVerifyCode')(sequelize, Sequelize);
-
+db.ResetPasswordCode = require('./ResetPasswordCode')(sequelize, Sequelize);
 /** passport store */
 db.Session = require('../passport/session')(sequelize, Sequelize);
 

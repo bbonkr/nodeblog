@@ -41,6 +41,7 @@ module.exports = (sequelize, DataTypes) => {
         db.User.hasMany(db.Image);
         db.User.hasMany(db.Comment);
         db.User.hasMany(db.UserVerifyCode);
+        db.User.hasMany(db.ResetPasswordCode);
     };
     return User;
 };
