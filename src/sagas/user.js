@@ -28,6 +28,12 @@ import {
     CHANGE_INFO_CALL,
     CHANGE_INFO_DONE,
     CHANGE_INFO_FAIL,
+    VERIFY_EMAIL_CALL,
+    VERIFY_EMAIL_FAIL,
+    VERIFY_EMAIL_DONE,
+    MAKE_VERIFY_EMAIL_CALL,
+    MAKE_VERIFY_EMAIL_FAIL,
+    MAKE_VERIFY_EMAIL_DONE,
 } from '../reducers/user';
 
 function getMyInfoApi() {
@@ -184,6 +190,56 @@ function* watchChangeInfo() {
     yield takeLatest(CHANGE_INFO_CALL, changeInfo);
 }
 
+function verifyEmailApi(formData) {
+    return axios.post('/user/verifyemail', formData, { withCredentials: true });
+}
+
+function* verifyEmail(action) {
+    try {
+        const result = yield call(verifyEmailApi, action.data);
+        yield put({
+            type: VERIFY_EMAIL_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: VERIFY_EMAIL_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* wacthVerifyEmail() {
+    yield takeLatest(VERIFY_EMAIL_CALL, verifyEmail);
+}
+
+function makeVerifyEmaiApi() {
+    return axios.post('/user/makeverifyemail', {}, { withCredentials: true });
+}
+
+function* makeVerifyEmail(action) {
+    try {
+        const result = yield call(makeVerifyEmaiApi);
+        yield put({
+            type: MAKE_VERIFY_EMAIL_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: MAKE_VERIFY_EMAIL_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchMakeVerifyEmail() {
+    yield takeLatest(MAKE_VERIFY_EMAIL_CALL, makeVerifyEmail);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchGetMyInfo),
@@ -192,5 +248,7 @@ export default function* postSaga() {
         fork(watchSignUp),
         fork(watchChangePassword),
         fork(watchChangeInfo),
+        fork(wacthVerifyEmail),
+        fork(watchMakeVerifyEmail),
     ]);
 }

@@ -2,10 +2,13 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Form, Input, Button, Modal, Icon, AutoComplete } from 'antd';
 import { signUpFormValidator } from '../helpers/formValidators';
-import { CHANGE_INFO_CALL } from '../reducers/user';
+import { CHANGE_INFO_CALL, MAKE_VERIFY_EMAIL_CALL } from '../reducers/user';
 import FileList from './FileList';
 
 const validator = {
+    checkEmail(formData) {
+        return signUpFormValidator.checkEmail(formData);
+    },
     checkUsername(formData) {
         return signUpFormValidator.checkUsername(formData);
     },
@@ -17,6 +20,7 @@ const validator = {
         const results = [];
         const messages = [];
 
+        results.push(this.checkEmail(formData));
         results.push(this.checkUsername(formData));
         results.push(this.checkDisplayName(formData));
 
@@ -38,6 +42,8 @@ const ChangeInfoForm = () => {
     const dispatch = useDispatch();
     const { loadingChangeInfo, changeInfoSuccess } = useSelector(s => s.user);
     const { me } = useSelector(s => s.user);
+    const [email, setEmail] = useState('');
+    const [emailErrorMessage, setemailErrorMessage] = useState('');
     const [username, setUsername] = useState('');
     const [usernameErrorMessage, setUsernameErrorMessage] = useState('');
     const [displayName, setDisplayName] = useState('');
@@ -47,6 +53,7 @@ const ChangeInfoForm = () => {
 
     useEffect(() => {
         if (me && me.id) {
+            setEmail(me.email);
             setUsername(me.username);
             setDisplayName(me.displayName);
             setPhoto(me.photo);
@@ -60,6 +67,13 @@ const ChangeInfoForm = () => {
     const onClickHideFileListModal = useCallback(() => {
         setFileListModalVisible(false);
     }, []);
+
+    const onChangeEmail = useCallback(e => {
+        const newValue = e.target.value;
+        setEmail(newValue);
+        const result = validator.checkEmail({ email: newValue.trim() });
+        setemailErrorMessage(result.message);
+    });
 
     const onChangeUsername = useCallback(e => {
         const newValue = e.target.value;
@@ -82,10 +96,19 @@ const ChangeInfoForm = () => {
         setPhoto(newValue);
     }, []);
 
+    const onClickVerifyEmail = useCallback(() => {
+        if (!me.isEmailConfirmed) {
+            dispatch({
+                type: MAKE_VERIFY_EMAIL_CALL,
+            });
+        }
+    }, [dispatch, me.isEmailConfirmed]);
+
     const onSubmit = useCallback(
         e => {
             e.preventDefault();
             const formData = {
+                email: email.trim(),
                 username: username.trim(),
                 displayName: displayName.trim(),
                 photo: photo,
@@ -99,12 +122,33 @@ const ChangeInfoForm = () => {
                 });
             }
         },
-        [dispatch, displayName, photo, username],
+        [dispatch, displayName, email, photo, username],
     );
 
     return (
         <>
             <Form onSubmit={onSubmit}>
+                <Form.Item
+                    label="Email address"
+                    hasFeedback={true}
+                    validateStatus={!emailErrorMessage ? 'success' : 'error'}
+                    help={emailErrorMessage}>
+                    <Input
+                        value={email}
+                        onChange={onChangeEmail}
+                        placeholder="Please input your email"
+                        addonBefore={
+                            !me.isEmailConfirmed && (
+                                <span
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={onClickVerifyEmail}
+                                    title="Verify email address">
+                                    Verify
+                                </span>
+                            )
+                        }
+                    />
+                </Form.Item>
                 <Form.Item
                     label="User name"
                     hasFeedback={true}
