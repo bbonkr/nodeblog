@@ -89,6 +89,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                     style={{
                                         minHeight: '16rem',
                                         maxHeigh: '16rem',
+                                        height: '16rem',
                                     }}>
                                     <Divider dashed={true} />
                                     <div>
@@ -111,8 +112,11 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
 
                                     <div
                                         style={{
+                                            overflow: 'hidden',
                                             textOverflow: 'ellipsis',
-                                            height: '100%',
+                                            height: '5.0rem',
+                                            minHeight: '5.0rem',
+                                            maxHeight: '5.0rem',
                                         }}>
                                         {excerpt}
                                     </div>
