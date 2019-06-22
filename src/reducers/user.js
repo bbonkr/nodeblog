@@ -23,6 +23,15 @@ export const initialState = {
     // make verify email code
     makeVerifyEmailLoading: false,
     makeVerifyEmailErrorReason: '',
+
+    // request reset password
+    requestResetPasswordLoading: false,
+    requestResetPasswordErrorReason: '',
+
+    // reset password
+    resetPasswordLoading: false,
+    resetPasswordErrorReason: '',
+    resetPasswordSuccess: false,
 };
 
 export const SIGN_IN_CALL = 'SIGN_IN_CALL';
@@ -54,6 +63,14 @@ export const VERIFY_EMAIL_FAIL = 'VERIFY_EMAIL_FAIL';
 export const MAKE_VERIFY_EMAIL_CALL = 'MAKE_VERIFY_EMAIL_CALL';
 export const MAKE_VERIFY_EMAIL_DONE = 'MAKE_VERIFY_EMAIL_DONE';
 export const MAKE_VERIFY_EMAIL_FAIL = 'MAKE_VERIFY_EMAIL_FAIL';
+
+export const REQUEST_RESET_PASSWORD_CALL = 'REQUEST_RESET_PASSWORD_CALL';
+export const REQUEST_RESET_PASSWORD_DONE = 'REQUEST_RESET_PASSWORD_DONE';
+export const REQUEST_RESET_PASSWORD_FAIL = 'REQUEST_RESET_PASSWORD_FAIL';
+
+export const RESET_PASSWORD_CALL = 'RESET_PASSWORD_CALL';
+export const RESET_PASSWORD_DONE = 'RESET_PASSWORD_DONE';
+export const RESET_PASSWORD_FAIL = 'RESET_PASSWORD_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -169,6 +186,46 @@ const reducer = (state = initialState, action) =>
                 draft.makeVerifyEmailLoading = false;
                 ShowNotification({
                     title: 'Fail to make verify email code.',
+                    message: action.reason,
+                });
+                break;
+
+            case REQUEST_RESET_PASSWORD_CALL:
+                draft.requestResetPasswordLoading = true;
+                draft.requestResetPasswordErrorReason = '';
+                break;
+            case REQUEST_RESET_PASSWORD_DONE:
+                draft.requestResetPasswordLoading = false;
+                draft.requestResetPasswordErrorReason = '';
+                ShowNotification({
+                    title: 'Sent email that Reset password link.',
+                    message: 'Please check your mailbox.',
+                });
+                break;
+            case REQUEST_RESET_PASSWORD_FAIL:
+                draft.requestResetPasswordLoading = false;
+                draft.requestResetPasswordErrorReason = action.reason;
+                ShowNotification({
+                    title: 'Fail a request to reset password.',
+                    message: action.reason,
+                });
+                break;
+
+            case RESET_PASSWORD_CALL:
+                draft.resetPasswordLoading = true;
+                draft.resetPasswordErrorReason = '';
+                draft.resetPasswordSuccess = false;
+                break;
+            case RESET_PASSWORD_DONE:
+                draft.resetPasswordLoading = false;
+                draft.resetPasswordErrorReason = '';
+                draft.resetPasswordSuccess = true;
+                break;
+            case RESET_PASSWORD_FAIL:
+                draft.resetPasswordLoading = false;
+                draft.resetPasswordErrorReason = action.reason;
+                ShowNotification({
+                    title: 'Fail to reset password.',
                     message: action.reason,
                 });
                 break;

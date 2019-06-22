@@ -191,9 +191,9 @@ const SignIn = ({ returnUrl }) => {
                                     onChange={onRememberChange}>
                                     Remember me
                                 </Checkbox>
-                                <Link href="/findpassword">
+                                <Link href="/requestresetpassword">
                                     <a style={{ float: 'right' }}>
-                                        Forgot password
+                                        Reset my password
                                     </a>
                                 </Link>
                                 <Button
@@ -205,7 +205,7 @@ const SignIn = ({ returnUrl }) => {
                                 </Button>
                                 {'Or '}
                                 <Link href="/signup">
-                                    <a>Register now!</a>
+                                    <a>Register</a>
                                 </Link>
                             </Form.Item>
                         </Form>

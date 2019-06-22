@@ -34,6 +34,12 @@ import {
     MAKE_VERIFY_EMAIL_CALL,
     MAKE_VERIFY_EMAIL_FAIL,
     MAKE_VERIFY_EMAIL_DONE,
+    REQUEST_RESET_PASSWORD_CALL,
+    REQUEST_RESET_PASSWORD_DONE,
+    REQUEST_RESET_PASSWORD_FAIL,
+    RESET_PASSWORD_CALL,
+    RESET_PASSWORD_DONE,
+    RESET_PASSWORD_FAIL,
 } from '../reducers/user';
 
 function getMyInfoApi() {
@@ -240,6 +246,60 @@ function* watchMakeVerifyEmail() {
     yield takeLatest(MAKE_VERIFY_EMAIL_CALL, makeVerifyEmail);
 }
 
+function requestResetPasswordApi(formData) {
+    return axios.post('/user/requestresetpassword', formData, {
+        withCredentials: true,
+    });
+}
+
+function* requestResetPassword(action) {
+    try {
+        const result = yield call(requestResetPasswordApi, action.data);
+        yield put({
+            type: REQUEST_RESET_PASSWORD_DONE,
+            data: result,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: REQUEST_RESET_PASSWORD_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchRequestResetPassword() {
+    yield takeLatest(REQUEST_RESET_PASSWORD_CALL, requestResetPassword);
+}
+
+function resetPasswordApi(formData) {
+    return axios.post('/user/resetpassword', formData, {
+        withCredentials: true,
+    });
+}
+
+function* resetPassword(action) {
+    try {
+        const result = yield call(resetPasswordApi, action.data);
+        yield put({
+            type: RESET_PASSWORD_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: RESET_PASSWORD_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchResetPassword() {
+    yield takeLatest(RESET_PASSWORD_CALL, resetPassword);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchGetMyInfo),
@@ -250,5 +310,7 @@ export default function* postSaga() {
         fork(watchChangeInfo),
         fork(wacthVerifyEmail),
         fork(watchMakeVerifyEmail),
+        fork(watchRequestResetPassword),
+        fork(watchResetPassword),
     ]);
 }

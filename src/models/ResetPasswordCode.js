@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false,
             },
             // 임시 비밀번호 해시됨
-            Password: {
+            password: {
                 type: DataTypes.STRING(500),
                 allowNull: false,
             },
