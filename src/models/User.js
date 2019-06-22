@@ -32,7 +32,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        }
+        },
     );
 
     User.associate = db => {
@@ -40,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         db.User.hasMany(db.Post);
         db.User.hasMany(db.Image);
         db.User.hasMany(db.Comment);
+        db.User.hasMany(db.UserVerifyCode);
     };
     return User;
 };

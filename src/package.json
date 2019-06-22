@@ -27,6 +27,7 @@
         "next:start": "cross-env NODE_ENV=production next start -p 5000"
     },
     "dependencies": {
+        "@sendgrid/mail": "^6.4.0",
         "@testing-library/react": "^8.0.1",
         "@types/jest": "^24.0.13",
         "@types/next": "^8.0.5",

@@ -14,6 +14,15 @@ export const initialState = {
 
     loadingChangeInfo: false,
     changeInfoSuccess: false,
+
+    // verify email
+    verifyEmailInfo: {},
+    verifyEmailLoading: false,
+    verifyEmailErrorReason: '',
+
+    // make verify email code
+    makeVerifyEmailLoading: false,
+    makeVerifyEmailErrorReason: '',
 };
 
 export const SIGN_IN_CALL = 'SIGN_IN_CALL';
@@ -36,6 +45,15 @@ export const CHANGE_PASSWORD_FAIL = 'CHANGE_PASSWORD_FAIL';
 export const CHANGE_INFO_CALL = 'CHANGE_INFO_CALL';
 export const CHANGE_INFO_DONE = 'CHANGE_INFO_DONE';
 export const CHANGE_INFO_FAIL = 'CHANGE_INFO_FAIL';
+
+export const VERIFY_EMAIL_CALL = 'VERIFY_EMAIL_CALL';
+export const VERIFY_EMAIL_DONE = 'VERIFY_EMAIL_DONE';
+export const VERIFY_EMAIL_FAIL = 'VERIFY_EMAIL_FAIL';
+
+/** 전자우편 확인 코드 생성 및 전자우편 전송 */
+export const MAKE_VERIFY_EMAIL_CALL = 'MAKE_VERIFY_EMAIL_CALL';
+export const MAKE_VERIFY_EMAIL_DONE = 'MAKE_VERIFY_EMAIL_DONE';
+export const MAKE_VERIFY_EMAIL_FAIL = 'MAKE_VERIFY_EMAIL_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -114,8 +132,46 @@ const reducer = (state = initialState, action) =>
             case CHANGE_INFO_FAIL:
                 draft.loadingChangeInfo = false;
                 draft.changeInfoSuccess = false;
+                ShowNotification({
+                    title: 'Fail to change account information',
+                    message: action.reason,
+                });
                 break;
 
+            case VERIFY_EMAIL_CALL:
+                draft.verifyEmailLoading = true;
+                draft.verifyEmailInfo = {};
+                draft.verifyEmailErrorReason = 'Processing ...';
+                break;
+            case VERIFY_EMAIL_DONE:
+                draft.verifyEmailInfo = action.data;
+                draft.verifyEmailErrorReason = '';
+                draft.verifyEmailLoading = false;
+
+                if (draft.me) {
+                    draft.me.isEmailConfirmed = true;
+                }
+                break;
+            case VERIFY_EMAIL_FAIL:
+                draft.verifyEmailErrorReason = action.reason;
+                draft.verifyEmailLoading = false;
+                break;
+
+            case MAKE_VERIFY_EMAIL_CALL:
+                draft.makeVerifyEmailErrorReason = '';
+                draft.makeVerifyEmailLoading = true;
+                break;
+            case MAKE_VERIFY_EMAIL_DONE:
+                draft.makeVerifyEmailLoading = false;
+                break;
+            case MAKE_VERIFY_EMAIL_FAIL:
+                draft.makeVerifyEmailErrorReason = action.reason;
+                draft.makeVerifyEmailLoading = false;
+                ShowNotification({
+                    title: 'Fail to make verify email code.',
+                    message: action.reason,
+                });
+                break;
             default:
                 break;
         }
