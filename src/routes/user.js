@@ -2,10 +2,14 @@ const router = require('express').Router();
 const bcrypt = require('bcrypt');
 const db = require('../models');
 const Sequelize = require('sequelize');
+const moment = require('moment');
 const { isLoggedIn } = require('./middleware');
 const { findUserById, defaultUserAttributes } = require('./helper');
 const { randomString, sendMail } = require('./util');
 const Op = Sequelize.Op;
+
+const serviceName = 'Nodeblog';
+const emailSender = 'app@bbon.kr';
 
 // const findUserById = async id => {
 //     const me = await db.User.findOne({
@@ -171,15 +175,14 @@ router.patch('/info', isLoggedIn, async (req, res, next) => {
 });
 
 const sendVerifyEmail = async (req, user) => {
-    const serviceName = 'Nodeblog';
-    const emailSender = 'app@bbon.kr';
-
     const { email } = user;
     const code = randomString(32);
     const hashedCode = await bcrypt.hash(code, 12);
     const hashedEmail = await bcrypt.hash(email, 12);
+
     const now = new Date();
     const term = 3 * 60 * 60 * 1000; // 3 hour after
+    const expire = now.setTime(now.getTime() + term);
 
     const url = `${req.protocol}://${req.get(
         'host',
@@ -197,7 +200,7 @@ const sendVerifyEmail = async (req, user) => {
     const newVerifyCode = await db.UserVerifyCode.create({
         email: hashedEmail,
         code: hashedCode,
-        expire: now.setTime(now.getTime() + term),
+        expire: expire,
         UserId: user.id,
     });
 
@@ -205,7 +208,6 @@ const sendVerifyEmail = async (req, user) => {
         throw new Error('Could not process a request. ');
     }
 
-    // TODO send mail
     const sent = await sendMail({
         to: email,
         from: emailSender,
@@ -216,6 +218,9 @@ const sendVerifyEmail = async (req, user) => {
 <a href="${url}">Verify email</a>
 <p>Please copy below url and paste address window on your web browser when may be unavailable navigating a link.</p>
 <pre><code>${url}</code></pre>
+<p>These link are valid until ${moment(expire).format(
+            'YYYY-MM-DD HH:mm:ss',
+        )} UTC</p>
 <hr />
 <p>Please do not reply this email.</p>
             `,
@@ -231,7 +236,7 @@ router.post('/makeverifyemail', isLoggedIn, async (req, res, next) => {
     try {
         const sent = await sendVerifyEmail(req, req.user);
         if (!sent) {
-            return res.send('Could not send mail.');
+            return res.send('Could not send a mail.');
         }
         return res.send('Send mail success');
     } catch (e) {
@@ -287,6 +292,11 @@ router.post('/verifyemail', async (req, res, next) => {
 
         const updatedUser = findUserById(user.id);
 
+        // 정상적으로 처리되면 요청은 바로 만료됩니다.
+        await verified.update({
+            expire: new Date(),
+        });
+
         return res.json({
             email: updatedUser.email,
             isEmailConfirmed: updatedUser.isEmailConfirmed,
@@ -297,4 +307,138 @@ router.post('/verifyemail', async (req, res, next) => {
     }
 });
 
+/**
+ * 비밀번호 초기화 요청
+ */
+router.post('/requestresetpassword', async (req, res, next) => {
+    try {
+        const { email } = req.body;
+        const user = await db.User.findOne({
+            where: { email: email.trim() },
+        });
+
+        if (!user) {
+            return res
+                .status(404)
+                .send('Could not find your email in our system.');
+        }
+
+        const newPassword = randomString(13);
+        const code = randomString(32);
+        const now = new Date();
+        const term = 3 * 60 * 60 * 1000; // 3 hour after
+        const expire = now.setTime(now.getTime() + term);
+
+        const hashedEmail = await bcrypt.hash(email.toLowerCase().trim(), 12);
+        const hashedCode = await bcrypt.hash(code, 12);
+        const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+        const url = `${req.protocol}://${req.get(
+            'host',
+        )}/resetpassword?email=${hashedEmail}&code=${hashedCode}`;
+
+        const deleteCodes = await db.ResetPasswordCode.findAll({
+            where: { UserId: user.id },
+        });
+
+        if (!!deleteCodes && deleteCodes.length > 0) {
+            const deletedCodes = await Promise.all(
+                deleteCodes.map(v => v.destroy()),
+            );
+        }
+
+        const newResetPasswordCode = await db.ResetPasswordCode.create({
+            email: hashedEmail,
+            code: hashedCode,
+            password: hashedPassword,
+            expire: expire,
+            UserId: user.id,
+        });
+
+        const sent = await sendMail({
+            to: user.email,
+            from: emailSender,
+            subject: `[${serviceName}] Reset your password. `,
+            html: `
+<h1>Reset Password</h1>
+<p>&nbsp;</p>
+<p>TEMPORARY PASSWORD: <code>${newPassword}</code></p>
+<p>&nbsp;</p>
+<p>Please navigate below link.</p>
+<a href="${url}">Reset my password</a>
+<p>Please copy below url and paste address window on your web browser when may be unavailable navigating a link.</p>
+<pre><code>${url}</code></pre>
+<p>These link are valid until ${moment(expire).format(
+                'YYYY-MM-DD HH:mm:ss',
+            )} UTC</p>
+<hr />
+<p>Please do not reply this email.</p>
+            `,
+        });
+
+        if (!sent) {
+            return res.status(400).send('Could not send a email.');
+        }
+
+        return res.send('Send mail success.');
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+/** 비밀번호 초기화 */
+router.post('/resetpassword', async (req, res, next) => {
+    try {
+        const { email, code, password, newPassword } = req.body;
+
+        const resetPasswordCode = await db.ResetPasswordCode.findOne({
+            where: {
+                email: email,
+                code: code,
+            },
+        });
+
+        if (!resetPasswordCode) {
+            return res
+                .status(404)
+                .send('Could not found a request to reset a password.');
+        }
+
+        if (resetPasswordCode.expire < new Date()) {
+            return res.status(400).send('This request has been expired.');
+        }
+
+        const result = await bcrypt.compare(
+            password,
+            resetPasswordCode.password,
+        );
+
+        if (!result) {
+            return res
+                .status(400)
+                .send('Check your request information that reset a password.');
+        }
+
+        const hashedNewPassword = await bcrypt.hash(newPassword, 12);
+
+        const user = await db.User.findOne({
+            where: { id: resetPasswordCode.UserId },
+        });
+
+        const updatedUser = await user.update({
+            password: hashedNewPassword,
+        });
+
+        // 정상적으로 처리되면 비밀번호 재설정 요청은 만료시킵니다.
+        await resetPasswordCode.update({
+            expire: new Date(),
+        });
+
+        return res.send('Password updated.');
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
 module.exports = router;

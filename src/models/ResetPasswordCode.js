@@ -1,9 +1,9 @@
 /**
- * 사용자의 전자우편 확인을 위한 코드
+ * 사용자의 비밀번호 초기화 코드
  */
 module.exports = (sequelize, DataTypes) => {
-    const UserVerifyCode = sequelize.define(
-        'UserVerifyCode',
+    const ResetPasswordCode = sequelize.define(
+        'ResetPasswordCode',
         {
             // 대상 전자우편주소 해시됨.
             email: {
@@ -12,6 +12,11 @@ module.exports = (sequelize, DataTypes) => {
             },
             // 확인용 코드
             code: {
+                type: DataTypes.STRING(500),
+                allowNull: false,
+            },
+            // 임시 비밀번호 해시됨
+            password: {
                 type: DataTypes.STRING(500),
                 allowNull: false,
             },
@@ -27,9 +32,9 @@ module.exports = (sequelize, DataTypes) => {
         },
     );
 
-    UserVerifyCode.associate = db => {
+    ResetPasswordCode.associate = db => {
         db.UserVerifyCode.belongsTo(db.User);
     };
 
-    return UserVerifyCode;
+    return ResetPasswordCode;
 };
