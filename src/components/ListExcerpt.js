@@ -1,7 +1,8 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
-import { List, Avatar, Button, Divider, Card, Typography } from 'antd';
+import { List, Avatar, Button, Divider, Card, Typography, Icon } from 'antd';
 import moment from 'moment';
 import styled from 'styled-components';
 import IconText from './IconText';
@@ -10,6 +11,7 @@ import LinkTag from './LinkTag';
 import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
 import UserAvatar from './UserAvatar';
+import IconLike from './IconLike';
 // import '../styles/styles.scss';
 
 const FullWidthButton = styled(Button)`
@@ -17,6 +19,7 @@ const FullWidthButton = styled(Button)`
 `;
 
 const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
+    const { me } = useSelector(s => s.user);
     console.log('======> posts count: ', (posts && posts.length) || 0);
 
     return (
@@ -60,6 +63,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                                 : 0
                                         }`}
                                     />,
+                                    <IconLike post={post} />,
                                 ]}>
                                 <Card.Meta
                                     avatar={

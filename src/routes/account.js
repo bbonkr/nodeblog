@@ -6,21 +6,6 @@ const passport = require('passport');
 const db = require('../models');
 const { findUserById } = require('./helper');
 
-// const findUserById = async id => {
-//     const fullUser = await db.User.findOne({
-//         where: { id: id },
-//         include: [
-//             {
-//                 model: db.Post,
-//                 attributes: ['id'],
-//             },
-//         ],
-//         attributes: ['id', 'username', 'email'],
-//     });
-
-//     return fullUser;
-// };
-
 router.post('/signin', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {

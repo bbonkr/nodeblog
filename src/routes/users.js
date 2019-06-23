@@ -88,6 +88,12 @@ router.get('/:user/posts', async (req, res, next) => {
                     model: db.PostAccessLog,
                     attributes: ['id'],
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             limit: limit,
@@ -161,6 +167,12 @@ router.get('/:user/posts/:post', async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -304,6 +316,12 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
                     model: db.PostAccessLog,
                     attributes: ['id'],
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             limit: limit,
@@ -325,6 +343,150 @@ router.get('/:user/categories/:category/posts', async (req, res, next) => {
             user: foundUser,
             category: foundCategory,
         });
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+/** 글 좋아요 */
+router.post('/:user/posts/:post/like', isLoggedIn, async (req, res, next) => {
+    try {
+        /** 사용자 username :==> @userName */
+        const user = decodeURIComponent(req.params.user);
+        const slug = decodeURIComponent(req.params.post);
+
+        if (!user) {
+            return res.status(401).send('유효한 요청이 아닙니다.');
+        }
+
+        if (!slug) {
+            return res.status(401).send('유효한 요청이 아닙니다.');
+        }
+        const username = normalizeUsername(user);
+
+        const foundUser = await db.User.findOne({
+            where: { username: username },
+            attributes: ['id'],
+        });
+
+        if (!foundUser) {
+            return res.status(404).send(`Could not find user [@${user}]`);
+        }
+
+        let post = await db.Post.findOne({
+            where: {
+                slug: slug,
+            },
+            include: [
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                },
+            ],
+        });
+
+        if (!post) {
+            return res.status(404).send(`Could not find a post. [${slug}]`);
+        }
+
+        const likerIndex = post.Likers.findIndex(x => x.id === req.user.id);
+        if (likerIndex >= 0) {
+            return res
+                .status(400)
+                .send('You marked to like this post already.');
+        }
+
+        await post.addLikers(req.user.id);
+
+        post = await db.Post.findOne({
+            where: {
+                slug: slug,
+            },
+            include: [
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
+            ],
+            attributes: ['id'],
+        });
+
+        return res.json(post);
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
+/** 글 좋아요 취소 */
+router.delete('/:user/posts/:post/like', isLoggedIn, async (req, res, next) => {
+    try {
+        /** 사용자 username :==> @userName */
+        const user = decodeURIComponent(req.params.user);
+        const slug = decodeURIComponent(req.params.post);
+
+        if (!user) {
+            return res.status(401).send('유효한 요청이 아닙니다.');
+        }
+
+        if (!slug) {
+            return res.status(401).send('유효한 요청이 아닙니다.');
+        }
+        const username = normalizeUsername(user);
+
+        const foundUser = await db.User.findOne({
+            where: { username: username },
+            attributes: ['id'],
+        });
+
+        if (!foundUser) {
+            return res.status(404).send(`Could not find user [@${user}]`);
+        }
+
+        let post = await db.Post.findOne({
+            where: {
+                slug: slug,
+            },
+            include: [
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                },
+            ],
+        });
+
+        if (!post) {
+            return res.status(404).send(`Could not find a post. [${slug}]`);
+        }
+
+        const likerIndex = post.Likers.findIndex(x => x.id === req.user.id);
+        if (likerIndex < 0) {
+            return res.status(400).send('You did not mark to like this post.');
+        }
+
+        await post.removeLikers(req.user.id);
+
+        post = await db.Post.findOne({
+            where: {
+                slug: slug,
+            },
+            include: [
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
+            ],
+            attributes: ['id'],
+        });
+
+        return res.json(post);
     } catch (e) {
         console.error(e);
         return next(e);

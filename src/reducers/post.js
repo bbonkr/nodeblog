@@ -1,4 +1,5 @@
 import produce from 'immer';
+import { ShowNotification } from '../components/ShowNotification';
 
 export const initialState = {
     /** posts */
@@ -57,6 +58,10 @@ export const initialState = {
     searchPostsErrorReason: '',
     searchPostsHasMore: false,
     searchPostsKeyword: '',
+
+    /** like post */
+    likePostLoading: false,
+    likePostErrorMessage: '',
 };
 
 export const LOAD_POSTS_CALL = 'LOAD_POSTS_CALL';
@@ -86,6 +91,40 @@ export const LOAD_USER_CATEGORY_POSTS_FAIL = 'LOAD_USER_CATEGORY_POSTS_FAIL';
 export const LOAD_SEARCH_POSTS_CALL = 'LOAD_SEARCH_POSTS_CALL';
 export const LOAD_SEARCH_POSTS_DONE = 'LOAD_SEARCH_POSTS_DONE';
 export const LOAD_SEARCH_POSTS_FAIL = 'LOAD_SEARCH_POSTS_FAIL';
+
+export const ADD_LIKE_POST_CALL = 'ADD_LIKE_POST_CALL';
+export const ADD_LIKE_POST_DONE = 'ADD_LIKE_POST_DONE';
+export const ADD_LIKE_POST_FAIL = 'ADD_LIKE_POST_FAIL';
+
+export const REMOVE_LIKE_POST_CALL = 'REMOVE_LIKE_POST_CALL';
+export const REMOVE_LIKE_POST_DONE = 'REMOVE_LIKE_POST_DONE';
+export const REMOVE_LIKE_POST_FAIL = 'REMOVE_LIKE_POST_FAIL';
+
+/**
+ * 글의 좋아요 사용자를 갱신합니다.
+ * @param {*} source Array<Post> 또는 Post object
+ * @param {*} update Likers 가 업데이트된 Post object
+ */
+const updatePostLikers = (source, update) => {
+    if (source == null) {
+        return;
+    }
+
+    let post = {};
+
+    if (Array.isArray(source)) {
+        // posts
+        post = source.find(x => x.id === update.id);
+    } else {
+        post = source;
+    }
+
+    if (post == null) {
+        return;
+    }
+
+    post.Likers = update.Likers;
+};
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -265,6 +304,58 @@ const reducer = (state = initialState, action) =>
                 draft.searchPostsLoading = false;
                 draft.searchPostsErrorReason = action.reason;
                 break;
+
+            case ADD_LIKE_POST_CALL:
+                draft.likePostLoading = true;
+                draft.likePostErrorMessage = '';
+                break;
+            case ADD_LIKE_POST_DONE:
+                updatePostLikers(draft.posts, action.data);
+                updatePostLikers(draft.singlePost, action.data);
+                updatePostLikers(draft.usersPosts, action.data);
+                updatePostLikers(draft.tagPosts, action.data);
+                updatePostLikers(draft.userCategoryPosts, action.data);
+                updatePostLikers(draft.searchPosts, action.data);
+
+                draft.likePostLoading = false;
+                draft.likePostErrorMessage = '';
+
+                break;
+            case ADD_LIKE_POST_FAIL:
+                draft.likePostLoading = false;
+                draft.likePostErrorMessage = action.reason;
+
+                ShowNotification({
+                    title: 'Notification',
+                    message: action.reason,
+                });
+                break;
+
+            case REMOVE_LIKE_POST_CALL:
+                draft.likePostLoading = true;
+                draft.likePostErrorMessage = '';
+                break;
+            case REMOVE_LIKE_POST_DONE:
+                updatePostLikers(draft.posts, action.data);
+                updatePostLikers(draft.singlePost, action.data);
+                updatePostLikers(draft.usersPosts, action.data);
+                updatePostLikers(draft.tagPosts, action.data);
+                updatePostLikers(draft.userCategoryPosts, action.data);
+                updatePostLikers(draft.searchPosts, action.data);
+
+                draft.likePostLoading = false;
+                draft.likePostErrorMessage = '';
+                break;
+            case REMOVE_LIKE_POST_FAIL:
+                draft.likePostLoading = false;
+                draft.likePostErrorMessage = action.reason;
+
+                ShowNotification({
+                    title: 'Notification',
+                    message: action.reason,
+                });
+                break;
+
             default:
                 break;
         }

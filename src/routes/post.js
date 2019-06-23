@@ -10,7 +10,12 @@ const xssFilter = require('showdown-xss-filter');
 const { isLoggedIn } = require('./middleware');
 const Op = Sequelize.Op;
 const { makeSlug } = require('../helpers/stringHelper');
-const { markdownConverter, stripHtml, getExcerpt } = require('./helper');
+const {
+    markdownConverter,
+    stripHtml,
+    getExcerpt,
+    defaultUserAttributes,
+} = require('./helper');
 const EXCERPT_LENGTH = 200;
 
 // const markdownConverter = new showdown.Converter(
@@ -80,7 +85,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             const foundCategories = await Promise.all(
                 categories.map(v => {
                     return db.Category.findOne({ where: { slug: v.slug } });
-                })
+                }),
             );
 
             // await Promise.all(
@@ -103,14 +108,14 @@ router.post('/', isLoggedIn, async (req, res, next) => {
                             slug: slug,
                         },
                     });
-                })
+                }),
             );
 
             await post.addTags(
                 foundTags.map(v => {
                     console.log('tag findOrCreate: ', v);
                     return v[0];
-                })
+                }),
             );
             // await Promise.all(
             //     foundTags.forEach(v => {
@@ -126,7 +131,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -140,6 +145,12 @@ router.post('/', isLoggedIn, async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -170,7 +181,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -181,6 +192,12 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                     model: db.Category,
                     as: 'Categories',
                     through: 'PostCategory',
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
                 },
             ],
         });
@@ -222,7 +239,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 markdown: markdown,
                 html: html,
                 text: text,
-                excerpt: text.slice(0, EXCERPT_LENGTH),
+                excerpt: getExcerpt(text),
             },
             {
                 fields: [
@@ -233,7 +250,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                     'text',
                     'excerpt',
                 ],
-            }
+            },
         );
 
         if (!!post.Categories) {
@@ -248,7 +265,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             const foundCategories = await Promise.all(
                 categories.map(v => {
                     return db.Category.findOne({ where: { slug: v.slug } });
-                })
+                }),
             );
 
             // await Promise.all(
@@ -272,7 +289,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                             slug: slug,
                         },
                     });
-                })
+                }),
             );
 
             console.log('foundTags: ', foundTags);
@@ -281,7 +298,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 foundTags.map(v => {
                     console.log('tag findOrCreate: ', v);
                     return v[0];
-                })
+                }),
             );
             // await Promise.all(
             //     foundTags.forEach(v => {
@@ -297,7 +314,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -311,6 +328,12 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -341,7 +364,7 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -373,6 +396,12 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
                 {
                     model: db.Comment,
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             attributes: ['id', 'title', 'slug', 'UserId'],
         });
@@ -380,17 +409,20 @@ router.delete('/:id', isLoggedIn, async (req, res, next) => {
         if (!post) {
             return res.status(404).send('Could not find a post');
         }
-        if (post.Categories) {
+        if (post.Categories && post.Categories.length > 0) {
             await post.removeCategories(post.Categories.map(x => x.id));
         }
-        if (post.PostAccessLogs) {
+        if (post.PostAccessLogs && post.PostAccessLogs.length > 0) {
             await post.removePostAccessLogs(post.PostAccessLogs.map(x => x.id));
         }
-        if (post.Tags) {
+        if (post.Tags && post.Tags.length > 0) {
             await post.removeTags(post.Tags.map(x => x.id));
         }
-        if (post.Comments) {
+        if (post.Comments && post.Comments.length > 0) {
             await post.removeComments(post.Comments.map(x => x.id));
+        }
+        if (post.Likers && post.Likers.length > 0) {
+            await post.removeLikers(post.Likers.map(x => x.id));
         }
         // await post.User.removePost(post.id);
 

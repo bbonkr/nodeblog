@@ -9,6 +9,7 @@ import LinkSinglePost from './LinkSinglePost';
 import UserAvatar from './UserAvatar';
 import moment from 'moment';
 import LinkUsersPosts from './LinkUsersPosts';
+import IconLike from './IconLike';
 
 const SinglePost = ({ post }) => {
     return (
@@ -22,11 +23,20 @@ const SinglePost = ({ post }) => {
                             </LinkUsersPosts>
                         }
                         title={
-                            <LinkSinglePost post={post}>
-                                <Typography.Title level={3} ellipsis={true}>
-                                    {post.title}
-                                </Typography.Title>
-                            </LinkSinglePost>
+                            <div>
+                                <div style={{ float: 'left' }}>
+                                    <LinkSinglePost post={post}>
+                                        <Typography.Title
+                                            level={3}
+                                            ellipsis={true}>
+                                            {post.title}
+                                        </Typography.Title>
+                                    </LinkSinglePost>
+                                </div>
+                                <div style={{ float: 'right' }}>
+                                    <IconLike post={post} />
+                                </div>
+                            </div>
                         }
                         description={
                             <span>

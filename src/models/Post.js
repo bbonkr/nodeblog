@@ -61,7 +61,7 @@ module.exports = (sequelize, DataTypes) => {
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        }
+        },
     );
 
     Post.associate = db => {
@@ -79,6 +79,10 @@ module.exports = (sequelize, DataTypes) => {
         db.Post.belongsToMany(db.Category, {
             through: 'PostCategory',
             as: 'Categories',
+        });
+        db.Post.belongsToMany(db.User, {
+            through: 'UserLikePost',
+            as: 'Likers',
         });
     };
 

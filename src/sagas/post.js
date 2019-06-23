@@ -31,6 +31,12 @@ import {
     LOAD_SEARCH_POSTS_CALL,
     LOAD_SEARCH_POSTS_DONE,
     LOAD_SEARCH_POSTS_FAIL,
+    ADD_LIKE_POST_CALL,
+    ADD_LIKE_POST_DONE,
+    ADD_LIKE_POST_FAIL,
+    REMOVE_LIKE_POST_CALL,
+    REMOVE_LIKE_POST_DONE,
+    REMOVE_LIKE_POST_FAIL,
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -277,6 +283,64 @@ function* watchLoadSearchPosts() {
     yield takeLatest(LOAD_SEARCH_POSTS_CALL, loadSearchPosts);
 }
 
+function addUserLikePostApi(data) {
+    const { user, post } = data;
+    return axios.post(
+        `/users/${user}/posts/${post}/like`,
+        {},
+        { withCredentials: true },
+    );
+}
+
+function* addUserLikePost(action) {
+    try {
+        const result = yield call(addUserLikePostApi, action.data);
+        yield put({
+            type: ADD_LIKE_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: ADD_LIKE_POST_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchAddUserLikePost() {
+    yield takeLatest(ADD_LIKE_POST_CALL, addUserLikePost);
+}
+
+function removeUserLikePostApi(data) {
+    const { user, post } = data;
+    return axios.delete(`/users/${user}/posts/${post}/like`, {
+        withCredentials: true,
+    });
+}
+
+function* removeUserLikePost(action) {
+    try {
+        const result = yield call(removeUserLikePostApi, action.data);
+        yield put({
+            type: REMOVE_LIKE_POST_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: REMOVE_LIKE_POST_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchRemoveUserLikePost() {
+    yield takeLatest(REMOVE_LIKE_POST_CALL, removeUserLikePost);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadPosts),
@@ -286,5 +350,7 @@ export default function* postSaga() {
         fork(watchLoadUsersPosts),
         fork(watchLaodUserCatetoryPosts),
         fork(watchLoadSearchPosts),
+        fork(watchAddUserLikePost),
+        fork(watchRemoveUserLikePost),
     ]);
 }

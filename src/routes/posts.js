@@ -81,6 +81,12 @@ router.get('/', async (req, res, next) => {
                     model: db.PostAccessLog,
                     attributes: ['id'],
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             limit: limit,
@@ -152,6 +158,12 @@ router.get('/category/:category', async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -250,6 +262,12 @@ router.get('/tag/:tag', async (req, res, next) => {
                     model: db.PostAccessLog,
                     attributes: ['id'],
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             limit: limit,
@@ -302,6 +320,12 @@ router.get('/:slug', async (req, res, next) => {
                     model: db.PostAccessLog,
                     attributes: ['id'],
                 },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                },
             ],
             order: [['createdAt', 'DESC']],
             attributes: [
@@ -318,8 +342,8 @@ router.get('/:slug', async (req, res, next) => {
         if (post) {
             // console.dir(post);
 
-            console.log('ipAddress: ', req.connection.remoteAddress);
-            console.log('userAgent: ', req.headers['user-agent']);
+            // console.log('ipAddress: ', req.connection.remoteAddress);
+            // console.log('userAgent: ', req.headers['user-agent']);
 
             const log = await db.PostAccessLog.create({
                 ipAddress: req.connection.remoteAddress,

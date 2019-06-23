@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const Sequelize = require('sequelize');
 const db = require('../models');
 const { isLoggedIn } = require('./middleware');
-const { findUserById } = require('./helper');
+const { findUserById, defaultUserAttributes } = require('./helper');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -67,7 +67,7 @@ const normalizeCategoryOrder = async userId => {
         await Promise.all(
             categoriesSort.map((v, i) => {
                 return v.update({ ordinal: i + 1 });
-            })
+            }),
         );
     }
 };
@@ -96,7 +96,7 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -110,6 +110,12 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -200,7 +206,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
             include: [
                 {
                     model: db.User,
-                    attributes: ['id', 'email', 'username', 'displayName'],
+                    attributes: defaultUserAttributes,
                 },
                 {
                     model: db.Tag,
@@ -214,6 +220,12 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
                 },
                 {
                     model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
                     attributes: ['id'],
                 },
             ],
@@ -308,21 +320,21 @@ router.post(
 
                     const savedFileExt = path.extname(v.path);
                     const savedFileBasename = encodeURIComponent(
-                        path.basename(v.path, savedFileExt)
+                        path.basename(v.path, savedFileExt),
                     );
                     const savedFileDir = path.dirname(v.path);
                     const serverRootDir = path.normalize(
-                        path.join(__dirname, '..')
+                        path.join(__dirname, '..'),
                     );
                     const savedFileRelativeDir = path.relative(
                         serverRootDir,
-                        savedFileDir
+                        savedFileDir,
                     );
 
                     const src = `/${replaceAll(
                         savedFileRelativeDir,
                         '\\\\',
-                        '/'
+                        '/',
                     )}/${savedFileBasename}${savedFileExt}`;
                     console.log('file src: ', src);
 
@@ -335,7 +347,7 @@ router.post(
                         contentType: v.mimetype,
                         UserId: req.user.id,
                     });
-                })
+                }),
             );
 
             console.log('Promise.all ==> images', images);
@@ -362,7 +374,7 @@ router.post(
             console.error(e);
             next(e);
         }
-    }
+    },
 );
 
 router.delete('/media/:id', isLoggedIn, async (req, res, next) => {
@@ -531,7 +543,7 @@ router.post('/category', isLoggedIn, async (req, res, next) => {
                     return v.update({
                         ordinal: ordinal + 1,
                     });
-                })
+                }),
             );
         }
 
@@ -631,7 +643,7 @@ router.patch('/category/:id', isLoggedIn, async (req, res, next) => {
                     return v.update({
                         ordinal: ordinal + 1,
                     });
-                })
+                }),
             );
         }
 
