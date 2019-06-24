@@ -20,7 +20,7 @@ const upload = multer({
             const mm = moment(Date.now()).format('MM');
             const yyyy = moment(Date.now()).format('YYYY');
             const dest = path.join('uploads', `${req.user.id}`, yyyy, mm);
-            console.log('destination directory: ', dest);
+            // console.log('destination directory: ', dest);
 
             // asynchronous
             // fs.exists(dest, exists => {
@@ -312,7 +312,7 @@ router.post(
         try {
             const images = await Promise.all(
                 req.files.map(v => {
-                    console.log('file: ', v);
+                    // console.log('file: ', v);
 
                     const filename = v.originalname;
                     const ext = path.extname(filename);
@@ -336,7 +336,7 @@ router.post(
                         '\\\\',
                         '/',
                     )}/${savedFileBasename}${savedFileExt}`;
-                    console.log('file src: ', src);
+                    // console.log('file src: ', src);
 
                     return db.Image.create({
                         src: src,
@@ -350,7 +350,7 @@ router.post(
                 }),
             );
 
-            console.log('Promise.all ==> images', images);
+            // console.log('Promise.all ==> images', images);
 
             const addedImages = await db.Image.findAll({
                 where: {

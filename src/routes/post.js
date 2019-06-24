@@ -113,7 +113,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
 
             await post.addTags(
                 foundTags.map(v => {
-                    console.log('tag findOrCreate: ', v);
+                    // console.log('tag findOrCreate: ', v);
                     return v[0];
                 }),
             );
@@ -273,7 +273,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
             //         return db.Category.addPost(post);
             //     }),
             // );
-            console.log('foundCategories: ', foundCategories);
+            // console.log('foundCategories: ', foundCategories);
 
             await post.addCategories(foundCategories);
         }
@@ -292,11 +292,11 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 }),
             );
 
-            console.log('foundTags: ', foundTags);
+            // console.log('foundTags: ', foundTags);
 
             await post.addTags(
                 foundTags.map(v => {
-                    console.log('tag findOrCreate: ', v);
+                    // console.log('tag findOrCreate: ', v);
                     return v[0];
                 }),
             );

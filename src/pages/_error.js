@@ -5,7 +5,7 @@ import { ContentWrapper } from '../styledComponents/Wrapper';
 import DefaultLayout from '../components/DefaultLayout';
 
 const NodeBlogError = ({ statusCode }) => {
-    console.log('statusCode', statusCode);
+    // console.log('statusCode', statusCode);
 
     return (
         <DefaultLayout>

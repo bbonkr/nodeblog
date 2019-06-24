@@ -35,8 +35,8 @@ UsersPost.propTypes = {
 
 UsersPost.getInitialProps = async context => {
     const { user, slug } = context.query;
-    console.log('Post.getInitialize() ==> user: ', user);
-    console.log('Post.getInitialize() ==> slug: ', slug);
+    // console.log('Post.getInitialize() ==> user: ', user);
+    // console.log('Post.getInitialize() ==> slug: ', slug);
     const decodedUser = user;
     const decodedSlug = decodeURIComponent(slug);
     context.store.dispatch({

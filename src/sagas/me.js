@@ -283,7 +283,7 @@ function uploadMyMediaFilesApi(data) {
 
 function* uploadMyMediaFiles(action) {
     try {
-        console.log('==========> form data:', action.data);
+        // console.log('==========> form data:', action.data);
         const result = yield call(uploadMyMediaFilesApi, action.data);
 
         yield put({

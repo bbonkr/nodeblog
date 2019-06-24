@@ -129,7 +129,7 @@ const updatePostLikers = (source, update) => {
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // https://lannstark.github.io/nodejs/console/3
-        console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
+        // console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
 
         switch (action.type) {
             case LOAD_POSTS_CALL:

@@ -20,7 +20,7 @@ const FullWidthButton = styled(Button)`
 
 const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
     const { me } = useSelector(s => s.user);
-    console.log('======> posts count: ', (posts && posts.length) || 0);
+    // console.log('======> posts count: ', (posts && posts.length) || 0);
 
     return (
         <article>

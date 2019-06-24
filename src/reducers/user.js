@@ -74,7 +74,7 @@ export const RESET_PASSWORD_FAIL = 'RESET_PASSWORD_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
-        console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
+        // console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
         switch (action.type) {
             case SIGN_IN_CALL:
                 draft.signInInProcess = true;

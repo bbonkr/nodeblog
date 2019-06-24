@@ -124,7 +124,7 @@ export const LOAD_LIKED_POSTS_FAIL = 'LOAD_LIKED_POSTS_FAIL';
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // https://lannstark.github.io/nodejs/console/3
-        console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
+        // console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
 
         switch (action.type) {
             case LOAD_MY_POSTS_CALL:
@@ -276,7 +276,7 @@ const reducer = (state = initialState, action) =>
                 draft.loadingMyPosts = false;
                 break;
             case DELETE_POST_FAIL:
-                console.log(action.reason);
+                // console.log(action.reason);
                 draft.loadingMyPosts = false;
                 break;
 

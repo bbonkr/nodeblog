@@ -32,7 +32,7 @@ const SignIn = ({ returnUrl }) => {
 
     useEffect(() => {
         if (me && me.id) {
-            console.log('returnUrl', returnUrl);
+            // console.log('returnUrl', returnUrl);
             Router.push(!!returnUrl ? returnUrl : '/');
         } else {
             setEmail('');
