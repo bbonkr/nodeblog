@@ -18,6 +18,11 @@ function getRandomInt(min, max) {
 exports.sendMail = async ({ to, from, subject, text, html }) => {
     // using Twilio SendGrid's v3 Node.js Library
     // https://github.com/sendgrid/sendgrid-nodejs
+    const key = process.env.SENDGRID_API_KEY;
+    if(!key){
+        // SendGrid API Key가 없으면 전자우편을 전송하지 않습니다.
+        return false;
+    }
     const sgMail = require('@sendgrid/mail');
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     try {

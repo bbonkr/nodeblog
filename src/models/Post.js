@@ -61,13 +61,15 @@ module.exports = (sequelize, DataTypes) => {
         {
             charset: 'utf8mb4',
             collate: 'utf8mb4_general_ci',
-        }
+        },
     );
 
     Post.associate = db => {
         db.Post.belongsTo(db.User);
         db.Post.hasMany(db.Comment);
         db.Post.hasMany(db.PostAccessLog);
+        db.Post.hasMany(db.UserLikePost); // userlikepost
+
         db.Post.belongsToMany(db.Image, {
             through: 'PostImage',
             as: 'Images',
@@ -79,6 +81,10 @@ module.exports = (sequelize, DataTypes) => {
         db.Post.belongsToMany(db.Category, {
             through: 'PostCategory',
             as: 'Categories',
+        });
+        db.Post.belongsToMany(db.User, {
+            through: 'UserLikePost',
+            as: 'Likers',
         });
     };
 

@@ -55,8 +55,8 @@ const FileList = () => {
 
     const onBeforeUploadFiles = useCallback(
         (file, fileList) => {
-            console.log('==========> file:', file);
-            console.log('==========> file list:', fileList);
+            // console.log('==========> file:', file);
+            // console.log('==========> file list:', fileList);
 
             if (!uploading) {
                 uploadBuffer.push(file);

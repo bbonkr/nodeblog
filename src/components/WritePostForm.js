@@ -97,7 +97,7 @@ const WritePostForm = ({ id }) => {
     }, []);
 
     useEffect(() => {
-        console.log('/me/write => useEffect id: ', id);
+        // console.log('/me/write => useEffect id: ', id);
 
         // if (!id) {
         //     dispatch({ type: WRITE_NEW_POST_CALL });
@@ -156,8 +156,8 @@ const WritePostForm = ({ id }) => {
     }, []);
 
     const onChangeCategories = useCallback((values, options) => {
-        console.log('selected values', values);
-        console.log('selected options', options);
+        // console.log('selected values', values);
+        // console.log('selected options', options);
         setSelectedCategories(
             options.map(v => {
                 return { name: v.props.value, slug: v.key };
@@ -167,8 +167,8 @@ const WritePostForm = ({ id }) => {
     }, []);
 
     const onChangeTags = useCallback((values, options) => {
-        console.log('selected values', values);
-        console.log('selected options', options);
+        // console.log('selected values', values);
+        // console.log('selected options', options);
 
         setSelectedTags(
             options.map(v => {
