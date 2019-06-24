@@ -47,6 +47,13 @@ const menusSide = [
         icon: 'picture',
     },
     {
+        key: 'liked',
+        caption: 'Liked',
+        path: '/me/liked',
+        pathAs: '',
+        icon: 'heart',
+    },
+    {
         key: 'settings',
         caption: 'Settings',
         path: '/me/settings',

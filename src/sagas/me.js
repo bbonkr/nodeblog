@@ -49,6 +49,9 @@ import {
     DELETE_MY_CATEGORY_CALL,
     DELETE_MY_CATEGORY_DONE,
     DELETE_MY_CATEGORY_FAIL,
+    LOAD_LIKED_POSTS_CALL,
+    LOAD_LIKED_POSTS_DONE,
+    LOAD_LIKED_POSTS_FAIL,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -420,6 +423,41 @@ function* watchDeleteCategory() {
     yield takeLatest(DELETE_MY_CATEGORY_CALL, deleteCategory);
 }
 
+function loadLikedPostsApi(query) {
+    const { pageToken, limit, keyword } = query;
+
+    return axios.get(
+        `/me/liked?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
+            keyword,
+        )}`,
+        {
+            withCredentials: true,
+        },
+    );
+}
+
+function* loadLikedPosts(action) {
+    try {
+        const result = yield call(loadLikedPostsApi, action.data);
+        yield put({
+            type: LOAD_LIKED_POSTS_DONE,
+            data: result.data,
+            keyword: action.data.keyword,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_LIKED_POSTS_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadLikedPosts() {
+    yield takeLatest(LOAD_LIKED_POSTS_CALL, loadLikedPosts);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -435,5 +473,6 @@ export default function* postSaga() {
         fork(watchDeleteMediaFile),
         fork(wacthEditCategory),
         fork(watchDeleteCategory),
+        fork(watchLoadLikedPosts),
     ]);
 }

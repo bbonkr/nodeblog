@@ -1,4 +1,4 @@
-import produce from 'immer';
+import produce, { finishDraft } from 'immer';
 import { ShowNotification } from '../components/ShowNotification';
 import Router from 'next/router';
 
@@ -47,6 +47,16 @@ export const initialState = {
 
     // menu
     sideMenuCollapsed: false,
+
+    // liked
+    likedPosts: [],
+    likedPostsLoading: false,
+    likedPostsKeyword: '',
+    likedPostsErrorReason: '',
+    likedPostsLimit: 10,
+    LikedPostsHasMore: false,
+    likedPostsPageToken: '',
+    likedPostsTotal: 0,
 };
 
 export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
@@ -107,6 +117,10 @@ export const DELETE_MY_CATEGORY_FAIL = 'DELETE_MY_CATEGORY_FAIL';
 
 export const SIDE_MENU_COLLAPSE = 'SIDE_MENU_COLLAPSE';
 
+export const LOAD_LIKED_POSTS_CALL = 'LOAD_LIKED_POSTS_CALL';
+export const LOAD_LIKED_POSTS_DONE = 'LOAD_LIKED_POSTS_DONE';
+export const LOAD_LIKED_POSTS_FAIL = 'LOAD_LIKED_POSTS_FAIL';
+
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // https://lannstark.github.io/nodejs/console/3
@@ -166,7 +180,6 @@ const reducer = (state = initialState, action) =>
                 draft.hasMoreCategories = action.data.pageToken
                     ? draft.hasMoreCategories
                     : true;
-                draft.loadingCategories = true;
                 draft.loadCategoriesErrorReason = '';
                 break;
             case LOAD_MY_CATEGORIES_DONE:
@@ -386,8 +399,38 @@ const reducer = (state = initialState, action) =>
             case DELETE_MY_CATEGORY_FAIL:
                 draft.loadingCategories = false;
                 break;
+
             case SIDE_MENU_COLLAPSE:
                 draft.sideMenuCollapsed = action.data;
+                break;
+
+            case LOAD_LIKED_POSTS_CALL:
+                draft.likedPostsLoading = true;
+                draft.likedPosts = action.data.pageToken
+                    ? draft.likedPosts
+                    : [];
+                draft.LikedPostsHasMore = action.data.pageToken
+                    ? draft.LikedPostsHasMore
+                    : true;
+                draft.likedPostsErrorReason = '';
+                break;
+            case LOAD_LIKED_POSTS_DONE:
+                action.data.records.forEach(x => {
+                    const post = draft.likedPosts.find(v => v.id === x.id);
+                    if (!post) {
+                        draft.likedPosts.push(x);
+                        draft.likedPostsPageToken = `${x.id}`;
+                    }
+                });
+                draft.likedPostsTotal = action.data.total;
+                draft.likedPostsHasMore =
+                    action.data.records.length === draft.likedPostsLimit;
+                draft.likedPostsKeyword = action.keyword;
+                draft.likedPostsLoading = false;
+                break;
+            case LOAD_LIKED_POSTS_FAIL:
+                draft.likedPostsLoading = false;
+                draft.likedPostsErrorReason = action.reason;
                 break;
             default:
                 break;

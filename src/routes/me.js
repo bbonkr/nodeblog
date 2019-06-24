@@ -712,4 +712,117 @@ router.delete('/category/:id', isLoggedIn, async (req, res, next) => {
     }
 });
 
+router.get('/liked', isLoggedIn, async (req, res, next) => {
+    try {
+        const limit = (req.query.limit && parseInt(req.query.limit, 10)) || 10;
+        const keyword =
+            req.query.keyword && decodeURIComponent(req.query.keyword);
+        const pageToken =
+            (req.query.pageToken && parseInt(req.query.pageToken)) || 0;
+        const skip = pageToken ? 1 : 0;
+
+        let where = {};
+
+        if (keyword) {
+            Object.assign(where, {
+                [Op.or]: [
+                    { title: { [Op.like]: `%${keyword}%` } },
+                    {
+                        text: {
+                            [Op.like]: `%${keyword}%`,
+                        },
+                    },
+                ],
+            });
+        }
+
+        const { count } = await db.Post.findAndCountAll({
+            where: where,
+            attributes: ['id'],
+            include: [
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                    where: {
+                        id: req.user.id,
+                    },
+                },
+            ],
+        });
+
+        if (pageToken) {
+            const basisPost = await db.Post.findOne({
+                where: {
+                    id: pageToken,
+                },
+            });
+
+            if (basisPost) {
+                Object.assign(where, {
+                    createdAt: {
+                        [db.Sequelize.Op.lt]: basisPost.createdAt,
+                    },
+                });
+                // where = {
+                //     createdAt: {
+                //         [db.Sequelize.Op.lt]: basisPost.createdAt,
+                //     },
+                // };
+            }
+        }
+
+        const posts = await db.Post.findAll({
+            where: where,
+            include: [
+                {
+                    model: db.User,
+                    attributes: defaultUserAttributes,
+                },
+                {
+                    model: db.Tag,
+                    as: 'Tags',
+                    through: 'PostTag',
+                },
+                {
+                    model: db.Category,
+                    as: 'Categories',
+                    through: 'PostCategory',
+                },
+                {
+                    model: db.PostAccessLog,
+                    attributes: ['id'],
+                },
+                {
+                    model: db.User,
+                    through: 'UserLikePost',
+                    as: 'Likers',
+                    attributes: ['id'],
+                    where: {
+                        id: req.user.id,
+                    },
+                },
+            ],
+            order: [['createdAt', 'DESC']],
+            limit: limit,
+            skip: skip,
+            attributes: [
+                'id',
+                'title',
+                'slug',
+                'excerpt',
+                'UserId',
+                'createdAt',
+                'updatedAt',
+            ],
+        });
+
+        return res.json({ records: posts, total: count });
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
 module.exports = router;
