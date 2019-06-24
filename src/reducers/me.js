@@ -53,7 +53,7 @@ export const initialState = {
     likedPostsLoading: false,
     likedPostsKeyword: '',
     likedPostsErrorReason: '',
-    likedPostsLimit: 10,
+    likedPostsLimit: 3,
     LikedPostsHasMore: false,
     likedPostsPageToken: '',
     likedPostsTotal: 0,
@@ -416,10 +416,12 @@ const reducer = (state = initialState, action) =>
                 break;
             case LOAD_LIKED_POSTS_DONE:
                 action.data.records.forEach(x => {
-                    const post = draft.likedPosts.find(v => v.id === x.id);
+                    const post = draft.likedPosts.find(
+                        v => v.UserId === x.UserId && v.PostId === x.PostId,
+                    );
                     if (!post) {
                         draft.likedPosts.push(x);
-                        draft.likedPostsPageToken = `${x.id}`;
+                        draft.likedPostsPageToken = `${x.UserId}|${x.PostId}`;
                     }
                 });
                 draft.likedPostsTotal = action.data.total;

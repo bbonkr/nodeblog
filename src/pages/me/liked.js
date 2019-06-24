@@ -1,10 +1,12 @@
 import React, { useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { PageHeader, Divider, Timeline, Button } from 'antd';
+import { PageHeader, Divider, Timeline, Button, Card, Icon } from 'antd';
+import moment from 'moment';
 import MeLayout from '../../components/MeLayout';
 import { ContentWrapper } from '../../styledComponents/Wrapper';
 import { withAuth } from '../../utils/auth';
 import { LOAD_LIKED_POSTS_CALL } from '../../reducers/me';
+import Router from 'next/router';
 
 const Liked = () => {
     const dispatch = useDispatch();
@@ -29,14 +31,61 @@ const Liked = () => {
         }
     }, [dispatch, likedPostsHasMore, likedPostsLimit, likedPostsPageToken]);
 
+    const onClickOpnePost = useCallback(
+        post => () => {
+            const username = `@${post.User.username}`;
+            const slug = encodeURIComponent(post.slug);
+
+            Router.push({
+                pathname: '/users/post',
+                query: { user: username, slug: slug },
+                as: `/users/${username}/posts/${slug}`,
+            });
+        },
+        [],
+    );
+
     return (
         <MeLayout>
             <ContentWrapper>
                 <PageHeader title="Liked posts" />
                 <Divider />
-                <Timeline pending={likedPostsLoading}>
-                    {likedPosts.map(post => {
-                        return <Timeline.Item>{post.title}</Timeline.Item>;
+                <Timeline
+                    pending={likedPostsLoading}
+                    reverse={false}
+                    mode="left">
+                    {likedPosts.map(likePost => {
+                        return (
+                            <Timeline.Item key={likePost.PostId}>
+                                <Card
+                                    title={`Liked at ${moment(
+                                        likePost.createdAt,
+                                    ).format('YYYY-MM-DD HH:mm:ss')}`}
+                                    extra={
+                                        <Button
+                                            type="primary"
+                                            onClick={onClickOpnePost(
+                                                likePost.Post,
+                                            )}>
+                                            Opne
+                                        </Button>
+                                    }>
+                                    <Card.Meta
+                                        title={likePost.Post.title}
+                                        description={
+                                            <span>
+                                                <Icon type="clock-circle-o" />
+                                                {` ${moment(
+                                                    likePost.Post.createdAt,
+                                                    'YYYY-MM-DD HH:mm:ss',
+                                                ).fromNow()}`}{' '}
+                                            </span>
+                                        }
+                                    />
+                                    {likePost.Post.excerpt}
+                                </Card>
+                            </Timeline.Item>
+                        );
                     })}
                 </Timeline>
                 <Button

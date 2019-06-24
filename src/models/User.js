@@ -42,7 +42,8 @@ module.exports = (sequelize, DataTypes) => {
         db.User.hasMany(db.Comment);
         db.User.hasMany(db.UserVerifyCode);
         db.User.hasMany(db.ResetPasswordCode);
-        db.Post.belongsToMany(db.User, {
+        db.User.hasMany(db.UserLikePost);
+        db.User.belongsToMany(db.Post, {
             through: 'UserLikePost',
             as: 'LikePosts',
         });

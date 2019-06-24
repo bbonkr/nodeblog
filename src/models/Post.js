@@ -68,6 +68,8 @@ module.exports = (sequelize, DataTypes) => {
         db.Post.belongsTo(db.User);
         db.Post.hasMany(db.Comment);
         db.Post.hasMany(db.PostAccessLog);
+        db.Post.hasMany(db.UserLikePost); // userlikepost
+
         db.Post.belongsToMany(db.Image, {
             through: 'PostImage',
             as: 'Images',

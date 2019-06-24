@@ -37,6 +37,8 @@ db.Category = require('./Category')(sequelize, Sequelize);
 db.PostAccessLog = require('./PostAccessLog')(sequelize, Sequelize);
 db.UserVerifyCode = require('./UserVerifyCode')(sequelize, Sequelize);
 db.ResetPasswordCode = require('./ResetPasswordCode')(sequelize, Sequelize);
+db.UserLikePost = require('./UserLikePost')(sequelize, Sequelize);
+
 /** passport store */
 db.Session = require('../passport/session')(sequelize, Sequelize);
 
