@@ -200,13 +200,19 @@ const SignUpForm = () => {
 
     const [errorMessage, setErrorMessage] = useState('');
     const [confirmDirty, setConfirmDirty] = useState(false);
-    const { me, signUpInProcess, signUpFailMessage } = useSelector(s => s.user);
+    const {
+        me,
+        signUpInProcess,
+        signUpFailMessage,
+        signUpSuccess,
+    } = useSelector(s => s.user);
 
     useEffect(() => {
-        if (me) {
-            Router.push('/me');
+        if (signUpSuccess) {
+            //Router.push('/me');
+            Router.push('/signin');
         }
-    }, [me]);
+    }, [signUpSuccess]);
 
     const onChangeEmail = useCallback(e => {
         const newValue = e.target.value;
@@ -227,7 +233,7 @@ const SignUpForm = () => {
             });
             setPasswordErrorMessage(message);
         },
-        [passwordConfirm]
+        [passwordConfirm],
     );
 
     const onChangePasswordConfirm = useCallback(
@@ -241,7 +247,7 @@ const SignUpForm = () => {
             });
             setPasswordConfirmErrorMessage(message);
         },
-        [password]
+        [password],
     );
 
     const onChangeUsername = useCallback(e => {
@@ -301,7 +307,7 @@ const SignUpForm = () => {
                 });
             }
         },
-        [email, password, passwordConfirm, username, displayName, dispatch]
+        [email, password, passwordConfirm, username, displayName, dispatch],
     );
 
     if (me) {

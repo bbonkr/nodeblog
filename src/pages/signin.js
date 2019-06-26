@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Form, Input, Checkbox, Button, Icon, Row, Col } from 'antd';
 import styled from 'styled-components';
 import Validator from '../helpers/validator';
-import { SIGN_IN_CALL } from '../reducers/user';
+import { SIGN_IN_PREPARE, SIGN_IN_CALL } from '../reducers/user';
 import Router from 'next/router';
 import PropTypes from 'prop-types';
 import {
@@ -41,6 +41,13 @@ const SignIn = ({ returnUrl }) => {
             setPasswordError('');
         }
     }, [me, returnUrl]);
+
+    useEffect(() => {
+        setEmail('');
+        setPassword('');
+        setEmailError('');
+        setPasswordError('');
+    }, []);
 
     const onEmailChange = useCallback(e => {
         const value = e.target.value;
@@ -224,6 +231,8 @@ SignIn.getInitialProps = async context => {
     if (!url) {
         url = !!returnUrl ? returnUrl : '/';
     }
+
+    context.store.dispatch({ type: SIGN_IN_PREPARE });
 
     return {
         doNotSetCurrentUrl: true,

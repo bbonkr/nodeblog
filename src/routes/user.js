@@ -3,9 +3,12 @@ const bcrypt = require('bcrypt');
 const db = require('../models');
 const Sequelize = require('sequelize');
 const moment = require('moment');
+const fs = require('fs');
+const passport = require('passport');
 const { isLoggedIn } = require('./middleware');
 const { findUserById, defaultUserAttributes } = require('./helper');
 const { randomString, sendMail } = require('./util');
+
 const Op = Sequelize.Op;
 
 const serviceName = 'Nodeblog';
@@ -66,6 +69,34 @@ router.post('/', async (req, res, next) => {
 
         // TODO Send mail
         sendVerifyEmail(req, newUser);
+
+        // sing in
+        // passport.authenticate('local', (err, user, info) => {
+        //     if (err) {
+        //         console.error(err);
+        //         next(err);
+        //     }
+
+        //     if (info) {
+        //         return res.status(401).send(info.reason);
+        //     }
+
+        //     // req.login 실행시 passport.serialize 실행
+        //     return req.login(user, async loginErr => {
+        //         if (loginErr) {
+        //             return next(loginErr);
+        //         }
+
+        //         try {
+        //             const fullUser = await findUserById(user.id);
+
+        //             return res.json(fullUser);
+        //         } catch (e) {
+        //             console.error(e);
+        //             return next(e);
+        //         }
+        //     });
+        // })(req, res, next);
 
         return res.json(me);
     } catch (e) {
@@ -441,4 +472,87 @@ router.post('/resetpassword', async (req, res, next) => {
         return next(e);
     }
 });
+
+router.post('/unregister', isLoggedIn, async (req, res, next) => {
+    try {
+        const { password } = req.body;
+
+        const me = await db.User.findOne({
+            where: { id: req.user.id },
+            include: [
+                { model: db.Image },
+                { model: db.Post },
+                { model: db.Category },
+                { model: db.Comment },
+                { model: db.UserVerifyCode },
+                { model: db.ResetPasswordCode },
+                { model: db.UserLikePost },
+            ],
+        });
+
+        const passwordResult = await bcrypt.compare(
+            password.trim(),
+            me.password,
+        );
+
+        if (!passwordResult) {
+            return res.status(401).send('Password does not match.');
+        }
+
+        if (me.UserVerifyCodes && me.UserVerifyCodes.length > 0) {
+            await Promise.all(me.UserVerifyCodes.map(v => v.destroy()));
+        }
+
+        if (me.ResetPasswordCodes && me.ResetPasswordCodes.length > 0) {
+            await Promise.all(me.ResetPasswordCodes.map(v => v.destroy()));
+        }
+
+        if (me.UserLikePosts && me.UserLikePosts.length > 0) {
+            await Promise.all(me.UserLikePosts.map(v => v.destroy()));
+        }
+
+        if (me.Comments && me.Comments.length > 0) {
+            await Promise.all(me.Comments.map(v => v.destroy()));
+        }
+
+        if (me.Posts && me.Posts.length > 0) {
+            await Promise.all(me.Posts.map(v => v.destory()));
+        }
+
+        if (me.Images && me.Images.length > 0) {
+            const files = [];
+            await Promise.all(
+                me.Images.map(v => {
+                    files.push(v.path);
+                    return v.destroy();
+                }),
+            );
+
+            if (files && files.length > 0) {
+                files.forEach(v => {
+                    if (fs.existsSync(v)) {
+                        // 파일이 있는 경우만 삭제합니다.
+                        fs.unlinkSync(v);
+                    }
+                });
+            }
+        }
+
+        if (me.Categories && me.Categories.length > 0) {
+            await Promise.all(me.Categories.map(v => v.destroy()));
+        }
+
+        // sign out
+        // req.logout();
+        // req.session && req.session.destroy();
+
+        await me.destroy();
+
+        return res.send('done.');
+    } catch (e) {
+        console.error(e);
+        return next(e);
+    }
+});
+
 module.exports = router;

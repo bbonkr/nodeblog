@@ -24,6 +24,7 @@ const prod = process.env.NODE_ENV === 'production';
 
 const nextApp = next({ dev });
 const handle = nextApp.getRequestHandler();
+const { COOKIE_NAME } = require('./routes/constants');
 
 db.sequelize.sync({
     // If force is true, each Model will run DROP TABLE IF EXISTS, before it tries to create its own table
@@ -58,7 +59,7 @@ nextApp.prepare().then(() => {
     expressApp.use(cookieParser(process.env.COOKIE_SECRET));
     expressApp.use(
         expressSession({
-            name: 'nodebird',
+            name: COOKIE_NAME, //'nodebird',
             resave: false,
             saveUninitialized: false,
             secret: process.env.COOKIE_SECRET,

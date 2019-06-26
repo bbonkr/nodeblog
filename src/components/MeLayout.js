@@ -129,16 +129,17 @@ const MeLayout = ({ children }) => {
                     // setSelectedMenuKeys([key]);
                     break;
                 case 'signout':
-                    dispatch({
-                        type: SIGN_OUT_CALL,
-                        returnUrl: '/',
-                    });
+                    // dispatch({
+                    //     type: SIGN_OUT_CALL,
+                    //     returnUrl: '/',
+                    // });
+                    Router.push('/signout');
                     break;
                 default:
                     break;
             }
         },
-        [dispatch],
+        [],
     );
 
     const onClickSideMenu = useCallback(menu => {
@@ -190,8 +191,10 @@ const MeLayout = ({ children }) => {
                             }}>
                             <UserAvatar user={me} />
 
-                            <div>{!sideMenuCollapsed && me.username}</div>
-                            <div>{!sideMenuCollapsed && me.displayName}</div>
+                            <div>{!sideMenuCollapsed && me && me.username}</div>
+                            <div>
+                                {!sideMenuCollapsed && me && me.displayName}
+                            </div>
                         </div>
                         <Menu
                             mode="inline"
