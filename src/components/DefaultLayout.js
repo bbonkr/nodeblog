@@ -136,8 +136,13 @@ const DefaultLayout = ({ children }) => {
                                         <a>Profile</a>
                                     </Link>
                                 </Menu.Item>
-                                <Menu.Item onClick={onClickSignOut}>
+                                {/* <Menu.Item onClick={onClickSignOut}>
                                     Sign out
+                                </Menu.Item> */}
+                                <Menu.Item>
+                                    <Link href="/signout">
+                                        <a>Sign out</a>
+                                    </Link>
                                 </Menu.Item>
                             </SubMenu>
                         )}

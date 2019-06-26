@@ -1,5 +1,6 @@
 import React from 'react';
 import Router from 'next/router';
+import { Spin } from 'antd';
 import { normalizeReturnUrl } from '../helpers/stringHelper';
 const { Component } = React;
 
@@ -53,7 +54,7 @@ const withAuth = WrappedComponent => {
         render() {
             if (this.state.loading) {
                 // TODO Add loading page
-                return <div>Loading ...</div>;
+                return <Spin spinning={true}>Loading...</Spin>;
             }
             return <WrappedComponent {...this.props} />;
         }

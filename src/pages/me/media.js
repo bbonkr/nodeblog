@@ -23,6 +23,7 @@ import moment from 'moment';
 import styled from 'styled-components';
 import ImageViewer from '../../components/ImageViewer';
 import FileList from '../../components/FileList';
+import { withAuth } from '../../utils/auth';
 
 const Paragraph = Typography.Paragraph;
 const Dragger = Upload.Dragger;
@@ -62,4 +63,4 @@ Media.getInitialProps = async context => {
     return {};
 };
 
-export default Media;
+export default withAuth(Media);

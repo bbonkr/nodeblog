@@ -6,14 +6,22 @@ export const initialState = {
     me: null,
     signInFailMessage: '',
     signInInProcess: false,
+
+    // sign Up
     signUpFailMessage: '',
     signUpInProcess: false,
+    signUpSuccess: false,
 
     loadingChangePassword: false,
     changePasswordSuccess: false,
 
     loadingChangeInfo: false,
     changeInfoSuccess: false,
+
+    // sign out
+    signOutLoading: false,
+    signOutErrorReason: '',
+    signOutReturnUrl: '',
 
     // verify email
     verifyEmailInfo: {},
@@ -32,8 +40,14 @@ export const initialState = {
     resetPasswordLoading: false,
     resetPasswordErrorReason: '',
     resetPasswordSuccess: false,
+
+    // unregister
+    unregisterLoading: false,
+    unregisterErrorReason: '',
+    unregisterSuccess: false,
 };
 
+export const SIGN_IN_PREPARE = 'SIGN_IN_PREPARE';
 export const SIGN_IN_CALL = 'SIGN_IN_CALL';
 export const SIGN_IN_DONE = 'SIGN_IN_DONE';
 export const SIGN_IN_FAIL = 'SIGN_IN_FAIL';
@@ -72,10 +86,16 @@ export const RESET_PASSWORD_CALL = 'RESET_PASSWORD_CALL';
 export const RESET_PASSWORD_DONE = 'RESET_PASSWORD_DONE';
 export const RESET_PASSWORD_FAIL = 'RESET_PASSWORD_FAIL';
 
+export const UNREGISTER_CALL = 'UNREGISTER_CALL';
+export const UNREGISTER_DONE = 'UNREGISTER_DONE';
+export const UNREGISTER_FAIL = 'UNREGISTER_FAIL';
+
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
         // console.log('\u001b[34mdispatch ==> \u001b[0m', action.type);
         switch (action.type) {
+            case SIGN_IN_PREPARE:
+                draft.signInFailMessage = '';
             case SIGN_IN_CALL:
                 draft.signInInProcess = true;
                 break;
@@ -90,12 +110,19 @@ const reducer = (state = initialState, action) =>
                     : action.error;
                 break;
             case SIGN_OUT_CALL:
+                draft.signOutLoading = true;
                 break;
             case SIGN_OUT_DONE:
                 draft.me = null;
-                Router.push(!!action.returnUrl ? action.returnUrl : '/');
+                // Router.push(!!action.returnUrl ? action.returnUrl : '/');
+                draft.signOutLoading = false;
+                draft.signOutReturnUrl = !!action.returnUrl
+                    ? action.returnUrl
+                    : '/';
                 break;
             case SIGN_OUT_FAIL:
+                draft.signOutLoading = false;
+                draft.signOutErrorReason = action.reason;
                 break;
             case ME_CALL:
                 break;
@@ -107,13 +134,16 @@ const reducer = (state = initialState, action) =>
             case SIGN_UP_CALL:
                 draft.signUpFailMessage = '';
                 draft.signUpInProcess = true;
+                draft.signUpSuccess = false;
                 break;
             case SIGN_UP_DONE:
                 draft.signUpInProcess = false;
-                draft.me = action.data;
+                // draft.me = action.data;
+                draft.signUpSuccess = true;
                 break;
             case SIGN_UP_FAIL:
                 draft.signUpInProcess = false;
+                draft.signUpSuccess = false;
                 draft.signUpFailMessage = action.reason
                     ? action.reason
                     : action.error;
@@ -228,6 +258,23 @@ const reducer = (state = initialState, action) =>
                     title: 'Fail to reset password.',
                     message: action.reason,
                 });
+                break;
+            case UNREGISTER_CALL:
+                draft.unregisterLoading = true;
+                draft.unregisterSuccess = false;
+                break;
+            case UNREGISTER_DONE:
+                draft.unregisterLoading = false;
+                // draft.me = null;
+                draft.unregisterSuccess = true;
+                // ShowNotification({
+                //     title: 'Farewell my friend. Hope to See you again soon.',
+                // });
+                break;
+            case UNREGISTER_FAIL:
+                draft.unregisterLoading = false;
+                draft.unregisterErrorReason = action.reason;
+                draft.unregisterSuccess = false;
                 break;
             default:
                 break;

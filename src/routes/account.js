@@ -5,7 +5,7 @@ const router = require('express').Router();
 const passport = require('passport');
 const db = require('../models');
 const { findUserById } = require('./helper');
-
+const { COOKIE_NAME } = require('./constants');
 router.post('/signin', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
@@ -39,7 +39,7 @@ router.post('/signout', (req, res, next) => {
     try {
         req.logout();
         req.session && req.session.destroy();
-        return res.send('logout success.');
+        return res.clearCookie(COOKIE_NAME).send('logout success.');
     } catch (e) {
         console.error(e);
         next(e);

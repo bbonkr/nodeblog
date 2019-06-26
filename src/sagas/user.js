@@ -40,6 +40,9 @@ import {
     RESET_PASSWORD_CALL,
     RESET_PASSWORD_DONE,
     RESET_PASSWORD_FAIL,
+    UNREGISTER_CALL,
+    UNREGISTER_FAIL,
+    UNREGISTER_DONE,
 } from '../reducers/user';
 
 function getMyInfoApi() {
@@ -300,6 +303,31 @@ function* watchResetPassword() {
     yield takeLatest(RESET_PASSWORD_CALL, resetPassword);
 }
 
+function unregisterApi(formData) {
+    return axios.post('/user/unregister', formData, { withCredentials: true });
+}
+
+function* unregister(action) {
+    try {
+        const result = yield call(unregisterApi, action.data);
+        yield put({
+            type: UNREGISTER_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: UNREGISTER_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchUnregister() {
+    yield takeLatest(UNREGISTER_CALL, unregister);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchGetMyInfo),
@@ -312,5 +340,6 @@ export default function* postSaga() {
         fork(watchMakeVerifyEmail),
         fork(watchRequestResetPassword),
         fork(watchResetPassword),
+        fork(watchUnregister),
     ]);
 }
