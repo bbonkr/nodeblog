@@ -6,6 +6,7 @@ const passport = require('passport');
 const db = require('../models');
 const { findUserById } = require('./helper');
 const { COOKIE_NAME } = require('./constants');
+
 router.post('/signin', (req, res, next) => {
     passport.authenticate('local', (err, user, info) => {
         if (err) {
