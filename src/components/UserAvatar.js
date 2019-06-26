@@ -6,7 +6,7 @@ const UserAvatar = ({ user }) => {
     const { username, displayName, photo } = user;
 
     return (
-        <Avatar src={!!photo && photo}>{displayName[0].toUpperCase()}</Avatar>
+        <Avatar src={!!photo && photo}>{displayName && displayName[0].toUpperCase()}</Avatar>
     );
 };
 
