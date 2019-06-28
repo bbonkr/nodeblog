@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
@@ -11,7 +11,14 @@ import moment from 'moment';
 import LinkUsersPosts from './LinkUsersPosts';
 import IconLike from './IconLike';
 
+import Prism from 'prismjs';
+import '../styles/prism.css';
+import '../styles/singlepost.css';
+
 const SinglePost = ({ post }) => {
+    useEffect(() => {
+        Prism.highlightAll();
+    }, []);
     return (
         <>
             <article>
@@ -62,6 +69,7 @@ const SinglePost = ({ post }) => {
                     </Divider>
 
                     <div
+                        className={`article-post`}
                         dangerouslySetInnerHTML={{
                             __html: post.html,
                         }}

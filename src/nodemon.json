@@ -11,6 +11,8 @@
         "reducers",
         "routes",
         "sagas",
+        "styledComponents",
+        "styles",
         "utils",
         "index.js",
         "next.config.js",
