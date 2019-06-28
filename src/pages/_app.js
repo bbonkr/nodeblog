@@ -19,13 +19,12 @@ import { SET_CURRENT_URL, SET_BASE_URL } from '../reducers/settings';
 import '../styles/styles.scss';
 // const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
 
-// FIXME:
-// 구성값을 데이터베이스에서 가져와야 합니다.
-const fbAdmin = process.env.FB_ADMIN;
-const siteName = process.env.SITE_NAME;
-
 const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
     // console.log('pageProps', pageProps);
+    // FIXME:
+    // 구성값을 데이터베이스에서 가져와야 합니다.
+    const fbAdmin = process.env.FB_ADMIN;
+    const siteName = process.env.SITE_NAME || 'nodeblog';
     return (
         <Container>
             <Provider store={store}>
@@ -40,9 +39,10 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                                 'width=device-width,minimum-scale=1,initial-scale=1',
                         },
                         { 'http-equiv': 'X-UA-Compatible', content: 'IE-edge' },
-                        { name: 'description', content: 'NodeBlog' },
-                        { name: 'og:title', content: 'NodeBlog' },
-                        { name: 'og:description', content: 'NodeBlog' },
+                        { name: 'description', content: siteName },
+                        { name: 'og:title', content: siteName },
+                        { name: 'og:site_name', content: '' },
+                        { name: 'og:description', content: siteName },
                         { name: 'og:type', content: 'website' },
                         { name: 'fb:admins', content: fbAdmin },
                         {

@@ -22,7 +22,15 @@ const SinglePost = ({ post }) => {
     return (
         <>
             <article>
-                <Card>
+                <Card
+                    cover={
+                        post.coverImage && (
+                            <img
+                                src={`${post.coverImage}`}
+                                alt={`${post.title}`}
+                            />
+                        )
+                    }>
                     <Card.Meta
                         avatar={
                             <LinkUsersPosts user={post.User}>

@@ -96,6 +96,7 @@ router.get('/', async (req, res, next) => {
                 'title',
                 'slug',
                 'excerpt',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -175,6 +176,7 @@ router.get('/category/:category', async (req, res, next) => {
                 'title',
                 'slug',
                 'excerpt',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -277,6 +279,7 @@ router.get('/tag/:tag', async (req, res, next) => {
                 'title',
                 'slug',
                 'excerpt',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -333,6 +336,7 @@ router.get('/:slug', async (req, res, next) => {
                 'title',
                 'slug',
                 'html',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -340,11 +344,6 @@ router.get('/:slug', async (req, res, next) => {
         });
 
         if (post) {
-            // console.dir(post);
-
-            // console.log('ipAddress: ', req.connection.remoteAddress);
-            // console.log('userAgent: ', req.headers['user-agent']);
-
             const log = await db.PostAccessLog.create({
                 ipAddress: req.connection.remoteAddress,
                 userAgent: req.headers['user-agent'],

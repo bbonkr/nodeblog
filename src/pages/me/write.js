@@ -30,14 +30,11 @@ import WritePostForm from '../../components/WritePostForm';
 const PLACEHOLDER_MARKDOWN = 'Write your thought!';
 
 const Write = ({ id }) => {
-    // useEffect(() => {
-    //     console.log('Write ==> useEffect ==> id: ', id);
-    // }, [id]);
-
     return (
         <MeLayout>
             <ContentWrapper>
                 <PageHeader title="Write" />
+                <Divider />
                 <WritePostForm key={`post-${id}`} id={id} />
             </ContentWrapper>
         </MeLayout>

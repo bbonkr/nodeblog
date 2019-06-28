@@ -12,6 +12,7 @@ import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
 import UserAvatar from './UserAvatar';
 import IconLike from './IconLike';
+import CroppedImage from './CroppedImage';
 // import '../styles/styles.scss';
 
 const FullWidthButton = styled(Button)`
@@ -53,6 +54,14 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                     return (
                         <List.Item key={post.id}>
                             <Card
+                                cover={
+                                    post.coverImage && (
+                                        <img
+                                            src={post.coverImage}
+                                            alt={post.title}
+                                        />
+                                    )
+                                }
                                 actions={[
                                     <IconText
                                         type="eye"
