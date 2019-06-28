@@ -14,22 +14,6 @@ const Op = Sequelize.Op;
 const serviceName = 'Nodeblog';
 const emailSender = 'app@bbon.kr';
 
-// const findUserById = async id => {
-//     const me = await db.User.findOne({
-//         where: {
-//             id: id,
-//         },
-//         include: [
-//             {
-//                 model: db.Post,
-//             },
-//         ],
-//         attributes: ['id', 'email', 'username'],
-//     });
-
-//     return me;
-// };
-
 /**
  * 사용자를 추가합니다.
  */

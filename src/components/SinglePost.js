@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
@@ -11,11 +11,26 @@ import moment from 'moment';
 import LinkUsersPosts from './LinkUsersPosts';
 import IconLike from './IconLike';
 
+import Prism from 'prismjs';
+import '../styles/prism.css';
+import '../styles/singlepost.css';
+
 const SinglePost = ({ post }) => {
+    useEffect(() => {
+        Prism.highlightAll();
+    }, []);
     return (
         <>
             <article>
-                <Card>
+                <Card
+                    cover={
+                        post.coverImage && (
+                            <img
+                                src={`${post.coverImage}`}
+                                alt={`${post.title}`}
+                            />
+                        )
+                    }>
                     <Card.Meta
                         avatar={
                             <LinkUsersPosts user={post.User}>
@@ -39,34 +54,37 @@ const SinglePost = ({ post }) => {
                             </div>
                         }
                         description={
-                            <span>
-                                <Icon type="clock-circle" />{' '}
-                                {moment(
-                                    new Date(post.createdAt),
-                                    'YYYY-MM-DD HH:mm:ss',
-                                ).fromNow()}
-                            </span>
+                            post.Categories &&
+                            post.Categories.map(category => {
+                                return (
+                                    <LinkCategory
+                                        key={category.slug}
+                                        user={post.User}
+                                        category={category}
+                                    />
+                                );
+                            })
                         }
                     />
-                    <Divider dashed={true} />
+                    <Divider orientation="right">
+                        <span>
+                            <Icon type="clock-circle" />{' '}
+                            {moment(
+                                new Date(post.createdAt),
+                                'YYYY-MM-DD HH:mm:ss',
+                            ).fromNow()}
+                        </span>
+                    </Divider>
+
                     <div
+                        className={`article-post`}
                         dangerouslySetInnerHTML={{
                             __html: post.html,
                         }}
                     />
 
-                    <Divider />
-                    {post.Categories &&
-                        post.Categories.map(category => {
-                            return (
-                                <LinkCategory
-                                    key={category.slug}
-                                    user={post.User}
-                                    category={category}
-                                />
-                            );
-                        })}
                     <Divider dashed={true} />
+
                     {post.Tags &&
                         post.Tags.map(v => {
                             return <LinkTag key={v.slug} tag={v} />;

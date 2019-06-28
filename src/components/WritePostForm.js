@@ -5,12 +5,8 @@ import Markdown from 'react-markdown';
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
 import {
-    LOAD_MY_CATEGORIES_CALL,
-    LOAD_MY_TAGS_CALL,
-    LOAD_MY_POST_CALL,
     WRITE_POST_CALL,
     EDIT_POST_CALL,
-    WRITE_NEW_POST_CALL,
 } from '../reducers/me';
 import FullSizeModal from '../styledComponents/FullSizeModal';
 import FileList from './FileList';
@@ -47,7 +43,7 @@ const WritePostForm = ({ id }) => {
         },
         {
             extensions: [xssFilter],
-        }
+        },
     );
     // const { myPost } = useSelector(s => s.me);
 
@@ -64,10 +60,12 @@ const WritePostForm = ({ id }) => {
     const [slug, setSlug] = useState('');
     const [markdown, setMarkdown] = useState('');
     const [html, setHtml] = useState('');
+    const [coverImage, setCoverImage] = useState('');
     const [selectedCategories, setSelectedCategories] = useState([]);
     const [selectedTags, setSelectedTags] = useState([]);
     const [selectedCategoryValues, setSelectedCategoryValues] = useState([]);
     const [selectedTagValues, setSelectedTagValues] = useState([]);
+    const [fileListVisible, setFileListVisible] = useState(false);
     // const [initCategories, setInitCategories] = useState([]);
     // const [initTags, setInitTags] = useState([]);
 
@@ -87,10 +85,17 @@ const WritePostForm = ({ id }) => {
             setMarkdown(text);
             setHtml(markdownConverter.makeHtml(text));
         },
-        [markdownConverter]
+        [markdownConverter],
     );
 
-    const [fileListVisible, setFileListVisible] = useState(false);
+    const onChangeCoverImage = useCallback(e => {
+        const newValue = e.target.value;
+        setCoverImage(newValue);
+
+        if (!!newValue) {
+            // 이미지 확인
+        }
+    }, []);
 
     const closeFileList = useCallback(() => {
         setFileListVisible(false);
@@ -107,18 +112,19 @@ const WritePostForm = ({ id }) => {
             setTitle(myPost.title);
             setSlug(myPost.slug);
             setMarkdown(myPost.markdown);
+            setCoverImage(myPost.coverImage);
             setSelectedCategoryValues(
-                !!myPost.Categories ? myPost.Categories.map(v => v.slug) : []
+                !!myPost.Categories ? myPost.Categories.map(v => v.slug) : [],
             );
             setSelectedTagValues(
-                !!myPost.Tags ? myPost.Tags.map(v => v.slug) : []
+                !!myPost.Tags ? myPost.Tags.map(v => v.slug) : [],
             );
             setSelectedCategories(
                 myPost.Categories
                     ? myPost.Categories.map(v => {
                           return { name: v.name, slug: v.slug };
                       })
-                    : []
+                    : [],
             );
             setSelectedTags(
                 myPost.Tags
@@ -128,13 +134,14 @@ const WritePostForm = ({ id }) => {
                               slug: v.slug,
                           };
                       })
-                    : []
+                    : [],
             );
         } else {
             /** reset */
             setTitle('');
             setSlug('');
             setMarkdown('');
+            setCoverImage('');
             setSelectedCategoryValues([]);
             setSelectedTagValues([]);
             setSelectedCategories([]);
@@ -150,8 +157,8 @@ const WritePostForm = ({ id }) => {
         const text = e.target.value;
         setMarkdown(
             `${text.substring(0, startIndex)}${indent}${text.substring(
-                endIndex
-            )} `
+                endIndex,
+            )} `,
         );
     }, []);
 
@@ -161,7 +168,7 @@ const WritePostForm = ({ id }) => {
         setSelectedCategories(
             options.map(v => {
                 return { name: v.props.value, slug: v.key };
-            })
+            }),
         );
         setSelectedCategoryValues(values);
     }, []);
@@ -176,9 +183,17 @@ const WritePostForm = ({ id }) => {
                     name: v.props.value,
                     slug: v.key,
                 };
-            })
+            }),
         );
         setSelectedTagValues(values);
+    }, []);
+
+    const onClickShowFileListModal = useCallback(() => {
+        setFileListVisible(true);
+    }, []);
+
+    const onClickHideFileListModal = useCallback(() => {
+        setFileListVisible(false);
     }, []);
 
     const onSubmit = useCallback(
@@ -197,27 +212,38 @@ const WritePostForm = ({ id }) => {
                     type: EDIT_POST_CALL,
                     id: id,
                     data: {
-                        title: title,
-                        slug: slug,
-                        markdown: markdown,
+                        title: title.trim(),
+                        slug: slug.trim(),
+                        markdown: markdown.trim(),
                         categories: selectedCategories,
                         tags: selectedTags,
+                        coverImage: coverImage.trim(),
                     },
                 });
             } else {
                 dispatch({
                     type: WRITE_POST_CALL,
                     data: {
-                        title: title,
-                        slug: slug,
-                        markdown: markdown,
+                        title: title.trim(),
+                        slug: slug.trim(),
+                        markdown: markdown.trim(),
                         categories: selectedCategories,
                         tags: selectedTags,
+                        coverImage: coverImage.trim(),
                     },
                 });
             }
         },
-        [dispatch, id, markdown, selectedCategories, selectedTags, slug, title]
+        [
+            coverImage,
+            dispatch,
+            id,
+            markdown,
+            selectedCategories,
+            selectedTags,
+            slug,
+            title,
+        ],
     );
 
     return (
@@ -266,6 +292,20 @@ const WritePostForm = ({ id }) => {
                             </div>
                         </Tabs.TabPane>
                     </Tabs>
+                </Form.Item>
+                <Form.Item label="Cover">
+                    <Input
+                        value={coverImage}
+                        onChange={onChangeCoverImage}
+                        placeholder="Set post cover image"
+                        addonBefore={
+                            <span
+                                style={{ cursor: 'pointer' }}
+                                onClick={onClickShowFileListModal}>
+                                <Icon type="picture" /> Select image
+                            </span>
+                        }
+                    />
                 </Form.Item>
                 <Form.Item label="Categories">
                     <Select

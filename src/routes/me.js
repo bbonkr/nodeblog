@@ -124,6 +124,7 @@ router.get('/post/:id', isLoggedIn, async (req, res, next) => {
                 'title',
                 'slug',
                 'markdown',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -237,6 +238,7 @@ router.get('/posts', isLoggedIn, async (req, res, next) => {
                 'title',
                 'slug',
                 'excerpt',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -755,22 +757,6 @@ router.get('/liked', isLoggedIn, async (req, res, next) => {
             });
         }
 
-        // const { count } = await db.Post.findAndCountAll({
-        //     where: where,
-        //     attributes: ['id'],
-        //     include: [
-        //         {
-        //             model: db.User,
-        //             through: 'UserLikePost',
-        //             as: 'Likers',
-        //             attributes: ['id'],
-        //             where: {
-        //                 id: req.user.id,
-        //             },
-        //         },
-        //     ],
-        // });
-
         if (pageToken) {
             const basisPost = await db.UserLikePost.findOne({
                 where: {
@@ -847,6 +833,7 @@ router.get('/liked', isLoggedIn, async (req, res, next) => {
                         'title',
                         'slug',
                         'excerpt',
+                        'coverImage',
                         'UserId',
                         'createdAt',
                     ],
@@ -858,67 +845,6 @@ router.get('/liked', isLoggedIn, async (req, res, next) => {
             limit: limit,
             skip: skip,
         });
-
-        // const posts = await db.Post.findAll({
-        //     where: where,
-        //     include: [
-        //         {
-        //             model: db.User,
-        //             through: 'UserLikePost',
-        //             as: 'Likers',
-        //             attributes: ['id', 'createdAt'],
-        //             where: {
-        //                 id: req.user.id,
-        //             },
-        //         },
-        //         {
-        //             model: db.User,
-        //             attributes: defaultUserAttributes,
-        //         },
-        //         {
-        //             model: db.Tag,
-        //             as: 'Tags',
-        //             through: 'PostTag',
-        //             attributes: ['id', 'name', 'slug'],
-        //         },
-        //         {
-        //             model: db.Category,
-        //             as: 'Categories',
-        //             through: 'PostCategory',
-        //             attributes: ['id', 'name', 'slug'],
-        //         },
-        //         {
-        //             model: db.PostAccessLog,
-        //             attributes: ['id'],
-        //         },
-        //     ],
-        //     order: [
-        //         [
-        //             {
-        //                 model: db.User,
-        //                 through: 'UserLikePost',
-        //                 as: 'Likers',
-        //                 attributes: ['id', 'createdAt'],
-        //                 where: {
-        //                     id: req.user.id,
-        //                 },
-        //             },
-        //             'createdAt',
-        //             'DESC',
-        //         ],
-        //     ],
-        //     limit: limit,
-        //     skip: skip,
-        //     attributes: [
-        //         'id',
-        //         'title',
-        //         'slug',
-        //         'excerpt',
-        //         'UserId',
-        //         'createdAt',
-        //         // 'updatedAt',
-        //     ],
-        // });
 
         return res.json({ records: likePosts, total: count });
     } catch (e) {

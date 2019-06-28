@@ -14,18 +14,17 @@ import rootSaga from '../sagas';
 import { normalizeReturnUrl } from '../helpers/stringHelper';
 import { ME_CALL } from '../reducers/user';
 import stringHelper from '../helpers/stringHelper';
-import { SET_CURRENT_URL } from '../reducers/settings';
+import { SET_CURRENT_URL, SET_BASE_URL } from '../reducers/settings';
 
 import '../styles/styles.scss';
 // const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
 
-// FIXME:
-// 구성값을 데이터베이스에서 가져와야 합니다.
-const fbAdmin = process.env.FB_ADMIN;
-const siteName = process.env.SITE_NAME;
-
 const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
     // console.log('pageProps', pageProps);
+    // FIXME:
+    // 구성값을 데이터베이스에서 가져와야 합니다.
+    const fbAdmin = process.env.FB_ADMIN;
+    const siteName = process.env.SITE_NAME || 'nodeblog';
     return (
         <Container>
             <Provider store={store}>
@@ -40,9 +39,10 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                                 'width=device-width,minimum-scale=1,initial-scale=1',
                         },
                         { 'http-equiv': 'X-UA-Compatible', content: 'IE-edge' },
-                        { name: 'description', content: 'NodeBlog' },
-                        { name: 'og:title', content: 'NodeBlog' },
-                        { name: 'og:description', content: 'NodeBlog' },
+                        { name: 'description', content: siteName },
+                        { name: 'og:title', content: siteName },
+                        { name: 'og:site_name', content: '' },
+                        { name: 'og:description', content: siteName },
                         { name: 'og:type', content: 'website' },
                         { name: 'fb:admins', content: fbAdmin },
                         {
@@ -119,6 +119,7 @@ NodeBlog.getInitialProps = async context => {
     const state = ctx.store.getState();
     const cookie = ctx.isServer ? ctx.req.headers.cookie : '';
     const { me } = state.user;
+    const { baseUrl } = state.settings;
 
     let url = '';
 
@@ -126,6 +127,12 @@ NodeBlog.getInitialProps = async context => {
     if (ctx.isServer) {
         const { req } = ctx;
         apiBaseUrl = `${req.protocol}://${req.get('host')}/api`;
+        if (!baseUrl) {
+            ctx.store.dispatch({
+                type: SET_BASE_URL,
+                data: `${req.protocol}://${req.get('host')}`,
+            });
+        }
     } else {
         apiBaseUrl = '/api';
     }
@@ -200,7 +207,7 @@ const configureStore = (initialState, options) => {
                   !options.isServer &&
                       window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
                       ? window.__REDUX_DEVTOOLS_EXTENSION__()
-                      : f => f
+                      : f => f,
               );
 
     const store = createStore(reducer, initialState, enhancers);

@@ -1,0 +1,8 @@
+article div .article-post {}
+
+article div .article-post img {
+    align-self: center;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -36,11 +36,7 @@ const Liked = () => {
             const username = `@${post.User.username}`;
             const slug = encodeURIComponent(post.slug);
 
-            Router.push({
-                pathname: '/users/post',
-                query: { user: username, slug: slug },
-                as: `/users/${username}/posts/${slug}`,
-            });
+            Router.push(`/users/${username}/posts/${slug}`);
         },
         [],
     );

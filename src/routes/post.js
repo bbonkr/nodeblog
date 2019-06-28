@@ -53,7 +53,14 @@ const EXCERPT_LENGTH = 200;
 
 router.post('/', isLoggedIn, async (req, res, next) => {
     try {
-        const { title, slug, markdown, categories, tags } = req.body;
+        const {
+            title,
+            slug,
+            markdown,
+            coverImage,
+            categories,
+            tags,
+        } = req.body;
 
         const html = markdownConverter.makeHtml(markdown);
         const text = stripHtml(html);
@@ -78,6 +85,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
             html: html,
             text: text,
             excerpt: getExcerpt(text),
+            coverImage: coverImage,
             UserId: req.user.id,
         });
 
@@ -160,6 +168,7 @@ router.post('/', isLoggedIn, async (req, res, next) => {
                 'title',
                 'slug',
                 'html',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',
@@ -208,7 +217,14 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 .send('Could not find a post. The post may not be yours.');
         }
 
-        const { title, slug, markdown, categories, tags } = req.body;
+        const {
+            title,
+            slug,
+            markdown,
+            coverImage,
+            categories,
+            tags,
+        } = req.body;
 
         const html = markdownConverter.makeHtml(markdown);
         const text = stripHtml(html);
@@ -240,6 +256,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 html: html,
                 text: text,
                 excerpt: getExcerpt(text),
+                coverImage: coverImage,
             },
             {
                 fields: [
@@ -249,6 +266,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                     'html',
                     'text',
                     'excerpt',
+                    'coverImage',
                 ],
             },
         );
@@ -343,6 +361,7 @@ router.patch('/:id', isLoggedIn, async (req, res, next) => {
                 'title',
                 'slug',
                 'html',
+                'coverImage',
                 'UserId',
                 'createdAt',
                 'updatedAt',

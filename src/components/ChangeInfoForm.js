@@ -4,6 +4,7 @@ import { Form, Input, Button, Modal, Icon, AutoComplete } from 'antd';
 import { signUpFormValidator } from '../helpers/formValidators';
 import { CHANGE_INFO_CALL, MAKE_VERIFY_EMAIL_CALL } from '../reducers/user';
 import FileList from './FileList';
+import FullSizeModal from '../styledComponents/FullSizeModal';
 
 const validator = {
     checkEmail(formData) {
@@ -187,7 +188,7 @@ const ChangeInfoForm = () => {
                     </Button>
                 </Form.Item>
             </Form>
-            <Modal
+            {/* <Modal
                 width="100%"
                 style={{
                     position: 'fixed',
@@ -203,7 +204,15 @@ const ChangeInfoForm = () => {
                 visible={fileListModalVisible}
                 onCancel={onClickHideFileListModal}>
                 <FileList />
-            </Modal>
+            </Modal> */}
+            <FullSizeModal
+                footer={false}
+                visible={fileListVisible}
+                maskClosable={true}
+                onCancel={closeFileList}
+                width="100%">
+                <FileList />
+            </FullSizeModal>
         </>
     );
 };

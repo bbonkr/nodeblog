@@ -12,6 +12,7 @@ import LinkSinglePost from './LinkSinglePost';
 import LinkUsersPosts from './LinkUsersPosts';
 import UserAvatar from './UserAvatar';
 import IconLike from './IconLike';
+import CroppedImage from './CroppedImage';
 // import '../styles/styles.scss';
 
 const FullWidthButton = styled(Button)`
@@ -53,6 +54,14 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                     return (
                         <List.Item key={post.id}>
                             <Card
+                                cover={
+                                    post.coverImage && (
+                                        <img
+                                            src={post.coverImage}
+                                            alt={post.title}
+                                        />
+                                    )
+                                }
                                 actions={[
                                     <IconText
                                         type="eye"
@@ -88,6 +97,18 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                             </Typography.Title>
                                         </LinkSinglePost>
                                     }
+                                    description={
+                                        post.Categories &&
+                                        post.Categories.map(category => {
+                                            return (
+                                                <LinkCategory
+                                                    key={category.slug}
+                                                    user={post.User}
+                                                    category={category}
+                                                />
+                                            );
+                                        })
+                                    }
                                 />
                                 <div
                                     style={{
@@ -95,8 +116,16 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                         maxHeigh: '16rem',
                                         height: '16rem',
                                     }}>
-                                    <Divider dashed={true} />
-                                    <div>
+                                    <Divider orientation="right">
+                                        <span>
+                                            <Icon type="clock-circle" />{' '}
+                                            {moment(
+                                                new Date(post.createdAt),
+                                                'YYYY-MM-DD HH:mm:ss',
+                                            ).fromNow()}
+                                        </span>
+                                    </Divider>
+                                    {/* <div>
                                         {post.Categories &&
                                             post.Categories.map(category => {
                                                 return (
@@ -112,7 +141,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler }) => {
                                     {post.Categories &&
                                         post.Categories.length > 0 && (
                                             <Divider dashed={true} />
-                                        )}
+                                        )} */}
 
                                     <div
                                         style={{
