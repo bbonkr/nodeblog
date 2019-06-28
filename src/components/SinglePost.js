@@ -39,34 +39,36 @@ const SinglePost = ({ post }) => {
                             </div>
                         }
                         description={
-                            <span>
-                                <Icon type="clock-circle" />{' '}
-                                {moment(
-                                    new Date(post.createdAt),
-                                    'YYYY-MM-DD HH:mm:ss',
-                                ).fromNow()}
-                            </span>
+                            post.Categories &&
+                            post.Categories.map(category => {
+                                return (
+                                    <LinkCategory
+                                        key={category.slug}
+                                        user={post.User}
+                                        category={category}
+                                    />
+                                );
+                            })
                         }
                     />
-                    <Divider dashed={true} />
+                    <Divider orientation="right">
+                        <span>
+                            <Icon type="clock-circle" />{' '}
+                            {moment(
+                                new Date(post.createdAt),
+                                'YYYY-MM-DD HH:mm:ss',
+                            ).fromNow()}
+                        </span>
+                    </Divider>
+
                     <div
                         dangerouslySetInnerHTML={{
                             __html: post.html,
                         }}
                     />
 
-                    <Divider />
-                    {post.Categories &&
-                        post.Categories.map(category => {
-                            return (
-                                <LinkCategory
-                                    key={category.slug}
-                                    user={post.User}
-                                    category={category}
-                                />
-                            );
-                        })}
                     <Divider dashed={true} />
+
                     {post.Tags &&
                         post.Tags.map(v => {
                             return <LinkTag key={v.slug} tag={v} />;
