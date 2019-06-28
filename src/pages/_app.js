@@ -207,7 +207,7 @@ const configureStore = (initialState, options) => {
                   !options.isServer &&
                       window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
                       ? window.__REDUX_DEVTOOLS_EXTENSION__()
-                      : f => f,
+                      : f => f
               );
 
     const store = createStore(reducer, initialState, enhancers);

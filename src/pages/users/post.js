@@ -11,6 +11,9 @@ import { LOAD_SINGLE_POST_CALL } from '../../reducers/post';
 import SinglePost from '../../components/SinglePost';
 import { Skeleton, Spin } from 'antd';
 
+import '../../styles/prism.css';
+import '../../styles/singlepost.css';
+
 const UsersPost = ({ user, slug }) => {
     const siteName = 'nodeblog';
     const { loadingPost, singlePost } = useSelector(s => s.post);
@@ -30,23 +33,25 @@ const UsersPost = ({ user, slug }) => {
     }, [baseUrl, singlePost]);
     return (
         <>
-            <Helmet
-                title={`${singlePost.title} | ${
-                    singlePost.User.displayName
-                } | ${siteName}`}
-                description={singlePost.excerpt}
-                meta={[
-                    { name: 'description', content: singlePost.excerpt },
-                    { name: 'og:title', content: singlePost.title },
-                    { name: 'og:description', content: singlePost.excerpt },
-                    { name: 'og:url', content: `${baseUrl}${currentUrl}` },
-                    { name: 'og:image', content: getOgImage() },
-                ]}
-            />
+            {!!singlePost && (
+                <Helmet
+                    title={`${singlePost.title} | ${
+                        singlePost.User.displayName
+                    } | ${siteName}`}
+                    description={singlePost.excerpt}
+                    meta={[
+                        { name: 'description', content: singlePost.excerpt },
+                        { name: 'og:title', content: singlePost.title },
+                        { name: 'og:description', content: singlePost.excerpt },
+                        { name: 'og:url', content: `${baseUrl}${currentUrl}` },
+                        { name: 'og:image', content: getOgImage() },
+                    ]}
+                />
+            )}
             <DefaultLayout>
                 <ContentWrapper>
                     <Spin spinning={loadingPost} tip="loading ...">
-                        {singlePost && !loadingPost ? (
+                        {!!singlePost && !loadingPost ? (
                             <SinglePost post={singlePost} />
                         ) : (
                             <Skeleton active paragraph={{ rows: 4 }} />
