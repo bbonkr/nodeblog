@@ -182,6 +182,7 @@ router.get('/:user/posts/:post', async (req, res, next) => {
                 'title',
                 'slug',
                 'html',
+                'excerpt',
                 'UserId',
                 'createdAt',
                 'updatedAt',

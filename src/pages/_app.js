@@ -14,7 +14,7 @@ import rootSaga from '../sagas';
 import { normalizeReturnUrl } from '../helpers/stringHelper';
 import { ME_CALL } from '../reducers/user';
 import stringHelper from '../helpers/stringHelper';
-import { SET_CURRENT_URL } from '../reducers/settings';
+import { SET_CURRENT_URL, SET_BASE_URL } from '../reducers/settings';
 
 import '../styles/styles.scss';
 // const normalizeReturnUrl = stringHelper.normalizeReturnUrl;
@@ -119,6 +119,7 @@ NodeBlog.getInitialProps = async context => {
     const state = ctx.store.getState();
     const cookie = ctx.isServer ? ctx.req.headers.cookie : '';
     const { me } = state.user;
+    const { baseUrl } = state.settings;
 
     let url = '';
 
@@ -126,6 +127,12 @@ NodeBlog.getInitialProps = async context => {
     if (ctx.isServer) {
         const { req } = ctx;
         apiBaseUrl = `${req.protocol}://${req.get('host')}/api`;
+        if (!baseUrl) {
+            ctx.store.dispatch({
+                type: SET_BASE_URL,
+                data: `${req.protocol}://${req.get('host')}`,
+            });
+        }
     } else {
         apiBaseUrl = '/api';
     }
@@ -200,7 +207,7 @@ const configureStore = (initialState, options) => {
                   !options.isServer &&
                       window.__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
                       ? window.__REDUX_DEVTOOLS_EXTENSION__()
-                      : f => f
+                      : f => f,
               );
 
     const store = createStore(reducer, initialState, enhancers);
