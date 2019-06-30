@@ -3,14 +3,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
     Upload,
     Icon,
-    List,
     Button,
     Card,
     Typography,
     Modal,
     Divider,
+    Spin,
 } from 'antd';
 import moment from 'moment';
+import PropTypes from 'prop-types';
+import StackGrid from 'react-stack-grid';
+import sizeMe from 'react-sizeme';
 import {
     UPLOAD_MY_MEDIA_FILES_CALL,
     LOAD_MY_MEDIA_FILES_CALL,
@@ -22,7 +25,7 @@ import CroppedImage from './CroppedImage';
 const Paragraph = Typography.Paragraph;
 const Dragger = Upload.Dragger;
 
-const FileList = () => {
+const FileList = ({ size, onSelect }) => {
     const dispatch = useDispatch();
 
     const {
@@ -40,6 +43,8 @@ const FileList = () => {
         setImageViewerVisible(false);
     }, []);
 
+    const [cardWidth, setCardWidth] = useState('100%');
+
     useEffect(() => {
         dispatch({
             type: LOAD_MY_MEDIA_FILES_CALL,
@@ -49,7 +54,31 @@ const FileList = () => {
                 keyword: '',
             },
         });
-    }, [dispatch, mediaFilesLimit, uploadBuffer, uploading]);
+    }, [dispatch, mediaFilesLimit]);
+
+    useEffect(() => {
+        const { width } = size;
+
+        let columnWidth = '100%';
+
+        if (width > 576) {
+            columnWidth = '50%';
+        }
+
+        if (width > 768) {
+            columnWidth = '33.33%';
+        }
+
+        if (width > 992) {
+            columnWidth = '25.0%';
+        }
+
+        if (width > 1200) {
+            columnWidth = '20%';
+        }
+
+        setCardWidth(columnWidth);
+    }, [size]);
 
     const uploadBuffer = [];
 
@@ -121,8 +150,37 @@ const FileList = () => {
         [dispatch],
     );
 
+    const onClickSelectFile = useCallback(
+        selectedItem => () => {
+            if (!!onSelect) {
+                onSelect(selectedItem);
+            }
+        },
+        [onSelect],
+    );
+
+    const getCardActions = item => {
+        const actions = [];
+
+        if (!!onSelect) {
+            actions.push(
+                <Icon type="check" onClick={onClickSelectFile(item)} />,
+            );
+        }
+
+        actions.push(
+            <Paragraph
+                copyable={{
+                    text: item.src,
+                }}
+            />,
+        );
+        actions.push(<Icon type="delete" onClick={onClickDeleteFile(item)} />);
+        return actions;
+    };
+
     return (
-        <>
+        <Spin spinning={loadingMediaFiles || uploading}>
             <Dragger
                 disabled={uploading}
                 supportServerRender={true}
@@ -141,35 +199,19 @@ const FileList = () => {
                     uploading company data or other band files
                 </p>
             </Dragger>
+
             <Divider />
-            <List
-                grid={{
-                    gutter: 16,
-                    xs: 1,
-                    sm: 2,
-                    md: 3,
-                    lg: 3,
-                    xl: 4,
-                    xxl: 4,
-                    type: 'flex',
-                    jusify: 'start',
-                    align: 'top',
-                }}
-                dataSource={mediaFiles}
-                loading={loadingMediaFiles || uploading}
-                loadMore={
-                    <Button
-                        style={{ width: '100%' }}
-                        onClick={onClickLoadMore}
-                        loading={loadingMediaFiles}
-                        disabled={!hasMoreMediaFiles}>
-                        Load more
-                    </Button>
-                }
-                renderItem={item => {
+
+            <StackGrid
+                columnWidth={cardWidth}
+                gutterWidth={16}
+                gutterHeight={16}
+                enableSSR={true}
+                monitorImagesLoaded={true}>
+                {mediaFiles.map(item => {
                     const filename = `${item.fileName}${item.fileExtension}`;
                     return (
-                        <List.Item key={item.id}>
+                        <div key={+item.id}>
                             <Card
                                 cover={
                                     item.contentType.indexOf('image') >= 0 && (
@@ -177,39 +219,9 @@ const FileList = () => {
                                             image={item}
                                             onClickHandler={onClickImage}
                                         />
-                                        // <figure
-                                        //     style={{
-                                        //         width: '100%',
-                                        //         height: '20rem',
-                                        //         overflow: 'hidden',
-                                        //         margin: '0',
-                                        //     }}>
-                                        //     <img
-                                        //         style={{
-                                        //             display: 'block',
-                                        //             width: '177.777%',
-                                        //             margin: '0 -38.885%',
-                                        //         }}
-                                        //         src={decodeURIComponent(
-                                        //             item.src
-                                        //         )}
-                                        //         alt={filename}
-                                        //         onClick={onClickImage(item)}
-                                        //     />
-                                        // </figure>
                                     )
                                 }
-                                actions={[
-                                    <Paragraph
-                                        copyable={{
-                                            text: item.src,
-                                        }}
-                                    />,
-                                    <Icon
-                                        type="delete"
-                                        onClick={onClickDeleteFile(item)}
-                                    />,
-                                ]}>
+                                actions={getCardActions(item)}>
                                 <Card.Meta
                                     title={filename}
                                     description={
@@ -222,33 +234,44 @@ const FileList = () => {
                                         </span>
                                     }
                                 />
-                                <div
-                                    tyle={{
-                                        textOverflow: 'ellipsis',
-                                    }}>
+                                <div style={{ textOverflow: 'ellipsis' }}>
                                     <Paragraph
                                         copyable={{
                                             text: item.src,
-                                        }}
-                                        ellipsis={true}>
+                                        }}>
                                         {`${item.fileName}${
                                             item.fileExtension
                                         }`}
                                     </Paragraph>
                                 </div>
                             </Card>
-                        </List.Item>
+                        </div>
                     );
-                }}
-            />
+                })}
+            </StackGrid>
+            <Divider />
+            <Button
+                loading={loadingMediaFiles || uploading}
+                style={{ width: '100%' }}
+                onClick={onClickLoadMore}
+                disabled={!hasMoreMediaFiles}>
+                Load more
+            </Button>
 
             <ImageViewer
                 files={imageViewerFiles}
                 visible={imageViewerVisible}
                 closeImageviewer={closeImageviewer}
             />
-        </>
+        </Spin>
     );
 };
 
-export default FileList;
+FileList.porpTypes = {
+    size: PropTypes.shape({
+        width: PropTypes.number.isRequired,
+    }),
+    onSelect: PropTypes.func,
+};
+
+export default sizeMe()(FileList);
