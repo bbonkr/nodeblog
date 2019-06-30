@@ -126,6 +126,13 @@ const ChangeInfoForm = () => {
         [dispatch, displayName, email, photo, username],
     );
 
+    const onSelect = item => {
+        if (!!item) {
+            setPhoto(item.src);
+            setFileListModalVisible(false);
+        }
+    };
+
     return (
         <>
             <Form onSubmit={onSubmit}>
@@ -207,11 +214,11 @@ const ChangeInfoForm = () => {
             </Modal> */}
             <FullSizeModal
                 footer={false}
-                visible={fileListVisible}
+                visible={fileListModalVisible}
                 maskClosable={true}
-                onCancel={closeFileList}
+                onCancel={onClickHideFileListModal}
                 width="100%">
-                <FileList />
+                <FileList onSelect={onSelect} />
             </FullSizeModal>
         </>
     );
