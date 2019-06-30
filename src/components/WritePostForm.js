@@ -1,17 +1,83 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Input, Divider, Select, Form, Button, Tabs, Icon } from 'antd';
+import { Input, Divider, Select, Form, Button, Tabs, Icon, Modal } from 'antd';
 import Markdown from 'react-markdown';
 import showdown from 'showdown';
 import xssFilter from 'showdown-xss-filter';
-import {
-    WRITE_POST_CALL,
-    EDIT_POST_CALL,
-} from '../reducers/me';
+import { WRITE_POST_CALL, EDIT_POST_CALL } from '../reducers/me';
 import FullSizeModal from '../styledComponents/FullSizeModal';
 import FileList from './FileList';
 
 const PLACEHOLDER_MARKDOWN = 'Write your thought!';
+const SELECT_FILE_TARGET_MARKDOWN = 'markdown';
+const SELECT_FILE_TARGET_COVERIMAGE = 'coverimage';
+
+const Validator = {
+    checkTitle(formData) {
+        const { title } = formData;
+
+        if (!title || title.trim().length === 0) {
+            return {
+                valid: false,
+                message: 'Please input a title',
+            };
+        }
+
+        return {
+            valid: true,
+            message: '',
+        };
+    },
+
+    checkMarkdown(formData) {
+        const { markdown } = formData;
+
+        if (!markdown || markdown.trim().length === 0) {
+            return {
+                valid: false,
+                message: 'Please write a your content.',
+            };
+        }
+
+        return {
+            valid: true,
+            message: '',
+        };
+    },
+
+    checkCategory(formData) {
+        const { categories } = formData;
+        if (!categories || categories.length === 0) {
+            return {
+                valid: false,
+                message: 'Please select a category at least one.',
+            };
+        }
+        return {
+            valid: true,
+            message: '',
+        };
+    },
+
+    validate(formData) {
+        let valid = true;
+        const results = [];
+        const messages = [];
+
+        results.push(this.checkTitle(formData));
+        results.push(this.checkMarkdown(formData));
+        results.push(this.checkCategory(formData));
+
+        results.forEach(v => {
+            valid &= v.valid;
+            if (!v.valid) {
+                messages.push(v.message);
+            }
+        });
+
+        return { valid: valid, messages: messages };
+    },
+};
 
 const WritePostForm = ({ id }) => {
     const dispatch = useDispatch();
@@ -69,45 +135,17 @@ const WritePostForm = ({ id }) => {
     // const [initCategories, setInitCategories] = useState([]);
     // const [initTags, setInitTags] = useState([]);
 
-    const onChangeTitle = useCallback(e => {
-        const text = e.target.value;
-        setTitle(text);
-    }, []);
+    const [selectFileTarget, setSelectFileTarget] = useState('');
 
-    const onChangeSlug = useCallback(e => {
-        const text = e.target.value;
-        setSlug(text);
-    }, []);
-
-    const onChangeMarkdown = useCallback(
-        e => {
-            const text = e.target.value;
-            setMarkdown(text);
-            setHtml(markdownConverter.makeHtml(text));
-        },
-        [markdownConverter],
+    const [titleErrorMessage, setTitleErrorMessage] = useState('');
+    const [markdownErrorMessage, setMarkdownErrorMessage] = useState('');
+    const [categoriesErrorMessage, setCategoriesErrorMessage] = useState(
+        'Please select a category at least one.',
     );
 
-    const onChangeCoverImage = useCallback(e => {
-        const newValue = e.target.value;
-        setCoverImage(newValue);
-
-        if (!!newValue) {
-            // 이미지 확인
-        }
-    }, []);
-
-    const closeFileList = useCallback(() => {
-        setFileListVisible(false);
-    }, []);
+    let markdownRef = React.createRef();
 
     useEffect(() => {
-        // console.log('/me/write => useEffect id: ', id);
-
-        // if (!id) {
-        //     dispatch({ type: WRITE_NEW_POST_CALL });
-        // }
-
         if (id && myPost) {
             setTitle(myPost.title);
             setSlug(myPost.slug);
@@ -149,6 +187,53 @@ const WritePostForm = ({ id }) => {
         }
     }, [dispatch, id, myPost]);
 
+    const onChangeTitle = useCallback(
+        e => {
+            const newValue = e.target.value;
+            setTitle(newValue);
+            const { message } = Validator.checkTitle({ title: newValue });
+            setTitleErrorMessage(message);
+
+            if (
+                !!newValue &&
+                newValue.trim().length > 0 &&
+                (!slug || slug.trim().length === 0)
+            ) {
+                setSlug(newValue.replace(/\s+/g, '-').toLowerCase());
+            }
+        },
+        [slug],
+    );
+
+    const onChangeSlug = useCallback(e => {
+        const text = e.target.value;
+        setSlug(text);
+    }, []);
+
+    const onChangeMarkdown = useCallback(
+        e => {
+            const newValue = e.target.value;
+            setMarkdown(newValue);
+            setHtml(markdownConverter.makeHtml(newValue));
+            const { message } = Validator.checkMarkdown({ markdown: newValue });
+            setMarkdownErrorMessage(message);
+        },
+        [markdownConverter],
+    );
+
+    const onChangeCoverImage = useCallback(e => {
+        const newValue = e.target.value;
+        setCoverImage(newValue);
+
+        if (!!newValue) {
+            // 이미지 확인
+        }
+    }, []);
+
+    const closeFileList = useCallback(() => {
+        setFileListVisible(false);
+    }, []);
+
     const onTabKeyPressed = useCallback(e => {
         e.preventDefault();
         const indent = `    `;
@@ -171,6 +256,8 @@ const WritePostForm = ({ id }) => {
             }),
         );
         setSelectedCategoryValues(values);
+        const { message } = Validator.checkCategory({ categories: values });
+        setCategoriesErrorMessage(message);
     }, []);
 
     const onChangeTags = useCallback((values, options) => {
@@ -189,49 +276,92 @@ const WritePostForm = ({ id }) => {
     }, []);
 
     const onClickShowFileListModal = useCallback(() => {
+        setSelectFileTarget(SELECT_FILE_TARGET_COVERIMAGE);
         setFileListVisible(true);
     }, []);
 
-    const onClickHideFileListModal = useCallback(() => {
-        setFileListVisible(false);
+    const onClickInsetImage = useCallback(e => {
+        setSelectFileTarget(SELECT_FILE_TARGET_MARKDOWN);
+        setFileListVisible(true);
     }, []);
+
+    const onSelectMarkdownInsertImage = useCallback(
+        item => {
+            const { textAreaRef } = markdownRef.current;
+
+            const startIndex = textAreaRef.selectionStart;
+            const imageItem = `![${item.fileName}${item.fileExtension}](${
+                item.src
+            })\n`;
+            const currentValue = textAreaRef.value;
+            const newValue = `${currentValue.slice(
+                0,
+                startIndex,
+            )}${imageItem}${currentValue.slice(startIndex)}`;
+
+            setMarkdown(newValue);
+            // setActiveKey('markdown');
+            setFileListVisible(false);
+            Modal.destroyAll();
+        },
+        [markdownRef],
+    );
+
+    const onSelectCoverImage = useCallback(item => {
+        setCoverImage(item.src);
+        setFileListVisible(false);
+        Modal.destroyAll();
+    }, []);
+
+    const onSelectItemOnFileList = useCallback(
+        item => {
+            switch (selectFileTarget) {
+                case SELECT_FILE_TARGET_MARKDOWN:
+                    onSelectMarkdownInsertImage(item);
+                    break;
+
+                case SELECT_FILE_TARGET_COVERIMAGE:
+                    onSelectCoverImage(item);
+                    break;
+
+                default:
+                    break;
+            }
+        },
+        [onSelectCoverImage, onSelectMarkdownInsertImage, selectFileTarget],
+    );
 
     const onSubmit = useCallback(
         e => {
             e.preventDefault();
 
-            if (!title) {
-            }
+            const formData = {
+                title: title.trim(),
+                slug: slug.trim(),
+                markdown: markdown.trim(),
+                categories: selectedCategories,
+                tags: selectedTags,
+                coverImage: coverImage.trim(),
+            };
 
-            if (!slug) {
-                setSlug(title.replace(/\s+/g, '-').toLowerCase());
-            }
+            const { valid } = Validator.validate(formData);
+            if (valid) {
+                if (!slug || slug.trim().length === 0) {
+                    setSlug(title.replace(/\s+/g, '-').toLowerCase());
+                }
 
-            if (id) {
-                dispatch({
-                    type: EDIT_POST_CALL,
-                    id: id,
-                    data: {
-                        title: title.trim(),
-                        slug: slug.trim(),
-                        markdown: markdown.trim(),
-                        categories: selectedCategories,
-                        tags: selectedTags,
-                        coverImage: coverImage.trim(),
-                    },
-                });
-            } else {
-                dispatch({
-                    type: WRITE_POST_CALL,
-                    data: {
-                        title: title.trim(),
-                        slug: slug.trim(),
-                        markdown: markdown.trim(),
-                        categories: selectedCategories,
-                        tags: selectedTags,
-                        coverImage: coverImage.trim(),
-                    },
-                });
+                if (id) {
+                    dispatch({
+                        type: EDIT_POST_CALL,
+                        id: id,
+                        data: formData,
+                    });
+                } else {
+                    dispatch({
+                        type: WRITE_POST_CALL,
+                        data: formData,
+                    });
+                }
             }
         },
         [
@@ -249,13 +379,21 @@ const WritePostForm = ({ id }) => {
     return (
         <>
             <Form onSubmit={onSubmit}>
-                <Form.Item label="Title">
+                <Form.Item
+                    label="Title"
+                    hasFeedback={true}
+                    help={titleErrorMessage}
+                    validateStatus={!!titleErrorMessage ? 'error' : ''}>
                     <Input value={title} onChange={onChangeTitle} />
                 </Form.Item>
                 <Form.Item label="Slug">
                     <Input value={slug} onChange={onChangeSlug} />
                 </Form.Item>
-                <Form.Item label="Content">
+                <Form.Item
+                    label="Content"
+                    hasFeedback={true}
+                    help={markdownErrorMessage}
+                    validateStatus={!!markdownErrorMessage ? 'error' : ''}>
                     <Tabs>
                         <Tabs.TabPane
                             tab={
@@ -264,7 +402,13 @@ const WritePostForm = ({ id }) => {
                                 </span>
                             }
                             key="markdown">
+                            <div>
+                                <Button onClick={onClickInsetImage}>
+                                    <Icon type="file-image" /> Insert image
+                                </Button>
+                            </div>
                             <Input.TextArea
+                                ref={markdownRef}
                                 value={markdown}
                                 onChange={onChangeMarkdown}
                                 placeholder={PLACEHOLDER_MARKDOWN}
@@ -280,7 +424,7 @@ const WritePostForm = ({ id }) => {
                             key="preview">
                             <Markdown source={markdown} escapeHtml={false} />
                         </Tabs.TabPane>
-                        <Tabs.TabPane
+                        {/* <Tabs.TabPane
                             tab={
                                 <span>
                                     <Icon type="file-image" /> Media
@@ -288,9 +432,9 @@ const WritePostForm = ({ id }) => {
                             }
                             key="media">
                             <div>
-                                <FileList />
+                                <FileList onSelect={onSelectImageFile} />
                             </div>
-                        </Tabs.TabPane>
+                        </Tabs.TabPane> */}
                     </Tabs>
                 </Form.Item>
                 <Form.Item label="Cover">
@@ -307,7 +451,11 @@ const WritePostForm = ({ id }) => {
                         }
                     />
                 </Form.Item>
-                <Form.Item label="Categories">
+                <Form.Item
+                    label="Categories"
+                    hasFeedback={true}
+                    help={categoriesErrorMessage}
+                    validateStatus={!!categoriesErrorMessage ? 'error' : ''}>
                     <Select
                         mode="multiple"
                         onChange={onChangeCategories}
@@ -353,12 +501,14 @@ const WritePostForm = ({ id }) => {
             </Form>
 
             <FullSizeModal
+                title="Select a file"
                 footer={false}
                 visible={fileListVisible}
                 maskClosable={true}
                 onCancel={closeFileList}
+                destroyOnClose={true}
                 width="100%">
-                <FileList />
+                <FileList onSelect={onSelectItemOnFileList} />
             </FullSizeModal>
         </>
     );

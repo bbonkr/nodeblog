@@ -12,8 +12,8 @@ import LinkUsersPosts from './LinkUsersPosts';
 import IconLike from './IconLike';
 
 import Prism from 'prismjs';
-// import '../styles/prism.css';
-// import '../styles/singlepost.css';
+import '../styles/prism.css';
+import '../styles/singlepost.css';
 
 const SinglePost = ({ post }) => {
     useEffect(() => {
@@ -71,7 +71,7 @@ const SinglePost = ({ post }) => {
                             <Icon type="clock-circle" />{' '}
                             {moment(
                                 new Date(post.createdAt),
-                                'YYYY-MM-DD HH:mm:ss'
+                                'YYYY-MM-DD HH:mm:ss',
                             ).fromNow()}
                         </span>
                     </Divider>

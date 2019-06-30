@@ -9,6 +9,7 @@ const FullSizeModal = styled(Modal)`
     right: 0;
     bottom: 0;
     height: 100vh;
+    min-height: 100vh;
     overflow-y: auto;
 `;
 
