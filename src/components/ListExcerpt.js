@@ -42,7 +42,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler, size }) => {
         }
 
         if (width > 1200) {
-            columnWidth = '300px';
+            columnWidth = '20%';
         }
 
         setCardWidth(columnWidth);
@@ -155,7 +155,7 @@ const ListExcerpt = ({ posts, loading, hasMore, loadMoreHandler, size }) => {
             <Divider />
             {hasMore && (
                 <FullWidthButton loading={loading} onClick={loadMoreHandler}>
-                    더 보기
+                    Load more
                 </FullWidthButton>
             )}
         </article>
