@@ -11,8 +11,8 @@ import { LOAD_SINGLE_POST_CALL } from '../../reducers/post';
 import SinglePost from '../../components/SinglePost';
 import { Skeleton, Spin } from 'antd';
 
-import '../../styles/prism.css';
-import '../../styles/singlepost.css';
+// import '../../styles/prism.css';
+// import '../../styles/singlepost.css';
 
 const UsersPost = ({ user, slug }) => {
     const siteName = 'nodeblog';

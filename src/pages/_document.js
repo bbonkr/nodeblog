@@ -16,6 +16,10 @@ class NodeBlogDocument extends Document {
 
     render() {
         const { htmlAttributes, bodyAttributes, ...helmet } = this.props.helmet;
+
+        const prefixDir = '/_next/';
+        const cssFiles = this.props.files.filter(v => v.endsWith('.css'));
+
         const htmlAttrs = htmlAttributes.toComponent();
         const bodyAttrs = bodyAttributes.toComponent();
 
@@ -28,6 +32,17 @@ class NodeBlogDocument extends Document {
                 <head>
                     {Object.values(helmet).map(el => el.toComponent())}
                     {this.props.styleTags}
+                    {cssFiles.map(css => {
+                        console.log('=========> css file: ', css);
+                        return (
+                            <link
+                                rel="stylesheet"
+                                href={`${prefixDir}${css}`}
+                                type="text/css"
+                                charSet="UTF-8"
+                            />
+                        );
+                    })}
                 </head>
                 <body {...bodyAttrs}>
                     <Main />
