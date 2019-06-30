@@ -67,6 +67,7 @@ const ChangeInfoForm = () => {
 
     const onClickHideFileListModal = useCallback(() => {
         setFileListModalVisible(false);
+        Modal.destroyAll();
     }, []);
 
     const onChangeEmail = useCallback(e => {
@@ -74,7 +75,7 @@ const ChangeInfoForm = () => {
         setEmail(newValue);
         const result = validator.checkEmail({ email: newValue.trim() });
         setemailErrorMessage(result.message);
-    });
+    }, []);
 
     const onChangeUsername = useCallback(e => {
         const newValue = e.target.value;
@@ -130,6 +131,7 @@ const ChangeInfoForm = () => {
         if (!!item) {
             setPhoto(item.src);
             setFileListModalVisible(false);
+            Modal.destroyAll();
         }
     };
 
@@ -195,30 +197,18 @@ const ChangeInfoForm = () => {
                     </Button>
                 </Form.Item>
             </Form>
-            {/* <Modal
-                width="100%"
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    overflow: 'auto',
-                }}
-                title="Files"
-                content={<div>Copy image file url.</div>}
-                footer={false}
-                visible={fileListModalVisible}
-                onCancel={onClickHideFileListModal}>
-                <FileList />
-            </Modal> */}
+
             <FullSizeModal
                 footer={false}
                 visible={fileListModalVisible}
                 maskClosable={true}
                 onCancel={onClickHideFileListModal}
-                width="100%">
-                <FileList onSelect={onSelect} />
+                width="100%"
+                title="Select a file"
+                destroyOnClose={true}>
+                <div>
+                    <FileList onSelect={onSelect} />
+                </div>
             </FullSizeModal>
         </>
     );
