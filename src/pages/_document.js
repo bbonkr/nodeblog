@@ -16,14 +16,7 @@ class NodeBlogDocument extends Document {
 
     render() {
         const { htmlAttributes, bodyAttributes, ...helmet } = this.props.helmet;
-        // const { buildManifest } = this.props;
-        // const { css } = buildManifest;
 
-        // console.log('=========> document props', this.props);
-        // console.dir(
-        //     '=========> document props styleTags',
-        //     this.props.styleTags,
-        // );
         const prefixDir = '/_next/';
         const cssFiles = this.props.files.filter(v => v.endsWith('.css'));
 

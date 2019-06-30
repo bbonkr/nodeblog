@@ -89,13 +89,13 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                             type: 'text/css',
                             charset: 'UTF-8',
                         },
-                        {
-                            rel: 'stylesheet',
-                            // href: '/_next/static/css/styles.chunk.css',
-                            href: '/_next/static/css/styles.css',
-                            type: 'text/css',
-                            charset: 'UTF-8',
-                        },
+                        // {
+                        //     rel: 'stylesheet',
+                        //     // href: '/_next/static/css/styles.chunk.css',
+                        //     href: '/_next/static/css/styles.css',
+                        //     type: 'text/css',
+                        //     charset: 'UTF-8',
+                        // },
                     ]}
                     script={[
                         {
