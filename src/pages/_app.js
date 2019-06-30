@@ -91,7 +91,8 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                         },
                         {
                             rel: 'stylesheet',
-                            href: '/_next/static/css/styles.chunk.css',
+                            // href: '/_next/static/css/styles.chunk.css',
+                            href: '/_next/static/css/styles.css',
                             type: 'text/css',
                             charset: 'UTF-8',
                         },
