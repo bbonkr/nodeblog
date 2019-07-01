@@ -52,6 +52,12 @@ import {
     LOAD_LIKED_POSTS_CALL,
     LOAD_LIKED_POSTS_DONE,
     LOAD_LIKED_POSTS_FAIL,
+    LOAD_STAT_GENERAL_CALL,
+    LOAD_STAT_GENERAL_DONE,
+    LOAD_STAT_GENERAL_FAIL,
+    LOAD_STAT_READ_CALL,
+    LOAD_STAT_READ_DONE,
+    LOAD_STAT_READ_FAIL,
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
@@ -458,6 +464,56 @@ function* watchLoadLikedPosts() {
     yield takeLatest(LOAD_LIKED_POSTS_CALL, loadLikedPosts);
 }
 
+function loadStatGeneralApi(query) {
+    return axios.get('/stat/general', { withCredentials: true });
+}
+
+function* loadStatGeneral(action) {
+    try {
+        const result = yield call(loadStatGeneralApi, action.data);
+        yield put({
+            type: LOAD_STAT_GENERAL_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_STAT_GENERAL_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadStatGeneral() {
+    yield takeLatest(LOAD_STAT_GENERAL_CALL, loadStatGeneral);
+}
+
+function loadStatReadApi(query) {
+    return axios.get('/stat/postread', { withCredentials: true });
+}
+
+function* loadStatRead(action) {
+    try {
+        const result = yield call(loadStatReadApi, action.data);
+        yield put({
+            type: LOAD_STAT_READ_DONE,
+            data: result.data,
+        });
+    } catch (e) {
+        console.error(e);
+        yield put({
+            type: LOAD_STAT_READ_FAIL,
+            error: e,
+            reason: e.response && e.response.data,
+        });
+    }
+}
+
+function* watchLoadStatRead() {
+    yield takeLatest(LOAD_STAT_READ_CALL, loadStatRead);
+}
+
 export default function* postSaga() {
     yield all([
         fork(watchLoadMyPosts),
@@ -474,5 +530,7 @@ export default function* postSaga() {
         fork(wacthEditCategory),
         fork(watchDeleteCategory),
         fork(watchLoadLikedPosts),
+        fork(watchLoadStatGeneral),
+        fork(watchLoadStatRead),
     ]);
 }

@@ -11,5 +11,6 @@ router.use('/tags', require('./tags'));
 router.use('/user', require('./user'));
 router.use('/users', require('./users'));
 router.use('/me', require('./me'));
+router.use('/stat', require('./stat'));
 
 module.exports = router;
