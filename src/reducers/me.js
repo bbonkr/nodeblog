@@ -57,6 +57,15 @@ export const initialState = {
     LikedPostsHasMore: false,
     likedPostsPageToken: '',
     likedPostsTotal: 0,
+
+    // stat - general
+    statGeneral: {},
+    statGeneralLoading: false,
+    statGeneralErrorReason: '',
+
+    statRead: {},
+    statReadLoading: false,
+    statReadErrorReason: '',
 };
 
 export const LOAD_MY_POSTS_CALL = 'LOAD_MY_POSTS_CALL';
@@ -120,6 +129,14 @@ export const SIDE_MENU_COLLAPSE = 'SIDE_MENU_COLLAPSE';
 export const LOAD_LIKED_POSTS_CALL = 'LOAD_LIKED_POSTS_CALL';
 export const LOAD_LIKED_POSTS_DONE = 'LOAD_LIKED_POSTS_DONE';
 export const LOAD_LIKED_POSTS_FAIL = 'LOAD_LIKED_POSTS_FAIL';
+
+export const LOAD_STAT_GENERAL_CALL = 'LOAD_STAT_GENERAL_CALL';
+export const LOAD_STAT_GENERAL_DONE = 'LOAD_STAT_GENERAL_DONE';
+export const LOAD_STAT_GENERAL_FAIL = 'LOAD_STAT_GENERAL_FAIL';
+
+export const LOAD_STAT_READ_CALL = 'LOAD_STAT_READ_CALL';
+export const LOAD_STAT_READ_DONE = 'LOAD_STAT_READ_DONE';
+export const LOAD_STAT_READ_FAIL = 'LOAD_STAT_READ_FAIL';
 
 const reducer = (state = initialState, action) =>
     produce(state, draft => {
@@ -434,6 +451,33 @@ const reducer = (state = initialState, action) =>
                 draft.likedPostsLoading = false;
                 draft.likedPostsErrorReason = action.reason;
                 break;
+
+            // 통계
+            case LOAD_STAT_GENERAL_CALL:
+                draft.statGeneralLoading = true;
+                break;
+            case LOAD_STAT_GENERAL_DONE:
+                draft.statGeneral = action.data;
+                draft.statGeneralLoading = false;
+                break;
+            case LOAD_STAT_GENERAL_FAIL:
+                draft.statGeneralLoading = false;
+                draft.statGeneralErrorReason = action.reason;
+                break;
+
+            // 통계 읽은수
+            case LOAD_STAT_READ_CALL:
+                draft.statReadLoading = true;
+                break;
+            case LOAD_STAT_READ_DONE:
+                draft.statRead = action.data;
+                draft.statReadLoading = false;
+                break;
+            case LOAD_STAT_READ_FAIL:
+                draft.statReadErrorReason = action.reason;
+                draft.statReadLoading = false;
+                break;
+
             default:
                 break;
         }
