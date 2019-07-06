@@ -321,7 +321,7 @@ const SignUpForm = () => {
                 hasFeedback={true}
                 validateStatus={!emailErrorMessage ? 'success' : 'error'}
                 help={emailErrorMessage}>
-                <Input
+                <Input type="email"
                     value={email}
                     onChange={onChangeEmail}
                     placeholder={PLACEHOLDER_EMAIL}
