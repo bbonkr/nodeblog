@@ -140,6 +140,7 @@ const SignIn = ({ returnUrl }) => {
                         <Form onSubmit={onSubmit}>
                             <Form.Item>
                                 <Input
+                                    type="email"
                                     style={{ width: '100%' }}
                                     value={email}
                                     onChange={onEmailChange}

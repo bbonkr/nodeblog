@@ -56,7 +56,7 @@ Home.getInitialProps = async context => {
     // console.log('context.isServer', context.isServer);
     // console.log('get post', context.isServer || !posts || posts.length === 0);
     if (context.isServer || !posts || posts.length === 0) {
-        console.log('get data');
+        // console.log('get data');
 
         context.store.dispatch({
             type: LOAD_POSTS_CALL,
