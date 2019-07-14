@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Layout, Menu, Icon, Avatar } from 'antd';
+import { Layout, Menu, Icon, Avatar, Drawer } from 'antd';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import Router from 'next/router';
@@ -179,6 +179,9 @@ const MeLayout = ({ children }) => {
                     minHeight: '100vh',
                 }}>
                 <Layout style={{ minHeight: '100vh' }}>
+                    <Drawer placement="left" closable={false} visible={false} bodyStyle={{padding: 0}}></Drawer>
+
+                    
                     <Sider
                         collapsible={true}
                         collapsed={sideMenuCollapsed}
@@ -211,6 +214,7 @@ const MeLayout = ({ children }) => {
                             })}
                         </Menu>
                     </Sider>
+                    
                     <Layout style={{ minHeight: '100vh' }}>
                         {/* <Layout.Header /> */}
                         <Layout.Content>

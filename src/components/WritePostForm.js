@@ -139,11 +139,9 @@ const WritePostForm = ({ id }) => {
 
     const [titleErrorMessage, setTitleErrorMessage] = useState('');
     const [markdownErrorMessage, setMarkdownErrorMessage] = useState('');
-    const [categoriesErrorMessage, setCategoriesErrorMessage] = useState(
-        'Please select a category at least one.',
-    );
+    const [categoriesErrorMessage, setCategoriesErrorMessage] = useState('');
 
-    let markdownRef = React.createRef();
+    const markdownRef = React.createRef(null);
 
     useEffect(() => {
         if (id && myPost) {
@@ -256,6 +254,7 @@ const WritePostForm = ({ id }) => {
             }),
         );
         setSelectedCategoryValues(values);
+
         const { message } = Validator.checkCategory({ categories: values });
         setCategoriesErrorMessage(message);
     }, []);
@@ -341,7 +340,7 @@ const WritePostForm = ({ id }) => {
                 markdown: markdown.trim(),
                 categories: selectedCategories,
                 tags: selectedTags,
-                coverImage: coverImage.trim(),
+                coverImage: (coverImage || '').trim(),
             };
 
             const { valid } = Validator.validate(formData);
@@ -412,7 +411,7 @@ const WritePostForm = ({ id }) => {
                                 value={markdown}
                                 onChange={onChangeMarkdown}
                                 placeholder={PLACEHOLDER_MARKDOWN}
-                                autosize={{ minRows: 10 }}
+                                autosize={{ minRows: 10, maxRows: 20 }}
                             />
                         </Tabs.TabPane>
                         <Tabs.TabPane
