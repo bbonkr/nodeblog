@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import { BackTop } from 'antd';
 import PropTypes from 'prop-types';
 
@@ -7,14 +7,14 @@ import PropTypes from 'prop-types';
  *
  * @param {element} 내부에 렌더링될 자식 요소
  */
-const AppLayout = ({ children }) => {
+const AppLayout = memo( ({ children }) => {
     return (
         <div style={{ minHeight: '100vh' }}>
             <BackTop />
             <div>{children}</div>
         </div>
     );
-};
+});
 
 AppLayout.propTypes = {
     children: PropTypes.element.isRequired,

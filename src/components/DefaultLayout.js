@@ -33,8 +33,13 @@ const DefaultLayout = ({ children }) => {
 
     const [searchModalVisible, setSearchModalVisible] = useState(false);
     const [searchKeywordText, setSearchKeywordText] = useState('');
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const { me } = useSelector(s => s.user);
     const { currentUrl } = useSelector(state => state.settings);
+
+    useEffect(()=>{
+        setIsLoggedIn(!!me);
+    }, [me]);
 
     const onClickShowSearchModal = useCallback(e => {
         setSearchKeywordText('');

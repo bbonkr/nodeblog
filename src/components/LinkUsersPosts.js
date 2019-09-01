@@ -1,8 +1,8 @@
-import React from 'react';
+import React, {memo} from 'react';
 import Link from 'next/link';
 import PropTypes from 'prop-types';
 
-const LinkUsersPosts = ({ user, children }) => {
+const LinkUsersPosts = memo( ({ user, children }) => {
     const { username } = user;
     const displayUsername = `@${username}`;
     return (
@@ -17,7 +17,7 @@ const LinkUsersPosts = ({ user, children }) => {
             <a>{children}</a>
         </Link>
     );
-};
+});
 
 LinkUsersPosts.propTypes = {
     user: PropTypes.object.isRequired,

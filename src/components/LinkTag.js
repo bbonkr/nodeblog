@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {memo} from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -8,7 +8,7 @@ const LinkWrapper = styled.span`
     margin-right: 1em;
 `;
 
-const LinkTag = ({ tag }) => {
+const LinkTag = memo( ({ tag }) => {
     const { name, slug } = tag;
     const encodedSlug = encodeURIComponent(slug);
     return (
@@ -22,7 +22,7 @@ const LinkTag = ({ tag }) => {
             </Link>
         </LinkWrapper>
     );
-};
+});
 
 LinkTag.propTypes = {
     tag: PropTypes.object.isRequired,
