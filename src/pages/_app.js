@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import App, { Container } from 'next/app';
 import PropTypes from 'prop-types';
 import withRedux from 'next-redux-wrapper';
@@ -26,7 +26,7 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
     const fbAdmin = process.env.FB_ADMIN;
     const siteName = process.env.SITE_NAME || 'nodeblog';
     return (
-        <Container>
+        <Fragment>
             <Provider store={store}>
                 <Helmet
                     title="NodeBlog"
@@ -108,7 +108,7 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                     <Component {...pageProps} returnUrl={returnUrl} />
                 </AppLayout>
             </Provider>
-        </Container>
+        </Fragment>
     );
 };
 

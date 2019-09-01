@@ -22,7 +22,6 @@ class NodeBlogDocument extends Document {
 
         const htmlAttrs = htmlAttributes.toComponent();
         const bodyAttrs = bodyAttributes.toComponent();
-
         const prod = process.env.NODE_ENV === 'production';
         /* IE 지원하려면 true */
         const ieSupport = false;
@@ -31,7 +30,7 @@ class NodeBlogDocument extends Document {
             <html {...htmlAttrs}>
                 <head>
                     {Object.values(helmet).map(el => el.toComponent())}
-                    {this.props.styleTags}
+                    {this.props.styleTags && this.props.styleTags.map(v=>v)}
                     {cssFiles.map(css => {
                         // console.log('=========> css file: ', css);
                         return (
@@ -59,7 +58,7 @@ class NodeBlogDocument extends Document {
 
 NodeBlogDocument.propTypes = {
     helmet: PropTypes.object.isRequired,
-    styleTags: PropTypes.object.isRequired,
+    styleTags: PropTypes.array.isRequired,
 };
 
 export default NodeBlogDocument;
