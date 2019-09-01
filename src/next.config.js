@@ -1,10 +1,13 @@
 const webpack = require('webpack');
+const dotenv = require('dotenv');
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
     enabled: process.env.ANALYZE === 'true',
 });
 const CompressionPlugin = require('compression-webpack-plugin');
 const withCSS = require('@zeit/next-css');
 const withSass = require('@zeit/next-sass');
+
+dotenv.config();
 
 function HACK_removeMinimizeOptionFromCssLoaders(config) {
     console.warn(
@@ -24,33 +27,11 @@ function HACK_removeMinimizeOptionFromCssLoaders(config) {
 module.exports = withBundleAnalyzer(
     withCSS(
         withSass({
-            // withSass
-            // sassLoaderOptions: {
-            //     includePaths: ['styles'],
-            // },
-
-            // withBundleAnalyzer
-            // analyzeServer: ['server', 'both'].includes(
-            //     process.env.BUNDLE_ANALYZE,
-            // ),
-            // analyzeBrowser: ['browser', 'both'].includes(
-            //     process.env.BUNDLE_ANALYZE,
-            // ),
-            // bundleAnalyzerConfig: {
-            //     server: {
-            //         analyzerMode: 'static',
-            //         reportFilename: 'bundles/server.html',
-            //     },
-
-            //     browser: {
-            //         analyzerMode: 'static',
-            //         reportFilename: 'bundles/client.html',
-            //     },
-            // },
-
+            env:{
+                apiBaseUrl: process.env.API_BASE_URL,
+            },
             distDir: '.next',
             webpack(config) {
-                // console.log('config', config);
                 const prod = process.env.NODE_ENV === 'production';
 
                 const plugins = [
@@ -62,7 +43,7 @@ module.exports = withBundleAnalyzer(
                 ];
 
                 if (prod) {
-                    config.plugins.push(new CompressionPlugin());
+                    plugins.push(new CompressionPlugin());
                 }
 
                 // config.module.rules.push({

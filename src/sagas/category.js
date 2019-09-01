@@ -8,7 +8,7 @@ import {
     actionChannel,
     throttle,
 } from 'redux-saga/effects';
-import {http} from './httpHelper'
+import { http } from './httpHelper'
 import {
     LOAD_CATEGORIES_CALL,
     LOAD_CATEGORIES_DONE,

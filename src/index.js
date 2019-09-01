@@ -9,6 +9,7 @@ const passportConfig = require('./passport');
 const dotenv = require('dotenv');
 const next = require('next');
 const path = require('path');
+// const axios = require('axios');
 const DatabaseSessionStore = require('./passport/databaseSessionStore');
 const expressApp = express();
 
@@ -37,6 +38,8 @@ const dbSessionStore = new DatabaseSessionStore({
     database: db,
     expiration: 1000 * 60 * 60 * 24 * 90,
 });
+
+// axios.defaults.baseURL = `${protocol}://${host}:${port}/api`;
 
 nextApp.prepare().then(() => {
     /** express app */

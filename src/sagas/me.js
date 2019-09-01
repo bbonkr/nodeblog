@@ -8,7 +8,7 @@ import {
     actionChannel,
     throttle,
 } from 'redux-saga/effects';
-import {http} from './httpHelper';
+import { http } from './httpHelper';
 import {
     LOAD_MY_POSTS_CALL,
     LOAD_MY_POSTS_DONE,

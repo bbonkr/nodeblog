@@ -192,13 +192,16 @@ router.get('/:user/posts/:post', async (req, res, next) => {
         });
 
         if (post) {
-            const log = await db.PostAccessLog.create({
-                ipAddress: req.connection.remoteAddress,
-                userAgent: req.headers['user-agent'],
-                userId: req.user && req.user.id,
-            });
 
-            await post.addPostAccessLog(log);
+            if(!req.user || (!!req.user && req.user.id !== post.userId)){
+                const log = await db.PostAccessLog.create({
+                    ipAddress: req.connection.remoteAddress,
+                    userAgent: req.headers['user-agent'],
+                    userId: req.user && req.user.id,
+                });
+
+                await post.addPostAccessLog(log);
+            }            
 
             return res.json(post);
         } else {

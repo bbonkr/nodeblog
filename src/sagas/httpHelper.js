@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 export const http = axios.create({
-    baseURL: axios.defaults.baseURL || '/api',
+    baseURL: process.env.apiBaseUrl,
     timeout: 180000,
     withCredentials: true,
-    // headers: { crossDomain: true, 'Content-Type': 'application/json' },
 });
