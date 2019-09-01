@@ -8,7 +8,7 @@ import {
     actionChannel,
     throttle,
 } from 'redux-saga/effects';
-import axios from 'axios';
+import {http} from './httpHelper'
 import {
     LOAD_CATEGORIES_CALL,
     LOAD_CATEGORIES_DONE,
@@ -16,7 +16,7 @@ import {
 } from '../reducers/category';
 
 function loadCategoriesApi() {
-    return axios.get('/category');
+    return http.get('/category');
 }
 
 function* loadCategories(action) {

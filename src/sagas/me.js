@@ -8,7 +8,7 @@ import {
     actionChannel,
     throttle,
 } from 'redux-saga/effects';
-import axios from 'axios';
+import {http} from './httpHelper';
 import {
     LOAD_MY_POSTS_CALL,
     LOAD_MY_POSTS_DONE,
@@ -61,13 +61,10 @@ import {
 } from '../reducers/me';
 
 function loadMyPostsApi(pageToken = '', limit = 10, keyword = '') {
-    return axios.get(
+    return http.get(
         `/me/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
             keyword,
-        )}`,
-        {
-            withCredentials: true,
-        },
+        )}`
     );
 }
 
@@ -100,7 +97,7 @@ function* watchLoadMyPosts() {
 }
 
 function writePostApi(formData) {
-    return axios.post('/post', formData, { withCredentials: true });
+    return http.post('/post', formData);
 }
 
 function* writePost(action) {
@@ -125,11 +122,10 @@ function* watchWritePost() {
 
 function loadCategoriesApi(query) {
     const { pageToken, limit, keyword } = query;
-    return axios.get(
+    return http.get(
         `/me/categories?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
             keyword,
         )}`,
-        { withCredentials: true },
     );
 }
 
@@ -162,7 +158,7 @@ function* watchLoadCategories() {
 }
 
 function loadTagsApi() {
-    return axios.get('/tags', { withCredentials: true });
+    return http.get('/tags');
 }
 
 function* loadTags(action) {
@@ -186,7 +182,7 @@ function* watchLoadTags() {
 }
 
 function editPostApi(id, data) {
-    return axios.patch(`/post/${id}`, data, { withCredentials: true });
+    return http.patch(`/post/${id}`, data);
 }
 
 function* editPost(action) {
@@ -216,7 +212,7 @@ function* watchEditPost() {
  *
  */
 function deletePostApi(id) {
-    return axios.delete(`/post/${id}`, { withCredentials: true });
+    return http.delete(`/post/${id}`);
 }
 
 function* deletePost(action) {
@@ -241,7 +237,7 @@ function* watchDeletePost() {
 }
 
 function loadMyPostApi(id) {
-    return axios.get(`/me/post/${id}`, { withCredentials: true });
+    return http.get(`/me/post/${id}`);
 }
 
 function* loadMyPost(action) {
@@ -284,7 +280,7 @@ function* watchWriteNewPost() {
 }
 
 function uploadMyMediaFilesApi(data) {
-    return axios.post('/me/media', data, { withCredentials: true });
+    return http.post('/me/media', data);
 }
 
 function* uploadMyMediaFiles(action) {
@@ -311,12 +307,7 @@ function* watchUploadMyMediaFiles() {
 }
 
 function loadMediaFilesApi(pageToken, limit, keyword) {
-    return axios.get(
-        `/me/media/?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-        { withCredentials: true },
-    );
+    return http.get(`/me/media/?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword,)}`);
 }
 
 function* loadMediaFiles(action) {
@@ -348,7 +339,7 @@ function* watchLoadMediaFiles() {
 }
 
 function deleteMediaFileApi(id) {
-    return axios.delete(`/me/media/${id}`, { withCredentials: true });
+    return http.delete(`/me/media/${id}`);
 }
 
 function* deleteMediaFile(action) {
@@ -374,11 +365,9 @@ function* watchDeleteMediaFile() {
 
 function editCategoryApi(formData) {
     if (!!formData.id) {
-        return axios.patch(`/me/category/${formData.id}`, formData, {
-            withCredentials: true,
-        });
+        return http.patch(`/me/category/${formData.id}`, formData);
     } else {
-        return axios.post('/me/category', formData, { withCredentials: true });
+        return http.post('/me/category', formData);
     }
 }
 
@@ -404,7 +393,7 @@ function* wacthEditCategory() {
 }
 
 function deleteCategoryApi(id) {
-    return axios.delete(`/me/category/${id}`, { withCredentials: true });
+    return http.delete(`/me/category/${id}`);
 }
 
 function* deleteCategory(action) {
@@ -432,14 +421,7 @@ function* watchDeleteCategory() {
 function loadLikedPostsApi(query) {
     const { pageToken, limit, keyword } = query;
 
-    return axios.get(
-        `/me/liked?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-        {
-            withCredentials: true,
-        },
-    );
+    return http.get(`/me/liked?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadLikedPosts(action) {
@@ -465,7 +447,7 @@ function* watchLoadLikedPosts() {
 }
 
 function loadStatGeneralApi(query) {
-    return axios.get('/stat/general', { withCredentials: true });
+    return http.get('/stat/general');
 }
 
 function* loadStatGeneral(action) {
@@ -490,7 +472,7 @@ function* watchLoadStatGeneral() {
 }
 
 function loadStatReadApi(query) {
-    return axios.get('/stat/postread', { withCredentials: true });
+    return http.get('/stat/postread');
 }
 
 function* loadStatRead(action) {

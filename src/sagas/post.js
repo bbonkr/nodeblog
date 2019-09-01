@@ -8,7 +8,7 @@ import {
     actionChannel,
     throttle,
 } from 'redux-saga/effects';
-import axios from 'axios';
+import {http} from './httpHelper';
 import {
     LOAD_POSTS_CALL,
     LOAD_POSTS_DONE,
@@ -40,11 +40,7 @@ import {
 } from '../reducers/post';
 
 function loadPostsApi(pageToken = '', limit = 10, keyword = '') {
-    return axios.get(
-        `/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-    );
+    return http.get(`/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadPosts(action) {
@@ -78,9 +74,7 @@ function* watchLoadPosts() {
 }
 
 function loadSinglePostApi(user, slug) {
-    return axios.get(`/users/${user}/posts/${encodeURIComponent(slug)}`, {
-        withCredentials: true,
-    });
+    return http.get(`/users/${user}/posts/${encodeURIComponent(slug)}`});
 }
 
 function* loadSinglePost(action) {
@@ -112,11 +106,7 @@ function loadCategoryPostsApi(
     limit = 10,
     keyword = '',
 ) {
-    return axios.get(
-        `/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-    );
+    return http.get(`/posts/category/${category}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadCategoryPosts(action) {
@@ -148,13 +138,7 @@ function* watchLoadCategoryPosts() {
 }
 
 function loadTagPostsApi(tag, pageToken = '', limit = 10, keyword = '') {
-    return axios.get(
-        `/posts/tag/${encodeURIComponent(
-            tag,
-        )}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-    );
+    return http.get(`/posts/tag/${encodeURIComponent(tag)}?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadTagPosts(action) {
@@ -186,11 +170,7 @@ function* watchLoadTagPosts() {
 }
 
 function loadUsersPostsApi(user, pageToken = '', limit = 10, keyword = '') {
-    return axios.get(
-        `/users/${user}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-    );
+    return http.get(`/users/${user}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadUsersPosts(action) {
@@ -223,12 +203,7 @@ function* watchLoadUsersPosts() {
 
 function loadUserCategoryPostsApi(query) {
     const { user, category, pageToken, limit, keyword } = query;
-    return axios.get(
-        `/users/${user}/categories/${category}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${keyword}`,
-        {
-            withCredentials: true,
-        },
-    );
+    return http.get(`/users/${user}/categories/${category}/posts?pageToken=${pageToken}&limit=${limit}&keyword=${keyword}`);
 }
 
 function* loadUserCategoryPosts(action) {
@@ -253,11 +228,7 @@ function* watchLaodUserCatetoryPosts() {
 
 function loadSearchPostsApi(query) {
     const { pageToken, limit, keyword } = query;
-    return axios.get(
-        `/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(
-            keyword,
-        )}`,
-    );
+    return http.get(`/posts?pageToken=${pageToken}&limit=${limit}&keyword=${encodeURIComponent(keyword)}`);
 }
 
 function* loadSearchPosts(action) {
@@ -285,11 +256,7 @@ function* watchLoadSearchPosts() {
 
 function addUserLikePostApi(data) {
     const { user, post } = data;
-    return axios.post(
-        `/users/${user}/posts/${post}/like`,
-        {},
-        { withCredentials: true },
-    );
+    return http.post(`/users/${user}/posts/${post}/like`,{});
 }
 
 function* addUserLikePost(action) {
@@ -315,9 +282,7 @@ function* watchAddUserLikePost() {
 
 function removeUserLikePostApi(data) {
     const { user, post } = data;
-    return axios.delete(`/users/${user}/posts/${post}/like`, {
-        withCredentials: true,
-    });
+    return http.delete(`/users/${user}/posts/${post}/like`);
 }
 
 function* removeUserLikePost(action) {

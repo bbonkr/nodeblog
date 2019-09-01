@@ -8,7 +8,7 @@ import axios from 'axios';
 // axios.defaults.baseURL = API_BASE_URL;
 //'http://localhost:3000/api';
 
-axios.defaults.baseURL = axios.defaults.baseURL || '/api';
+// axios.defaults.baseURL = axios.defaults.baseURL || '/api';
 
 export default function* rootSaga() {
     yield all([call(user), call(post), call(category), call(me)]);
