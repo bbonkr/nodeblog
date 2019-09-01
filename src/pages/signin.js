@@ -27,7 +27,7 @@ const SignIn = ({ returnUrl }) => {
     const [emailError, setEmailError] = useState('');
     const [password, setPassword] = useState('');
     const [passwordError, setPasswordError] = useState('');
-    const [remember, setRemember] = useState(false);
+    const [remember, setRemember] = useState(true);
     const { me, signInFailMessage } = useSelector(s => s.user);
 
     useEffect(() => {
@@ -84,6 +84,10 @@ const SignIn = ({ returnUrl }) => {
     const isSubmitButtonDisabled = useCallback(() => {
         return !!(emailError || passwordError);
     }, [emailError, passwordError]);
+
+    const onClickSignUp = useCallback(()=>{
+        Router.push('/signup');
+    },[]);
 
     const onSubmit = useCallback(
         e => {
@@ -194,11 +198,11 @@ const SignIn = ({ returnUrl }) => {
                                 )}
                             </Form.Item>
                             <Form.Item>
-                                <Checkbox
+                                {/* <Checkbox
                                     checked={remember}
                                     onChange={onRememberChange}>
                                     Remember me
-                                </Checkbox>
+                                </Checkbox> */}
                                 <Link href="/requestresetpassword">
                                     <a style={{ float: 'right' }}>
                                         Reset my password
@@ -211,10 +215,14 @@ const SignIn = ({ returnUrl }) => {
                                     disabled={isSubmitButtonDisabled()}>
                                     Log in
                                 </Button>
-                                {'Or '}
-                                <Link href="/signup">
+                                <div style={{textAlign: 'center'}}>OR</div>
+                                
+                                {/* <Link href="/signup">
                                     <a>Register</a>
-                                </Link>
+                                </Link> */}
+                                <Button type="primary" style={{ width: '100%'}} onClick={onClickSignUp}>
+                                    Sign up
+                                </Button>
                             </Form.Item>
                         </Form>
                     </Col>

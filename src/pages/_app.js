@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import App, { Container } from 'next/app';
 import PropTypes from 'prop-types';
 import withRedux from 'next-redux-wrapper';
@@ -26,7 +26,7 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
     const fbAdmin = process.env.FB_ADMIN;
     const siteName = process.env.SITE_NAME || 'nodeblog';
     return (
-        <Container>
+        <Fragment>
             <Provider store={store}>
                 <Helmet
                     title="NodeBlog"
@@ -108,7 +108,7 @@ const NodeBlog = ({ Component, store, pageProps, returnUrl }) => {
                     <Component {...pageProps} returnUrl={returnUrl} />
                 </AppLayout>
             </Provider>
-        </Container>
+        </Fragment>
     );
 };
 
@@ -124,21 +124,25 @@ NodeBlog.getInitialProps = async context => {
 
     let url = '';
 
-    let apiBaseUrl = '';
-    if (ctx.isServer) {
-        const { req } = ctx;
-        apiBaseUrl = `${req.protocol}://${req.get('host')}/api`;
-        if (!baseUrl) {
-            ctx.store.dispatch({
-                type: SET_BASE_URL,
-                data: `${req.protocol}://${req.get('host')}`,
-            });
-        }
-    } else {
-        apiBaseUrl = '/api';
-    }
+    // let apiBaseUrl = '';
+    // if (ctx.isServer) {
+        
+    //     const { req } = ctx;
 
-    axios.defaults.baseURL = apiBaseUrl;
+    //     apiBaseUrl = `${ctx.req.protocol}://${ctx.req.get('host')}/api`;
+    //     if (!baseUrl) {
+    //         ctx.store.dispatch({
+    //             type: SET_BASE_URL,
+    //             data: `${ctx.req.protocol}://${req.get('host')}`,
+    //         });
+    //     }
+    // } else {
+    //     console.debug('===========> SSR Client');
+    //     apiBaseUrl = '/api';
+    // }
+
+    // console.debug('=========>SSR axios base url: ', apiBaseUrl);
+    // axios.defaults.baseURL = apiBaseUrl;
 
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {

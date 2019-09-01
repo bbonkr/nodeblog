@@ -24,6 +24,8 @@ Need to fill database information.
 > DB_USERNAME=nodeblog
 > DB_PASSWORD=nodeblog
 > SKIP_PREFLIGHT_CHECK=true
+> API_BASE_URL=http://your-domain.com/api
+> ANALYZE=true
 > ```
 
 ```sh

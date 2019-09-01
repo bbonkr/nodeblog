@@ -48,7 +48,7 @@ function* loadPosts(action) {
         const { pageToken, limit, keyword } = action.data;
         const result = yield call(
             loadPostsApi,
-            pageToken,
+            pageToken || '',
             limit || 10,
             keyword,
         );
@@ -74,7 +74,7 @@ function* watchLoadPosts() {
 }
 
 function loadSinglePostApi(user, slug) {
-    return http.get(`/users/${user}/posts/${encodeURIComponent(slug)}`});
+    return http.get(`/users/${user}/posts/${encodeURIComponent(slug)}`);
 }
 
 function* loadSinglePost(action) {

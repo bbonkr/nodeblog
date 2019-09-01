@@ -23,6 +23,7 @@ module.exports.findUserById = async id => {
         include: [
             {
                 model: db.Post,
+                attributes: ['id'],
             },
         ],
         attributes: defaultUserAttributes,
