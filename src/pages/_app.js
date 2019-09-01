@@ -124,21 +124,25 @@ NodeBlog.getInitialProps = async context => {
 
     let url = '';
 
-    let apiBaseUrl = '';
-    if (ctx.isServer) {
-        const { req } = ctx;
-        apiBaseUrl = `${req.protocol}://${req.get('host')}/api`;
-        if (!baseUrl) {
-            ctx.store.dispatch({
-                type: SET_BASE_URL,
-                data: `${req.protocol}://${req.get('host')}`,
-            });
-        }
-    } else {
-        apiBaseUrl = '/api';
-    }
+    // let apiBaseUrl = '';
+    // if (ctx.isServer) {
+        
+    //     const { req } = ctx;
 
-    axios.defaults.baseURL = apiBaseUrl;
+    //     apiBaseUrl = `${ctx.req.protocol}://${ctx.req.get('host')}/api`;
+    //     if (!baseUrl) {
+    //         ctx.store.dispatch({
+    //             type: SET_BASE_URL,
+    //             data: `${ctx.req.protocol}://${req.get('host')}`,
+    //         });
+    //     }
+    // } else {
+    //     console.debug('===========> SSR Client');
+    //     apiBaseUrl = '/api';
+    // }
+
+    // console.debug('=========>SSR axios base url: ', apiBaseUrl);
+    // axios.defaults.baseURL = apiBaseUrl;
 
     // HTTP 요청시 쿠키 추가
     if (ctx.isServer && cookie) {

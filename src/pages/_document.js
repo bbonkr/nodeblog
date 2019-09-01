@@ -33,9 +33,10 @@ class NodeBlogDocument extends Document {
                     {Object.values(helmet).map(el => el.toComponent())}
                     {this.props.styleTags}
                     {cssFiles.map(css => {
-                        console.log('=========> css file: ', css);
+                        // console.log('=========> css file: ', css);
                         return (
                             <link
+                                key={css}
                                 rel="stylesheet"
                                 href={`${prefixDir}${css}`}
                                 type="text/css"
