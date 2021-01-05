@@ -42,7 +42,7 @@
         "@zeit/next-typescript": "^1.1.1",
         "acorn": "^7.0.0",
         "antd": "^3.22.2",
-        "axios": "^0.19.0",
+        "axios": "^0.21.1",
         "babel-eslint": "^10.0.3",
         "bcrypt": "^3.0.6",
         "compression-webpack-plugin": "^3.0.0",
